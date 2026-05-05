@@ -56,17 +56,20 @@ function RailNode({ row }: { row: Row }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="relative mt-7"
+          className="relative mt-8"
         >
-          <span className="absolute inset-0 -m-1 rounded-full bg-indigo-500/30 blur-md" aria-hidden />
           <span
-            className="incoming-node-pulse relative block h-5 w-5 rounded-full border-2 border-indigo-300 bg-indigo-500 shadow-[0_0_22px_rgba(99,102,241,0.85)]"
+            aria-hidden
+            className="absolute left-1/2 top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/25 blur-md"
+          />
+          <span
+            className="incoming-node-pulse relative block h-2.5 w-2.5 rounded-full bg-indigo-400 shadow-[0_0_14px_rgba(99,102,241,0.95)]"
             aria-hidden
           />
         </motion.div>
       ) : (
         <span
-          className="relative mt-9 block h-3 w-3 rounded-full border border-white/30 bg-[#0d0f18]"
+          className="relative mt-9 block h-1.5 w-1.5 rounded-full bg-zinc-400/70"
           aria-hidden
         />
       )}
@@ -108,7 +111,7 @@ export default function Timeline() {
       <div className="relative hidden md:block">
         <div
           aria-hidden
-          className="absolute left-1/2 top-2 bottom-2 w-px -translate-x-1/2 bg-gradient-to-b from-indigo-400/40 via-violet-400/25 to-zinc-500/15"
+          className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-indigo-400/55 to-transparent"
         />
 
         <div className="space-y-10">

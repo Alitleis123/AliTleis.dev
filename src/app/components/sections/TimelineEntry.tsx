@@ -57,10 +57,10 @@ export default function TimelineEntry({ entry, side }: Props) {
       className={`relative w-full ${side === "right" ? "md:ml-auto" : ""}`}
     >
       <div
-        className={`relative rounded-2xl border bg-[#0d0f18]/90 p-5 shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition ${
+        className={`relative rounded-xl border bg-[#0d0f18]/75 p-4 backdrop-blur-sm transition ${
           isIncoming
-            ? "border-indigo-400/50 shadow-[0_0_50px_rgba(99,102,241,0.25)]"
-            : "border-white/10"
+            ? "border-indigo-400/45 shadow-[0_0_45px_rgba(99,102,241,0.22)]"
+            : "border-white/[0.07] shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
         }`}
       >
         {isIncoming ? (
@@ -134,7 +134,7 @@ export default function TimelineEntry({ entry, side }: Props) {
               transition={{ duration: 0.3, ease: "easeOut" }}
               className="relative overflow-hidden"
             >
-              <ul className="mt-4 space-y-2 pl-5 text-[13px] text-zinc-300">
+              <ul className="mt-4 space-y-2 pl-5 text-[13px] leading-relaxed text-zinc-300">
                 {entry.bullets.map((b) => (
                   <li key={b} className="list-disc">
                     {b}
@@ -143,16 +143,19 @@ export default function TimelineEntry({ entry, side }: Props) {
               </ul>
 
               {entry.tech?.length ? (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {entry.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-zinc-300/80"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
+                <>
+                  <div className="mt-4 h-px w-full bg-white/[0.06]" aria-hidden />
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {entry.tech.map((t) => (
+                      <span
+                        key={t}
+                        className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[10.5px] text-zinc-300/85"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </>
               ) : null}
 
               {entry.track === "project" && (entry.demo || entry.repo) ? (

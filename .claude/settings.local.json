@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Read(//c/Users/alitl/.claude/skills/**)",
+      "Read(//c/Users/alitl/.claude/**)",
+      "Bash(git clone *)",
+      "Read(//tmp/**)",
+      "Bash(cp *)"
+    ]
+  }
+}

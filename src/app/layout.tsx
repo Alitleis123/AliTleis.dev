@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import ResetAnimationsOnLoad from "./components/ResetAnimationsOnLoad";
 import "./globals.css";
 import BackgroundRings from "./components/BackgroundRings";
@@ -21,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} scroll-smooth`}>
       <head />
       <body className="relative min-h-screen bg-black text-white antialiased">
         <ResetAnimationsOnLoad>

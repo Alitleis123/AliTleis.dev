@@ -14,7 +14,7 @@ export default function Hero() {
       <div className="grid w-full grid-cols-1 items-center gap-16 md:grid-cols-2">
         <div className="flex flex-col">
           <motion.h1
-            className="mb-5 text-[5.5rem] font-light leading-[1.02] tracking-tight md:text-[6rem]"
+            className="mb-5 font-mono text-[5.5rem] font-light leading-[1.02] tracking-tight md:text-[6rem]"
             variants={heroContainer}
             initial="hidden"
             animate="visible"
@@ -35,14 +35,17 @@ export default function Hero() {
           >
             <a
               href="#timeline"
-              className="incoming-badge group inline-flex items-center gap-2 rounded-full border border-indigo-400/40 bg-indigo-500/10 px-4 py-2 text-[12px] font-medium tracking-wide text-indigo-100 transition hover:border-indigo-300/70 hover:bg-indigo-500/15"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-indigo-400/30 bg-indigo-500/[0.06] px-3.5 py-1.5 text-[11.5px] font-medium tracking-wide text-indigo-100/90 transition hover:border-indigo-300/60 hover:bg-indigo-500/10"
             >
-              <span aria-hidden className="text-sm leading-none">⚡</span>
+              <span
+                aria-hidden
+                className="incoming-dot block h-1.5 w-1.5 rounded-full bg-indigo-400"
+              />
               <span className="text-indigo-200">Incoming</span>
-              <span className="text-indigo-400/60">·</span>
+              <span className="text-indigo-400/40">·</span>
               <span>MIT Lincoln Laboratory</span>
-              <span className="text-indigo-400/60">·</span>
-              <span className="text-indigo-200/80">
+              <span className="text-indigo-400/40">·</span>
+              <span className="text-indigo-200/70">
                 Web Application Developer (AI Integration)
               </span>
             </a>
@@ -54,7 +57,7 @@ export default function Hero() {
             initial="hidden"
             animate="visible"
           >
-            CS student at Northeastern. I build things that feel good to use —
+            CS student at Northeastern. I build things that feel good to use:
             clean interfaces, solid architecture, and attention to detail.
           </motion.p>
 

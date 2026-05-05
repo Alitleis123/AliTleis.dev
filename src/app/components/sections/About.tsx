@@ -7,15 +7,15 @@ import { fadeUp } from "../../lib/animations";
 const pillars = [
   {
     label: "AI-Integrated Web Systems",
-    desc: "Web apps that wrap LLM and AI workflows behind clean interfaces.",
+    desc: "I like the puzzle of wrapping models behind interfaces that feel calm and trustworthy. The model does the heavy lifting; the UI decides whether anyone wants to use it.",
   },
   {
     label: "UI & Motion",
-    desc: "Clean interfaces with purposeful animation using React and Framer Motion.",
+    desc: "Interfaces should know when to be still and when to move. I lean on React and Framer Motion to keep transitions purposeful, never decorative.",
   },
   {
     label: "Creative Tooling",
-    desc: "Video editing pipelines, browser extensions, and automation scripts.",
+    desc: "Video pipelines, browser extensions, and small automations that take a tedious thing and quietly remove it from someone's day.",
   },
 ];
 
@@ -40,9 +40,9 @@ export default function About() {
     >
       <p className="mx-auto mb-12 max-w-2xl text-center text-base leading-7 text-zinc-300">
         CS student at Northeastern, incoming Web Application Developer at{" "}
-        <span className="text-indigo-300">MIT Lincoln Laboratory</span>. I build
-        things that feel good to use — clean interfaces, solid architecture,
-        and attention to detail.
+        <span className="text-indigo-300">MIT Lincoln Laboratory</span>. I care
+        about the small details: how a button settles after a click, how data
+        moves between screens, how a system stays calm under pressure.
       </p>
 
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -99,7 +99,7 @@ export default function About() {
 
       <p className="mt-8 text-center text-xs text-zinc-600">
         Outside of code: lifting, video editing in DaVinci, the occasional
-        competitive FPS.
+        competitive FPS run.
       </p>
     </motion.section>
   );
