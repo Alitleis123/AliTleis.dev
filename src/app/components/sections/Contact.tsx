@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import { HiOutlineLocationMarker } from "react-icons/hi";
 import { fadeUp } from "../../lib/animations";
 
 export default function Contact() {
@@ -14,22 +15,18 @@ export default function Contact() {
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
     >
-      {/* Decorative separator */}
-      <div className="mx-auto mb-16 flex w-full max-w-md items-center gap-4">
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-white/10" />
-        <span
-          className="block h-1.5 w-1.5 rounded-full"
-          style={{
-            background: "rgba(99,102,241,0.65)",
-            boxShadow: "0 0 14px rgba(99,102,241,0.55)",
-          }}
-          aria-hidden
-        />
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-white/10" />
+      <div className="mb-10 flex items-center justify-center gap-4">
+        <span className="font-mono text-[11px] tracking-[0.28em] text-[var(--text-dim)]">
+          06
+        </span>
+        <span className="block h-px w-10 bg-white/15" />
+        <span className="section-eyebrow">Contact</span>
       </div>
 
       <div className="text-center">
-        <h2 className="section-heading">Get in touch.</h2>
+        <h2 className="text-[2.25rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.75rem]">
+          Get in touch<span className="text-[var(--accent-electric)]">.</span>
+        </h2>
         <p className="mx-auto mt-5 max-w-xl text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
           I&apos;m always open to interesting conversations, collaborations, and
           opportunities. Reach out, I reply to everything.
@@ -66,7 +63,8 @@ export default function Contact() {
           </a>
         </div>
 
-        <p className="mt-8 text-[12px] tracking-tight text-[var(--text-dim)]">
+        <p className="mt-8 inline-flex items-center justify-center gap-1.5 text-[12px] tracking-tight text-[var(--text-dim)]">
+          <HiOutlineLocationMarker className="text-[13px]" />
           Boston, MA
         </p>
       </div>

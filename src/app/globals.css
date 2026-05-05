@@ -46,6 +46,20 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  cursor: default;
+}
+
+/* Suppress text I-beam everywhere — this site has no text inputs. */
+body, body * {
+  cursor: default;
+}
+
+a, button, [role="button"], summary, label[for], select {
+  cursor: pointer;
+}
+
+a:disabled, button:disabled, [aria-disabled="true"] {
+  cursor: not-allowed;
 }
 
 .ambient-gradient {

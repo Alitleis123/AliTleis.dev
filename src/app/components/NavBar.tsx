@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 const NAV_SECTIONS = [
   { id: "about",    label: "About" },
+  { id: "projects", label: "Projects" },
   { id: "timeline", label: "Timeline" },
   { id: "stack",    label: "Stack" },
   { id: "resume",   label: "Resume" },

@@ -1,7 +1,7 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useState, type ComponentType } from "react";
+import { motion } from "framer-motion";
+import { type ComponentType } from "react";
 import { FaJava } from "react-icons/fa";
 import {
   SiReact,
@@ -35,184 +35,166 @@ import {
 import { LuBrainCircuit, LuSparkles } from "react-icons/lu";
 import { TbApi } from "react-icons/tb";
 import { VscTerminalPowershell } from "react-icons/vsc";
-import { FaChevronDown } from "react-icons/fa6";
-import { fadeUp } from "../../lib/animations";
+import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { coreStack, stackGroups, type StackItem } from "../../data";
 
-type IconCmp = ComponentType<{ className?: string }>;
+type IconCmp = ComponentType<{ className?: string; style?: React.CSSProperties }>;
 
 const ICON_MAP: Record<string, IconCmp> = {
-  SiReact,
-  SiTypescript,
-  SiJavascript,
-  SiPython,
-  SiCplusplus,
-  SiSharp,
-  SiLua,
-  SiKotlin,
-  SiNextdotjs,
-  SiNodedotjs,
-  SiTailwindcss,
-  SiFramer,
-  SiMui,
-  SiVite,
-  SiReactrouter,
-  SiGit,
-  SiGithub,
-  SiDocker,
-  SiLinux,
-  SiOpencv,
-  SiFfmpeg,
-  SiMongodb,
-  SiPostgresql,
-  SiMysql,
-  SiOpenai,
-  SiAnthropic,
-  SiJsonwebtokens,
-  FaJava,
-  LuBrainCircuit,
-  LuSparkles,
-  TbApi,
-  VscTerminalPowershell,
+  SiReact, SiTypescript, SiJavascript, SiPython, SiCplusplus, SiSharp, SiLua,
+  SiKotlin, SiNextdotjs, SiNodedotjs, SiTailwindcss, SiFramer, SiMui, SiVite,
+  SiReactrouter, SiGit, SiGithub, SiDocker, SiLinux, SiOpencv, SiFfmpeg,
+  SiMongodb, SiPostgresql, SiMysql, SiOpenai, SiAnthropic, SiJsonwebtokens,
+  FaJava, LuBrainCircuit, LuSparkles, TbApi, VscTerminalPowershell,
 };
 
-// Per-category accent for the left-border treatment on category headings.
-const CATEGORY_ACCENT: Record<string, string> = {
-  Languages: "border-purple-400/80",
-  "Frameworks & Frontend": "border-sky-400/80",
-  "Backend & Tools": "border-teal-400/80",
-  Databases: "border-emerald-400/80",
-  "AI & ML": "border-[#6366f1]",
+// Brand colors — applied to icons for personality.
+const ICON_COLOR: Record<string, string> = {
+  React: "#61DAFB",
+  TypeScript: "#3178C6",
+  JavaScript: "#F7DF1E",
+  Python: "#FFD43B",
+  "Next.js": "#FFFFFF",
+  "Node.js": "#5FA04E",
+  "Tailwind CSS": "#06B6D4",
+  Git: "#F05032",
+  MongoDB: "#47A248",
+  Java: "#EA2D2E",
+  "C++": "#00599C",
+  "C#": "#9B4F96",
+  Lua: "#74C7EC",
+  Kotlin: "#7F52FF",
+  "Framer Motion": "#FFFFFF",
+  MUI: "#007FFF",
+  Vite: "#646CFF",
+  "React Router": "#CA4245",
+  "Node.js / Express": "#5FA04E",
+  "REST APIs": "#F472B6",
+  "JWT Auth": "#FB7185",
+  "Git / GitHub": "#FFFFFF",
+  Docker: "#2496ED",
+  Linux: "#FCC624",
+  OpenCV: "#5C3EE8",
+  FFmpeg: "#65C77D",
+  PowerShell: "#5391FE",
+  PostgreSQL: "#4169E1",
+  MySQL: "#4479A1",
+  "OpenAI API": "#FFFFFF",
+  Anthropic: "#D97757",
+  "LLM Integration": "#A78BFA",
+  "Prompt Engineering": "#FACC15",
 };
 
-function StackChip({ item, prominent = false }: { item: StackItem; prominent?: boolean }) {
+function Chip({ item }: { item: StackItem }) {
   const Icon = item.iconKey ? ICON_MAP[item.iconKey] : null;
+  const color = ICON_COLOR[item.name] ?? "#E5E7EB";
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-white/[0.025] text-white/85 transition-[border-color,background-color,box-shadow,color] duration-200 hover:border-[var(--border-soft)] hover:bg-white/[0.06] hover:text-white hover:shadow-[0_0_18px_rgba(255,255,255,0.05)] ${
-        prominent
-          ? "px-4 py-2 text-[13.5px] tracking-tight"
-          : "px-2.5 py-1 text-[11px] tracking-tight"
-      }`}
-    >
-      {Icon ? (
-        <Icon
-          className={`${
-            prominent ? "text-[16px]" : "text-[12.5px]"
-          } text-zinc-200`}
-        />
-      ) : null}
-      <span>{item.name}</span>
+    <span className="inline-flex items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-white/[0.025] px-3 py-1.5 text-[12px] tracking-tight text-white/85 transition-[border-color,background-color,color] duration-200 hover:border-[var(--border-soft)] hover:bg-white/[0.05] hover:text-white">
+      {Icon ? <Icon className="text-[13px]" style={{ color }} /> : null}
+      {item.name}
     </span>
   );
 }
 
-export default function Stack() {
-  const [expanded, setExpanded] = useState(false);
+function CoreTile({ item }: { item: StackItem }) {
+  const Icon = item.iconKey ? ICON_MAP[item.iconKey] : null;
+  const color = ICON_COLOR[item.name] ?? "#E5E7EB";
+  return (
+    <div
+      className="group relative flex flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] py-6 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(60% 60% at 50% 0%, ${color}1f, transparent 70%)`,
+        }}
+      />
+      {Icon ? (
+        <Icon className="relative text-[28px] transition-transform duration-300 group-hover:scale-110" style={{ color }} />
+      ) : null}
+      <span className="relative text-[12px] tracking-tight text-white/85">{item.name}</span>
+    </div>
+  );
+}
 
+export default function Stack() {
   return (
     <motion.section
       id="stack"
-      className="relative z-10 mx-auto max-w-5xl px-6 pb-24 pt-10"
+      className="relative z-10 mx-auto max-w-6xl px-6 pt-8 pb-24"
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true }}
+      viewport={{ once: true, amount: 0.05 }}
     >
-      <div className="mb-12 max-w-2xl">
-        <h2 className="section-heading">Stack</h2>
-        <p className="mt-4 text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
-          The tools I reach for first, and the wider system I&apos;m fluent in. This is what I actually build with.
-        </p>
+      <div className="mb-12 flex items-center gap-4">
+        <span className="font-mono text-[11px] tracking-[0.28em] text-[var(--text-dim)]">
+          04
+        </span>
+        <span className="block h-px w-10 bg-white/15" />
+        <span className="section-eyebrow">Stack</span>
       </div>
 
-      {/* Core Stack — pinned, featured */}
-      <div
-        className="relative overflow-hidden rounded-2xl border border-[var(--border-soft)] p-9"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(99,102,241,0.07) 0%, rgba(56,189,248,0.04) 50%, rgba(15,17,24,0.6) 100%)",
-        }}
+      <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+        <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
+          The tools I reach for first.
+        </h2>
+        <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
+          CORE · {coreStack.length.toString().padStart(2, "0")} TOOLS
+        </span>
+      </div>
+
+      {/* Core grid — featured, visual */}
+      <motion.div
+        variants={staggerParent}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8"
       >
-        <div className="flex items-center gap-3">
-          <span
-            className="block h-4 w-[2px] rounded-full"
-            style={{ background: "var(--accent-electric)" }}
-            aria-hidden
-          />
-          <div className="text-[11px] font-medium uppercase tracking-[0.32em] text-white/70">
-            Core Stack
-          </div>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-2.5">
-          {coreStack.map((item) => (
-            <StackChip key={item.name} item={item} prominent />
+        {coreStack.map((item) => (
+          <motion.div key={item.name} variants={staggerChild}>
+            <CoreTile item={item} />
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Categorical breakdown — labeled rows */}
+      <div className="mt-12 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-7 md:p-9">
+        <div className="grid gap-x-10 gap-y-7 md:grid-cols-[180px_1fr]">
+          {stackGroups.map((group, i) => (
+            <RowEntry key={group.title} group={group} divider={i > 0} />
           ))}
         </div>
       </div>
-
-      {/* More toggle */}
-      <div className="mt-7 flex justify-center">
-        <button
-          type="button"
-          onClick={() => setExpanded((e) => !e)}
-          className="group inline-flex items-center gap-2.5 rounded-full border border-[var(--border-soft)] bg-white/[0.03] px-5 py-2.5 text-[12px] font-medium uppercase tracking-[0.24em] text-white/80 transition-[border-color,background-color,color] duration-200 hover:border-white/25 hover:bg-white/[0.06] hover:text-white"
-          aria-expanded={expanded}
-          aria-controls="stack-more"
-        >
-          <span>{expanded ? "Hide" : "More"}</span>
-          <motion.span
-            aria-hidden
-            animate={{ rotate: expanded ? 180 : 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center"
-          >
-            <FaChevronDown className="text-[10px]" />
-          </motion.span>
-        </button>
-      </div>
-
-      <AnimatePresence initial={false}>
-        {expanded ? (
-          <motion.div
-            id="stack-more"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="overflow-hidden"
-          >
-            <div className="mt-7 grid gap-5 sm:grid-cols-2">
-              {stackGroups.map((group) => {
-                const accent = CATEGORY_ACCENT[group.title] ?? "border-white/40";
-                const isAi = group.title === "AI & ML";
-                return (
-                  <div
-                    key={group.title}
-                    className="rounded-xl border border-[var(--border-soft)] p-6 transition-[border-color,background-color] duration-200 hover:border-white/15"
-                    style={{
-                      background: isAi
-                        ? "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(99,102,241,0.015) 60%, rgba(15,17,24,0.4))"
-                        : "var(--surface-1)",
-                    }}
-                  >
-                    <div className={`flex items-center gap-3 border-l-2 pl-3.5 ${accent}`}>
-                      <h3 className="text-[10.5px] font-medium uppercase tracking-[0.3em] text-zinc-100">
-                        {group.title}
-                      </h3>
-                    </div>
-                    <div className="mt-5 flex flex-wrap gap-1.5">
-                      {group.items.map((item) => (
-                        <StackChip key={item.name} item={item} />
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </motion.section>
+  );
+}
+
+function RowEntry({
+  group,
+  divider,
+}: {
+  group: { title: string; items: StackItem[] };
+  divider: boolean;
+}) {
+  return (
+    <>
+      <div
+        className={`flex items-start ${divider ? "md:border-t md:border-[var(--border-hairline)] md:pt-7" : ""}`}
+      >
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+          {group.title}
+        </span>
+      </div>
+      <div
+        className={`flex flex-wrap gap-1.5 ${divider ? "md:border-t md:border-[var(--border-hairline)] md:pt-7" : ""}`}
+      >
+        {group.items.map((item) => (
+          <Chip key={item.name} item={item} />
+        ))}
+      </div>
+    </>
   );
 }
