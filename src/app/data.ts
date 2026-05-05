@@ -30,11 +30,11 @@ export type TimelineEntry = {
 export const timeline: TimelineEntry[] = [
   {
     id: "mit-ll-2026",
-    sortKey: "2026-06",
+    sortKey: "2026-07",
     track: "experience",
     title: "MIT Lincoln Laboratory",
     subtitle: "Web Application Developer (AI Integration)",
-    range: "Jun – Dec 2026",
+    range: "Jul – Dec 2026",
     meta: "Lexington, MA",
     desc: "Incoming co-op building AI-integrated internal web applications at MIT Lincoln Laboratory.",
     bullets: [
