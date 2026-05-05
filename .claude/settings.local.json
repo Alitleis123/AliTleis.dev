@@ -6,7 +6,9 @@
       "Read(//c/Users/alitl/.claude/**)",
       "Bash(git clone *)",
       "Read(//tmp/**)",
-      "Bash(cp *)"
+      "Bash(cp *)",
+      "Bash(Get-ChildItem -Force)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

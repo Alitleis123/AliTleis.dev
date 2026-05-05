@@ -1,103 +1,95 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaGithub, FaDownload } from "react-icons/fa";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { heroContainer, heroItem } from "../../lib/animations";
 import { withBasePath } from "../../data";
+
 
 export default function Hero() {
   return (
     <section
       id="about"
-      className="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-12"
+      className="relative z-10 mx-auto max-w-6xl px-6 pt-20 pb-28 md:pt-28 md:pb-36"
     >
-      <div className="grid w-full grid-cols-1 items-center gap-16 md:grid-cols-2">
+      <motion.div
+        variants={heroContainer}
+        initial="hidden"
+        animate="visible"
+        className="grid w-full grid-cols-1 items-center gap-16 md:grid-cols-[1.15fr_0.85fr]"
+      >
         <div className="flex flex-col">
           <motion.h1
-            className="mb-5 font-mono text-[5.5rem] font-light leading-[1.02] tracking-tight md:text-[6rem]"
-            variants={heroContainer}
-            initial="hidden"
-            animate="visible"
+            variants={heroItem}
+            className="font-mono text-[4.5rem] font-light leading-[0.98] tracking-[-0.04em] text-white md:text-[6.25rem]"
           >
-            <motion.span variants={heroItem} className="block">
-              Ali
-            </motion.span>
-            <motion.span variants={heroItem} className="block">
-              Tleis
-            </motion.span>
+            Ali Tleis
           </motion.h1>
 
-          <motion.div
-            className="mb-6"
-            variants={heroItem}
-            initial="hidden"
-            animate="visible"
-          >
-            <a
-              href="#timeline"
-              className="group inline-flex items-center gap-2.5 rounded-full border border-indigo-400/30 bg-indigo-500/[0.06] px-3.5 py-1.5 text-[11.5px] font-medium tracking-wide text-indigo-100/90 transition hover:border-indigo-300/60 hover:bg-indigo-500/10"
-            >
+          <motion.div variants={heroItem} className="mt-7">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-white/[0.07] bg-white/[0.02] px-3 py-1.5 text-[11.5px] font-medium tracking-tight text-white/80">
               <span
                 aria-hidden
-                className="incoming-dot block h-1.5 w-1.5 rounded-full bg-indigo-400"
+                className="incoming-dot block h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--accent-electric)" }}
               />
-              <span className="text-indigo-200">Incoming</span>
-              <span className="text-indigo-400/40">·</span>
+              <span>Incoming</span>
+              <span className="text-[var(--text-faint)]">·</span>
               <span>MIT Lincoln Laboratory</span>
-              <span className="text-indigo-400/40">·</span>
-              <span className="text-indigo-200/70">
+              <span className="text-[var(--text-faint)]">·</span>
+              <span className="text-white/65">
                 Web Application Developer (AI Integration)
               </span>
-            </a>
+            </span>
           </motion.div>
 
           <motion.p
-            className="max-w-xl text-lg leading-8 text-zinc-400"
             variants={heroItem}
-            initial="hidden"
-            animate="visible"
+            className="mt-7 max-w-xl text-[15.5px] leading-[1.7] text-[var(--text-muted)]"
           >
-            CS student at Northeastern. I build things that feel good to use:
+            CS student at Northeastern. I build things that feel good to use —
             clean interfaces, solid architecture, and attention to detail.
           </motion.p>
 
           <motion.div
-            className="mt-8 flex flex-wrap items-center gap-3 pointer-events-auto"
             variants={heroItem}
-            initial="hidden"
-            animate="visible"
+            className="mt-10 flex flex-wrap items-center gap-3"
           >
             <a
-              href={withBasePath("/resume/resume.pdf")}
-              download
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-500 px-6 py-3 text-sm font-medium text-white shadow-[0_0_30px_rgba(99,102,241,0.35)] transition hover:bg-indigo-400"
+              href="https://www.linkedin.com/in/ali-tleis-091800247/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13px] font-medium text-black transition-colors duration-200 hover:bg-white/90"
             >
-              <FaDownload className="text-sm" />
-              Download Resume
+              <FaLinkedin className="text-[14px]" />
+              LinkedIn
             </a>
             <a
               href="https://github.com/Alitleis123"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-6 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--border-soft)] px-5 py-2.5 text-[13px] font-medium text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
             >
-              <FaGithub className="text-base" />
+              <FaGithub className="text-[14px]" />
               GitHub
             </a>
           </motion.div>
         </div>
 
-        <div className="flex justify-center md:justify-end">
-          <div className="relative aspect-[3/4] w-full max-w-sm overflow-hidden rounded-2xl border border-indigo-500/25 shadow-[0_0_60px_rgba(99,102,241,0.15),0_0_120px_rgba(56,189,248,0.07)]">
+        <motion.div
+          variants={heroItem}
+          className="flex justify-center md:justify-end"
+        >
+          <div className="relative aspect-[3/4] w-full max-w-sm overflow-hidden rounded-2xl border border-[var(--border-soft)]">
             <img
               src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.jpg")}
               alt="Ali Tleis portrait"
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

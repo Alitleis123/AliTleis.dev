@@ -2,12 +2,22 @@
 
 :root {
   /* Core palette */
-  --background: #0d0f16;
+  --background: #0a0c12;
   --foreground: #e5e7eb;
 
-  /* Accent colors (muted, editorial) */
-  --accent-indigo: #4f46e5;
+  /* Accent — used ONLY for MIT LL node, hero badge dot, Incoming pill */
+  --accent-electric: #6366f1;
+
+  /* Editorial neutrals (used for headings, copy, dividers, borders) */
   --accent-slate: #64748b;
+  --border-hairline: rgba(255, 255, 255, 0.06);
+  --border-soft: rgba(255, 255, 255, 0.10);
+  --surface-1: rgba(255, 255, 255, 0.018);
+  --surface-2: rgba(255, 255, 255, 0.035);
+  --text-strong: #f1f5f9;
+  --text-muted: rgba(203, 213, 225, 0.72);
+  --text-dim: rgba(148, 163, 184, 0.55);
+  --text-faint: rgba(148, 163, 184, 0.32);
 }
 
 @theme inline {
@@ -99,19 +109,17 @@ body {
 .section-divider::before {
   content: "";
   position: absolute;
-  left: 10%;
-  right: 10%;
+  left: 20%;
+  right: 20%;
   top: 50%;
-  height: 2px;
+  height: 1px;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(99, 102, 241, 0.45),
-    rgba(56, 189, 248, 0.35),
+    rgba(255, 255, 255, 0.10),
     transparent
   );
   transform: translateY(-50%);
-  animation: divider-glow 6s ease-in-out infinite;
 }
 
 .section-divider::after {
@@ -131,8 +139,8 @@ body {
 
 /* Layout helpers */
 .section {
-  padding-top: 3.5rem;
-  padding-bottom: 4.5rem;
+  padding-top: 5rem;
+  padding-bottom: 6rem;
 }
 
 .container {
@@ -145,9 +153,69 @@ body {
 
 @media (min-width: 768px) {
   .section {
-    padding-top: 4.5rem;
-    padding-bottom: 6rem;
+    padding-top: 7rem;
+    padding-bottom: 8rem;
   }
+}
+
+/* Editorial card surface — used by About, Stack, Timeline, Resume cards */
+.editorial-card {
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-1);
+  border-radius: 0.875rem;
+  transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.3s ease;
+}
+
+.editorial-card:hover {
+  border-color: var(--border-soft);
+  background: var(--surface-2);
+}
+
+/* Hairline divider used inside cards */
+.hairline {
+  height: 1px;
+  width: 100%;
+  background: var(--border-hairline);
+}
+
+/* Section eyebrow (small uppercase wide-tracked label) */
+.section-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.section-heading {
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+  line-height: 1.1;
+}
+
+/* Muted node glow for non-MIT timeline nodes */
+.timeline-node-glow {
+  box-shadow: 0 0 14px rgba(148, 163, 184, 0.30);
+}
+
+/* Soft pill (used everywhere by default) */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-1);
+  border-radius: 9999px;
+  color: rgba(226, 232, 240, 0.85);
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.pill:hover {
+  border-color: var(--border-soft);
+  background: var(--surface-2);
+  color: #fff;
 }
 
 /* =========================

@@ -14,15 +14,14 @@ const particles = [
 export default function BackgroundRings() {
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-      <div className="ambient-pulse absolute inset-0 opacity-70">
+      <div className="ambient-pulse absolute inset-0 opacity-40">
         <div className="ambient-gradient" />
       </div>
 
-      <div className="edge-lights" />
       <div className="noise-overlay" />
 
-      <div className="orb-left absolute -left-40 top-32 h-[520px] w-[520px] rounded-full bg-sky-500/10 blur-[80px]" />
-      <div className="orb-right absolute right-[-180px] top-1/3 h-[560px] w-[560px] rounded-full bg-indigo-500/10 blur-[100px]" />
+      <div className="orb-left absolute -left-40 top-32 h-[520px] w-[520px] rounded-full bg-sky-500/[0.04] blur-[100px]" />
+      <div className="orb-right absolute right-[-180px] top-1/3 h-[560px] w-[560px] rounded-full bg-indigo-500/[0.05] blur-[120px]" />
 
       {particles.map((particle, index) => (
         <span
@@ -40,7 +39,7 @@ export default function BackgroundRings() {
       ))}
 
       <svg
-        className="absolute left-1/2 top-1/2 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 opacity-40"
+        className="absolute left-1/2 top-1/2 h-[1200px] w-[1200px] -translate-x-1/2 -translate-y-1/2 opacity-25"
         viewBox="0 0 1000 1000"
         fill="none"
       >

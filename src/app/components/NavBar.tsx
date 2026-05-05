@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaDownload } from "react-icons/fa";
 
 const NAV_SECTIONS = [
   { id: "about",    label: "About" },
@@ -16,6 +15,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export default function NavBar() {
   const [active, setActive] = useState("about");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -35,71 +35,93 @@ export default function NavBar() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <>
-      <nav className="hidden items-center gap-6 text-sm text-white/60 md:flex">
-        {NAV_SECTIONS.map(({ id, label }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className={`relative transition-colors duration-200 ${
-              active === id ? "nav-link-active text-white" : "hover:text-white/90"
-            }`}
-          >
-            {label}
-          </a>
-        ))}
-
-        <span className="mx-1 h-4 w-px bg-white/10" />
-
+    <header
+      className={`fixed top-0 left-0 right-0 z-30 transition-[background-color,border-color,backdrop-filter] duration-300 ${
+        scrolled
+          ? "border-b border-[var(--border-hairline)] bg-[rgba(10,12,18,0.78)] backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a
-          href={`${basePath}/resume/resume.pdf`}
-          download
-          className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500 px-4 py-1.5 text-xs font-medium text-white shadow-[0_0_20px_rgba(99,102,241,0.4)] transition hover:bg-indigo-400"
+          href="#about"
+          className="text-[15px] font-medium tracking-tight text-white/90 transition-colors duration-200 hover:text-white"
         >
-          <FaDownload className="text-[11px]" />
-          Download Resume
+          Ali Tleis
         </a>
-      </nav>
 
-      <button
-        type="button"
-        className="flex flex-col justify-center gap-[5px] p-2 md:hidden"
-        onClick={() => setMenuOpen((o) => !o)}
-        aria-label="Toggle navigation menu"
-      >
-        <span className={`block h-[2px] w-5 origin-center bg-white/80 transition-all duration-200 ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
-        <span className={`block h-[2px] w-5 bg-white/80 transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
-        <span className={`block h-[2px] w-5 origin-center bg-white/80 transition-all duration-200 ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
-      </button>
-
-      {menuOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 flex flex-col gap-1 rounded-2xl border border-white/10 bg-black/95 p-4 text-sm md:hidden">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 text-[13px] md:flex">
           {NAV_SECTIONS.map(({ id, label }) => (
             <a
               key={id}
               href={`#${id}`}
-              onClick={() => setMenuOpen(false)}
-              className={`rounded-xl px-4 py-2.5 transition ${
+              className={`transition-colors duration-200 ${
                 active === id
-                  ? "bg-white/10 font-medium text-white"
-                  : "text-white/70 hover:bg-white/5 hover:text-white"
+                  ? "text-white"
+                  : "text-white/55 hover:text-white/90"
               }`}
             >
               {label}
             </a>
           ))}
-          <a
-            href={`${basePath}/resume/resume.pdf`}
-            download
-            onClick={() => setMenuOpen(false)}
-            className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5 text-center text-sm font-medium text-white transition hover:bg-indigo-400"
-          >
-            <FaDownload className="text-xs" />
-            Download Resume
-          </a>
+        </nav>
+
+        <a
+          href={`${basePath}/resume/resume.pdf`}
+          download
+          className="hidden rounded-full border border-[var(--border-soft)] bg-transparent px-4 py-1.5 text-[12.5px] font-medium tracking-tight text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white md:inline-flex"
+        >
+          Download Resume
+        </a>
+
+        <button
+          type="button"
+          className="flex flex-col justify-center gap-[5px] p-2 md:hidden"
+          onClick={() => setMenuOpen((o) => !o)}
+          aria-label="Toggle navigation menu"
+        >
+          <span className={`block h-[1.5px] w-5 origin-center bg-white/80 transition-all duration-200 ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
+          <span className={`block h-[1.5px] w-5 bg-white/80 transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+          <span className={`block h-[1.5px] w-5 origin-center bg-white/80 transition-all duration-200 ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
+        </button>
+      </div>
+
+      {menuOpen ? (
+        <div className="md:hidden">
+          <div className="mx-4 mb-4 flex flex-col gap-1 rounded-2xl border border-[var(--border-soft)] bg-[rgba(10,12,18,0.95)] p-3 text-sm backdrop-blur-xl">
+            {NAV_SECTIONS.map(({ id, label }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                onClick={() => setMenuOpen(false)}
+                className={`rounded-xl px-4 py-2.5 transition-colors duration-200 ${
+                  active === id
+                    ? "bg-white/[0.06] text-white"
+                    : "text-white/70 hover:bg-white/[0.04] hover:text-white"
+                }`}
+              >
+                {label}
+              </a>
+            ))}
+            <a
+              href={`${basePath}/resume/resume.pdf`}
+              download
+              onClick={() => setMenuOpen(false)}
+              className="mt-2 inline-flex items-center justify-center rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-center text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
+            >
+              Download Resume
+            </a>
+          </div>
         </div>
-      )}
-    </>
+      ) : null}
+    </header>
   );
 }
