@@ -49,10 +49,10 @@ export default function Intro() {
             variants={heroItem}
             className="mt-8 max-w-[36rem] text-[16px] leading-[1.7] text-[var(--text-muted)]"
           >
-            CS student at Northeastern. I build production software end-to-end —
-            full-stack web platforms, automation pipelines, and tooling that
-            real people actually use. Pragmatic by default, polished where it
-            matters.
+            CS student at Northeastern. I build production software
+            end-to-end. Full-stack web platforms, automation pipelines, and
+            tooling that real people actually use. Pragmatic by default,
+            polished where it matters.
           </motion.p>
 
           <motion.div
@@ -119,13 +119,13 @@ export default function Intro() {
             Currently studying Computer Science at Northeastern, joining MIT
             Lincoln Laboratory in June 2026 for a six-month co-op on the AI
             integration team. The work I gravitate toward is the kind that
-            ships — full systems with database schemas underneath them, Python
-            and Lua pipelines doing the unglamorous middle, and a clean front
-            end on top.
+            ships, full systems with database schemas underneath them, Python
+            and Lua pipelines handling the parts no one wants to do by hand,
+            and a clean front end on top.
           </p>
           <p className="mt-5 text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
             I care about software that respects the person on the other side of
-            it — fast, considered, and quietly opinionated.
+            it. Fast, considered, and quietly opinionated.
           </p>
         </motion.div>
 

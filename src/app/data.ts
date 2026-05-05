@@ -38,11 +38,10 @@ export const timeline: TimelineEntry[] = [
     meta: "Lexington, MA",
     desc: "Incoming co-op building AI-integrated internal web applications at MIT Lincoln Laboratory.",
     bullets: [
-      "Incoming on a competitive co-op placement from Northeastern University into one of the most prestigious federally funded research institutions in the country. MIT Lincoln Laboratory is a Department of Defense research and development center operated by MIT.",
-      "Selected from a competitive applicant pool specifically for the Web Application Developer role with an AI integration focus, not a general software placement.",
-      "Role centers on designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers operating across classified and unclassified research divisions.",
-      "Will work across the full stack with a primary focus on integrating LLM and AI workflows into production-grade internal web tooling, bridging the gap between research-grade AI capabilities and usable software interfaces.",
-      "Commuting to Lexington, MA from Boston for the full six-month co-op starting June 2026.",
+      "Designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers across classified and unclassified divisions of MIT Lincoln Laboratory.",
+      "Working full-stack with a primary focus on integrating LLM and AI workflows into production-grade internal tooling, turning research-grade capabilities into software the lab can actually use day to day.",
+      "Operating inside a federally funded R&D center on a competitive Northeastern co-op placement, selected for the Web Application Developer (AI Integration) role specifically.",
+      "Owning features end to end: schema and API decisions, integration with existing internal systems, and the interface on top.",
     ],
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.jpg"),
     iconAlt: "MIT Lincoln Laboratory logo",
@@ -96,7 +95,7 @@ export const timeline: TimelineEntry[] = [
     desc: "B.S. Computer Science via Northeastern's co-op program — coursework alternated with full-time engineering placements.",
     bullets: [
       "Northeastern's signature co-op program integrates six-month full-time engineering placements directly into the degree, allowing immediate progression between coursework and production work.",
-      "Selected through Northeastern's competitive co-op pipeline into the MIT Lincoln Laboratory web application developer role for 2026.",
+      "Working through core CS fundamentals (algorithms, systems, software design, OOD) while building independent projects and shipping internships in parallel to sharpen engineering skills outside the classroom.",
     ],
     education: {
       stats: [
@@ -289,7 +288,7 @@ export const aboutPillars = [
   },
   {
     label: "Shipping to Users",
-    desc: "Software with real people on the other side — public releases, daily operators, classified workflows.",
+    desc: "Software with real people on the other side. Public releases, daily operators, classified workflows.",
   },
 ];
 
