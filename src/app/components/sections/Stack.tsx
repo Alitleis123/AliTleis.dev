@@ -28,13 +28,16 @@ import {
   SiMongodb,
   SiPostgresql,
   SiMysql,
-  SiOpenai,
-  SiAnthropic,
   SiJsonwebtokens,
+  SiJest,
+  SiJunit5,
+  SiHeroku,
+  SiArduino,
+  SiGooglegemini,
 } from "react-icons/si";
-import { LuBrainCircuit, LuSparkles } from "react-icons/lu";
+import { LuBrainCircuit } from "react-icons/lu";
 import { TbApi } from "react-icons/tb";
-import { VscTerminalPowershell } from "react-icons/vsc";
+import { VscTerminalPowershell, VscAzureDevops } from "react-icons/vsc";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { coreStack, stackGroups, type StackItem } from "../../data";
 
@@ -44,8 +47,9 @@ const ICON_MAP: Record<string, IconCmp> = {
   SiReact, SiTypescript, SiJavascript, SiPython, SiCplusplus, SiSharp, SiLua,
   SiKotlin, SiNextdotjs, SiNodedotjs, SiTailwindcss, SiFramer, SiMui, SiVite,
   SiReactrouter, SiGit, SiGithub, SiDocker, SiLinux, SiOpencv, SiFfmpeg,
-  SiMongodb, SiPostgresql, SiMysql, SiOpenai, SiAnthropic, SiJsonwebtokens,
-  FaJava, LuBrainCircuit, LuSparkles, TbApi, VscTerminalPowershell,
+  SiMongodb, SiPostgresql, SiMysql, SiJsonwebtokens, SiJest, SiJunit5,
+  SiHeroku, SiArduino, SiGooglegemini,
+  FaJava, LuBrainCircuit, TbApi, VscTerminalPowershell, VscAzureDevops,
 };
 
 // Brand colors — applied to icons for personality.
@@ -79,10 +83,13 @@ const ICON_COLOR: Record<string, string> = {
   PowerShell: "#5391FE",
   PostgreSQL: "#4169E1",
   MySQL: "#4479A1",
-  "OpenAI API": "#FFFFFF",
-  Anthropic: "#D97757",
+  "Azure DevOps": "#0078D7",
+  Jest: "#C21325",
+  JUnit: "#25A162",
+  Heroku: "#430098",
+  Arduino: "#00979D",
+  "Gemini API": "#8E75E2",
   "LLM Integration": "#A78BFA",
-  "Prompt Engineering": "#FACC15",
 };
 
 function Chip({ item }: { item: StackItem }) {

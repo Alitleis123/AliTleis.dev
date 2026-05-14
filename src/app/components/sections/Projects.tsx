@@ -14,12 +14,23 @@ import { TbCalculator } from "react-icons/tb";
 import { SiCplusplus } from "react-icons/si";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { featuredProjects, otherWork, type Project } from "../../data";
+import EternalReverseCover from "../projectCovers/EternalReverseCover";
+import Eternal2xCover from "../projectCovers/Eternal2xCover";
+import TopChoiceRealtyCover from "../projectCovers/TopChoiceRealtyCover";
+import EternalSummaryCover from "../projectCovers/EternalSummaryCover";
 
 type IconCmp = ComponentType<{ className?: string }>;
 
 const OTHER_ICON: Record<string, IconCmp> = {
   calculator: TbCalculator,
   cplusplus: SiCplusplus,
+};
+
+const COVER_MAP: Record<string, ComponentType> = {
+  eternalReverse: EternalReverseCover,
+  eternal2x: Eternal2xCover,
+  topChoiceRealty: TopChoiceRealtyCover,
+  eternalSummary: EternalSummaryCover,
 };
 
 type LightboxState = {
@@ -147,6 +158,8 @@ function ProjectCard({
   const isComing = project.comingSoon;
   const hero = project.gallery?.[0];
   const galleryCount = project.gallery?.length ?? 0;
+  const Cover = project.coverKey ? COVER_MAP[project.coverKey] : null;
+  const hasClickableGallery = !!project.gallery?.length;
 
   return (
     <motion.div
@@ -162,8 +175,46 @@ function ProjectCard({
         }}
       />
 
-      {/* Showcase image — only when gallery exists */}
-      {hero ? (
+      {/* Cover area — custom SVG cover takes precedence over screenshot hero.
+          If a gallery exists, the cover is clickable to open the lightbox of real screenshots. */}
+      {Cover ? (
+        hasClickableGallery ? (
+          <button
+            type="button"
+            onClick={onOpenGallery}
+            className="group/hero relative block aspect-[16/9] w-full overflow-hidden border-b border-[var(--border-hairline)] bg-black/40"
+            aria-label={`Open ${project.title} gallery`}
+          >
+            <div className="absolute inset-0 transition-transform duration-500 group-hover/hero:scale-[1.02]">
+              <Cover />
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover/hero:bg-black/25" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--background)] to-transparent" />
+
+            <span className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/55 text-white/90 backdrop-blur-md transition-[border-color,background-color,transform] duration-200 group-hover/hero:scale-110 group-hover/hero:border-white/40 group-hover/hero:bg-black/75">
+              <FaMagnifyingGlassPlus className="text-[12px]" />
+            </span>
+
+            {galleryCount > 1 ? (
+              <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-white/85 backdrop-blur-md">
+                {String(galleryCount).padStart(2, "0")} SCREENS
+              </span>
+            ) : null}
+
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/hero:opacity-100">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 font-mono text-[10.5px] tracking-[0.22em] text-white backdrop-blur-md">
+                <FaMagnifyingGlassPlus className="text-[11px]" />
+                VIEW SCREENS
+              </span>
+            </span>
+          </button>
+        ) : (
+          <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-[var(--border-hairline)] bg-black/40">
+            <Cover />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--background)] to-transparent" />
+          </div>
+        )
+      ) : hero ? (
         <button
           type="button"
           onClick={onOpenGallery}
@@ -175,24 +226,19 @@ function ProjectCard({
             alt={hero.alt}
             className="h-full w-full object-cover transition-transform duration-500 group-hover/hero:scale-[1.03]"
           />
-          {/* darken on hover for affordance */}
           <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover/hero:bg-black/30" />
-          {/* bottom edge fade into card body */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--background)] to-transparent" />
 
-          {/* Always-visible zoom button (top-right) */}
           <span className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-black/55 text-white/90 backdrop-blur-md transition-[border-color,background-color,transform] duration-200 group-hover/hero:scale-110 group-hover/hero:border-white/40 group-hover/hero:bg-black/75">
             <FaMagnifyingGlassPlus className="text-[12px]" />
           </span>
 
-          {/* Image counter (top-left) — only if multi-image */}
           {galleryCount > 1 ? (
             <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-white/85 backdrop-blur-md">
               01 / {String(galleryCount).padStart(2, "0")}
             </span>
           ) : null}
 
-          {/* Centered hover hint */}
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/hero:opacity-100">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 font-mono text-[10.5px] tracking-[0.22em] text-white backdrop-blur-md">
               <FaMagnifyingGlassPlus className="text-[11px]" />

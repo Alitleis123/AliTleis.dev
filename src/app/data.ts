@@ -158,6 +158,8 @@ export type Project = {
   repo?: string;
   comingSoon?: boolean;
   iconKey?: string;
+  /** Key referencing a custom SVG cover component (used when there's no gallery hero). */
+  coverKey?: string;
   /** Gallery — first image is shown as the card's showcase, rest available in lightbox. */
   gallery?: { src: string; alt: string }[];
 };
@@ -182,6 +184,7 @@ export const featuredProjects: Project[] = [
     tech: ["Python", "Lua", "OpenCV", "FFmpeg", "DaVinci Resolve"],
     demo: "https://eternal2x.com",
     repo: "https://github.com/Alitleis123/DaVinchi-Resolve-Smart-Upscale-Plugin",
+    coverKey: "eternal2x",
     gallery: [
       { src: withBasePath("/projects/eternal2x%20about.png"), alt: "Eternal2x — about page" },
       { src: withBasePath("/projects/eternal2x%20download.png"), alt: "Eternal2x — download page" },
@@ -204,6 +207,7 @@ export const featuredProjects: Project[] = [
     tech: ["React", "TypeScript", "Node.js", "MongoDB", "REST APIs"],
     demo: "https://alitleis123.github.io/topchoicerealty/",
     repo: "https://github.com/alitleis123/topchoicerealty",
+    coverKey: "topChoiceRealty",
     gallery: [
       { src: withBasePath("/projects/Top%20choice%20image%201.png"), alt: "Top Choice Realty — main listings page" },
       { src: withBasePath("/projects/Top%20choice%20image%202.png"), alt: "Top Choice Realty — agent dashboard" },
@@ -231,6 +235,7 @@ export const featuredProjects: Project[] = [
     tech: ["JavaScript", "Chrome Extensions MV3", "OpenAI API", "Node.js", "Express"],
     demo: "https://alitleis123.github.io/Eternal-Summary/",
     repo: "https://github.com/Alitleis123/Eternal-Summary",
+    coverKey: "eternalSummary",
     gallery: [
       { src: withBasePath("/projects/EternalSummary.png"), alt: "Eternal Summary — main page" },
       { src: withBasePath("/projects/EternalSummary%20image%201.png"), alt: "Eternal Summary — extension popup" },
@@ -242,11 +247,21 @@ export const featuredProjects: Project[] = [
   {
     id: "eternal-reverse",
     title: "Eternal Reverse",
-    range: "Coming Soon",
-    desc: "Details coming soon.",
-    bullets: ["Details coming soon."],
+    subtitle: "eternalreverse.dev",
+    range: "2025 – Present",
+    desc: "Independent dev studio with a shared Next.js / Node web surface and a Python / Lua / FFmpeg media pipeline, shipping six products across desktop, browser, and full-stack web — a Resolve upscaling plugin, a Discord rich-presence client, a Chrome summarizer, a barbershop booking platform, and two cross-platform apps in development.",
+    bullets: [
+      "Co-founded eternalreverse.dev as an independent two-person dev studio, housing multiple shipping software products across systems, web, and mobile under a single umbrella.",
+      "Own the web-facing surface — Next.js, TypeScript, React, Node.js, and Tailwind — for the studio site and per-product pages.",
+      "Author the Python, Lua, and FFmpeg pipeline that ships as Eternal2x under the studio, integrating with DaVinci Resolve's scripting environment.",
+      "Studio houses six products at different stages: Eternal2x (Resolve plugin, live), Eternal Summary (Chrome extension, live), EternalRichPresence (Discord client, live beta), Signature Cuts 413 (booking platform, live), EternalMonitor (display receiver, in dev), and Exerly Fitness (in dev).",
+      "Live at eternalreverse.dev.",
+    ],
     iconText: "ER",
-    comingSoon: true,
+    tech: ["TypeScript", "Next.js", "React", "Node.js", "Python", "Lua", "MongoDB", "FFmpeg"],
+    demo: "https://eternalreverse.dev",
+    repo: "https://github.com/whoisaldo",
+    coverKey: "eternalReverse",
   },
 ];
 
@@ -366,6 +381,11 @@ export const stackGroups: StackGroup[] = [
       { name: "OpenCV", iconKey: "SiOpencv" },
       { name: "FFmpeg", iconKey: "SiFfmpeg" },
       { name: "PowerShell", iconKey: "VscTerminalPowershell" },
+      { name: "Azure DevOps", iconKey: "VscAzureDevops" },
+      { name: "Jest", iconKey: "SiJest" },
+      { name: "JUnit", iconKey: "SiJunit5" },
+      { name: "Heroku", iconKey: "SiHeroku" },
+      { name: "Arduino", iconKey: "SiArduino" },
     ],
   },
   {
@@ -379,10 +399,8 @@ export const stackGroups: StackGroup[] = [
   {
     title: "AI & ML",
     items: [
-      { name: "OpenAI API", iconKey: "SiOpenai" },
-      { name: "Anthropic", iconKey: "SiAnthropic" },
+      { name: "Gemini API", iconKey: "SiGooglegemini" },
       { name: "LLM Integration", iconKey: "LuBrainCircuit" },
-      { name: "Prompt Engineering", iconKey: "LuSparkles" },
     ],
   },
 ];
