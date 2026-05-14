@@ -260,7 +260,7 @@ export const featuredProjects: Project[] = [
     iconText: "ER",
     tech: ["TypeScript", "Next.js", "React", "Node.js", "Python", "Lua", "MongoDB", "FFmpeg"],
     demo: "https://eternalreverse.dev",
-    repo: "https://github.com/whoisaldo",
+    repo: "https://github.com/whoisaldo/EternalReverse-dev",
     coverKey: "eternalReverse",
   },
 ];
