@@ -23,7 +23,7 @@ export default function Resume() {
       </div>
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
-          One page, everything I&apos;ve done.
+          On paper.
         </h2>
         <div className="flex flex-wrap gap-3">
           <a

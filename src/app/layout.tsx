@@ -26,6 +26,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${GeistSans.variable} ${GeistMono.variable} scroll-smooth`}
+      suppressHydrationWarning
     >
       <head />
       <body className="relative min-h-screen bg-[var(--background)] font-sans text-[var(--text-strong)] antialiased">

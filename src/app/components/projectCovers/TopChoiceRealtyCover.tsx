@@ -1,5 +1,7 @@
 "use client";
 
+import { withBasePath } from "../../data";
+
 const GOLD = "#C8A85A";
 const GOLD_DIM = "#9A803F";
 const BG = "#0a0a0a";
@@ -55,25 +57,35 @@ export default function TopChoiceRealtyCover() {
         </text>
       </g>
 
-      {/* Center: gold roof badge */}
-      <g transform="translate(400, 175)">
-        <circle r="46" fill="none" stroke={GOLD} strokeWidth="1.8" />
-        <circle r="46" fill="rgba(200,168,90,0.04)" />
-        {/* House roof glyph */}
-        <g stroke={GOLD} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" fill="none">
-          <path d="M-22 8 L0 -16 L22 8" />
-          <path d="M-16 8 L-16 22 L16 22 L16 8" />
-          <rect x="-5" y="11" width="10" height="11" />
-        </g>
+      {/* Center: actual TCR logo inside gold ring */}
+      <defs>
+        <clipPath id="tcr-logo-clip">
+          <circle cx="400" cy="175" r="50" />
+        </clipPath>
+      </defs>
+      <g>
+        {/* Outer gold ring */}
+        <circle cx="400" cy="175" r="54" fill="none" stroke={GOLD} strokeWidth="1.8" />
+        <circle cx="400" cy="175" r="50" fill="#000000" />
+        {/* Actual logo art */}
+        <image
+          href={withBasePath("/Timeline/Top%20Choice%20Realty.jpg")}
+          x="350"
+          y="125"
+          width="100"
+          height="100"
+          clipPath="url(#tcr-logo-clip)"
+          preserveAspectRatio="xMidYMid slice"
+        />
       </g>
 
       {/* Brand wordmark */}
       <g textAnchor="middle">
-        <text x="400" y="262" fontSize="36" fontWeight="800" letterSpacing="1.5">
+        <text x="400" y="270" fontSize="36" fontWeight="800" letterSpacing="1.5">
           <tspan fill={GOLD}>TOP CHOICE </tspan>
           <tspan fill="#ffffff">REALTY</tspan>
         </text>
-        <text x="400" y="282" fontSize="10" letterSpacing="5" fill="rgba(200,168,90,0.85)" fontWeight="600">
+        <text x="400" y="290" fontSize="10" letterSpacing="5" fill="rgba(200,168,90,0.85)" fontWeight="600">
           REALTY LLC
         </text>
       </g>

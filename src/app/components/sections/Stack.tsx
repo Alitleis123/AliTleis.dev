@@ -145,7 +145,7 @@ export default function Stack() {
 
       <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
-          The tools I reach for first.
+          What I build with.
         </h2>
         <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
           CORE · {coreStack.length.toString().padStart(2, "0")} TOOLS
