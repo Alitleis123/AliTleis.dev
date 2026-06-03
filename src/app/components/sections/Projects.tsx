@@ -10,7 +10,7 @@ import {
   FaXmark,
   FaMagnifyingGlassPlus,
 } from "react-icons/fa6";
-import { TbCalculator } from "react-icons/tb";
+import { TbCalculator, TbPuzzle } from "react-icons/tb";
 import { SiCplusplus } from "react-icons/si";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { featuredProjects, otherWork, type Project } from "../../data";
@@ -24,6 +24,7 @@ type IconCmp = ComponentType<{ className?: string }>;
 const OTHER_ICON: Record<string, IconCmp> = {
   calculator: TbCalculator,
   cplusplus: SiCplusplus,
+  puzzle: TbPuzzle,
 };
 
 const COVER_MAP: Record<string, ComponentType> = {

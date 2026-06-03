@@ -286,6 +286,16 @@ export const otherWork: Project[] = [
     repo: "https://github.com/Alitleis123/CS3520-Summer-2025",
     iconKey: "cplusplus",
   },
+  {
+    id: "better-canvas",
+    title: "Better Canvas",
+    range: "2026",
+    desc: "Privacy-focused browser extension that customizes the Canvas LMS — dark mode, dashboard redesign, planner widget, and a GPA calculator, with no telemetry or external servers.",
+    bullets: [],
+    tech: ["JavaScript", "CSS", "HTML"],
+    repo: "https://github.com/Alitleis123/Better-Canvas",
+    iconKey: "puzzle",
+  },
 ];
 
 // ───────────────────────────────────────────────────────────────────
