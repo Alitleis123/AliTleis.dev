@@ -46,7 +46,7 @@ export const timeline: TimelineEntry[] = [
     bullets: [
       "Owning design and implementation of an AI-assisted search layer over the Laboratory's Apache Solr index, authoring the technical proposal and driving it through engineering review ahead of schedule.",
       "Built the ingestion layer on Norconex, handling authenticated access, JavaScript-rendered pages, and mixed document formats to normalize content from multiple Laboratory web properties and SharePoint into the Solr index.",
-      "Engineered retrieval logic that ranks and narrows candidate documents before model invocation, cutting query response time 70% and token consumption per request 40%.",
+      "Engineered retrieval logic in Java that ranks and narrows candidate documents before model invocation, cutting query response time 70% and token consumption per request 40%.",
       "Delivered a working end-to-end prototype and demoed it to the group, unifying content from SharePoint, internal documentation, and the public Laboratory site behind a single search interface.",
       "Working across both frontier model APIs and self-hosted open-weight models, choosing per workload rather than defaulting to one provider, and keeping the retrieval layer independent of any single model.",
       "Designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers across classified and unclassified divisions of MIT Lincoln Laboratory.",
@@ -62,6 +62,7 @@ export const timeline: TimelineEntry[] = [
       "TypeScript",
       "Next.js",
       "Node.js",
+      "Java",
       "LLM Integration",
       "Apache Solr",
       "Norconex",
