@@ -4,6 +4,17 @@ export const withBasePath = (path: string) => `${basePath}${path}`;
 /** Canonical origin — matches public/CNAME. Used for metadata, sitemap, robots. */
 export const SITE_URL = "https://alitleis.dev";
 
+/**
+ * Resume URL, cache-busted by the PDF's own content hash (computed at build
+ * time in next.config.ts). Without this, browsers keep serving the previously
+ * cached PDF from the unchanged path after a new resume ships.
+ */
+export const RESUME_HREF = (() => {
+  const base = withBasePath("/resume/resume.pdf");
+  const v = process.env.NEXT_PUBLIC_RESUME_V;
+  return v ? `${base}?v=${v}` : base;
+})();
+
 export type TimelineEntry = {
   id: string;
   /** Start month, "YYYY-MM". Also drives descending timeline order. */

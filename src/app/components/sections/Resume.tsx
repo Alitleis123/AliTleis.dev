@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { fadeUp } from "../../lib/animations";
-import { withBasePath } from "../../data";
+import { RESUME_HREF } from "../../data";
 
 /**
  * Mounts the PDF iframe only once the section is near the viewport. Embedding a
@@ -62,14 +62,14 @@ export default function Resume() {
         </h2>
         <div className="flex flex-wrap gap-3">
           <a
-            href={withBasePath("/resume/resume.pdf")}
+            href={RESUME_HREF}
             download
             className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-[13px] font-medium text-black transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(255,255,255,0.18)]"
           >
             Download PDF
           </a>
           <a
-            href={withBasePath("/resume/resume.pdf")}
+            href={RESUME_HREF}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center rounded-full border border-[var(--border-soft)] px-5 py-2.5 text-[13px] font-medium text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white"
@@ -86,7 +86,7 @@ export default function Resume() {
         <div className="relative w-full" style={{ paddingTop: "129.4%" }}>
           {showFrame ? (
             <iframe
-              src={`${withBasePath("/resume/resume.pdf")}#view=FitH&toolbar=0&navpanes=0`}
+              src={`${RESUME_HREF}#view=FitH&toolbar=0&navpanes=0`}
               className="absolute inset-0 h-full w-full"
               title="Ali Tleis Resume"
               loading="lazy"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { RESUME_HREF } from "../data";
 
 const NAV_SECTIONS = [
   { id: "about",    label: "About" },
@@ -10,8 +11,6 @@ const NAV_SECTIONS = [
   { id: "resume",   label: "Resume" },
   { id: "contact",  label: "Contact" },
 ];
-
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export default function NavBar() {
   const [active, setActive] = useState("about");
@@ -76,7 +75,7 @@ export default function NavBar() {
         </nav>
 
         <a
-          href={`${basePath}/resume/resume.pdf`}
+          href={RESUME_HREF}
           download
           className="hidden rounded-full border border-[var(--border-soft)] bg-transparent px-4 py-1.5 text-[12.5px] font-medium tracking-tight text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white md:inline-flex"
         >
@@ -113,7 +112,7 @@ export default function NavBar() {
               </a>
             ))}
             <a
-              href={`${basePath}/resume/resume.pdf`}
+              href={RESUME_HREF}
               download
               onClick={() => setMenuOpen(false)}
               className="mt-2 inline-flex items-center justify-center rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-center text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
