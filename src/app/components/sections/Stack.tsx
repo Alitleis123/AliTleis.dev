@@ -41,7 +41,7 @@ import { LuBrainCircuit } from "react-icons/lu";
 // Boomi, DeepSeek and Norconex have no brand glyph in simple-icons, so these
 // stand in semantically: a connector for Boomi's iPaaS, a brain for DeepSeek,
 // a spider for Norconex's crawler.
-import { TbApi, TbPlugConnected, TbBrain, TbSpider } from "react-icons/tb";
+import { TbApi, TbPlugConnected, TbBrain, TbSpider, TbDatabase } from "react-icons/tb";
 import { VscTerminalPowershell, VscAzureDevops } from "react-icons/vsc";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { coreStack, stackGroups, type StackItem } from "../../data";
@@ -54,7 +54,7 @@ const ICON_MAP: Record<string, IconCmp> = {
   SiReactrouter, SiGit, SiGithub, SiDocker, SiLinux, SiOpencv, SiFfmpeg,
   SiMongodb, SiPostgresql, SiMysql, SiJsonwebtokens, SiJest, SiJunit5,
   SiHeroku, SiArduino, SiGooglegemini, SiHuggingface, SiApachesolr, SiFlydotio,
-  FaJava, LuBrainCircuit, TbApi, TbPlugConnected, TbBrain, TbSpider,
+  FaJava, LuBrainCircuit, TbApi, TbPlugConnected, TbBrain, TbSpider, TbDatabase,
   VscTerminalPowershell, VscAzureDevops,
 };
 
@@ -74,6 +74,7 @@ const ICON_COLOR: Record<string, string> = {
   "C#": "#9B4F96",
   Lua: "#74C7EC",
   Kotlin: "#7F52FF",
+  SQL: "#94A3B8",
   "Framer Motion": "#FFFFFF",
   Vite: "#646CFF",
   "React Router": "#CA4245",
