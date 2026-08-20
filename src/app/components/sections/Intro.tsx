@@ -119,7 +119,7 @@ export default function Intro() {
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
           <p className="text-[18px] leading-[1.7] text-[var(--text-muted)] md:text-[19px]">
-            Computer Science at Northeastern, currently on a six-month co-op at
+            Computer Science at Northeastern, currently on a seven-month co-op at
             MIT Lincoln Laboratory building AI-integrated internal web
             applications. The work I gravitate toward is the kind that ships,
             full systems with database schemas underneath them, Python and Lua

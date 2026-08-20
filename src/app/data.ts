@@ -21,12 +21,6 @@ export type TimelineEntry = {
   sortKey: string;
   /** End month, "YYYY-MM". Omit for an open-ended role. */
   endKey?: string;
-  /**
-   * Explicit duration label, overriding the derived one. Needed when the real
-   * length doesn't match whole-month arithmetic — e.g. a co-op that runs into
-   * the first day of a month.
-   */
-  durationLabel?: string;
   track: "experience" | "education";
   title: string;
   subtitle?: string;
@@ -53,16 +47,16 @@ export const timeline: TimelineEntry[] = [
   {
     id: "mit-ll-2026",
     sortKey: "2026-06",
-    // Last day is Jan 1 2027, so December is the final full working month —
-    // endKey drives the "Current" badge, which should retire in January.
+    // Last day is Jan 1 2027, so December is the final full working month.
+    // Jun–Dec inclusive derives the 7-month duration, and the "Current" badge
+    // retires in January.
     endKey: "2026-12",
-    durationLabel: "6 mos",
     track: "experience",
     title: "MIT Lincoln Laboratory",
     subtitle: "Web Application Developer (AI Integration)",
     range: "Jun 2026 – Jan 2027",
     meta: "Lexington, MA",
-    desc: "Six-month co-op building an LLM-backed search layer over the Laboratory's Apache Solr index.",
+    desc: "Seven-month co-op building an LLM-backed search layer over the Laboratory's Apache Solr index.",
     bullets: [
       "Owning design and implementation of an LLM-backed search layer over the Laboratory's Apache Solr index, authoring the technical proposal and driving it through engineering review ahead of schedule.",
       "Built the ingestion layer on Norconex, handling authenticated access, JavaScript-rendered pages, and mixed document formats to normalize content from multiple Laboratory web properties and SharePoint into the Solr index.",
@@ -212,8 +206,6 @@ export const isCurrentEntry = (entry: TimelineEntry) =>
  * absurd span.
  */
 export const entryDuration = (entry: TimelineEntry): string | null => {
-  if (entry.durationLabel) return entry.durationLabel;
-
   const [sy, sm] = entry.sortKey.split("-").map(Number);
   const [ey, em] = (entry.endKey || NOW_MARKER_SORTKEY).split("-").map(Number);
   if ([sy, sm, ey, em].some(Number.isNaN)) return null;
