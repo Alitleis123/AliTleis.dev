@@ -16,7 +16,6 @@ import {
   SiNodedotjs,
   SiTailwindcss,
   SiFramer,
-  SiMui,
   SiVite,
   SiReactrouter,
   SiGit,
@@ -34,9 +33,15 @@ import {
   SiHeroku,
   SiArduino,
   SiGooglegemini,
+  SiHuggingface,
+  SiApachesolr,
+  SiFlydotio,
 } from "react-icons/si";
 import { LuBrainCircuit } from "react-icons/lu";
-import { TbApi } from "react-icons/tb";
+// Boomi, DeepSeek and Norconex have no brand glyph in simple-icons, so these
+// stand in semantically: a connector for Boomi's iPaaS, a brain for DeepSeek,
+// a spider for Norconex's crawler.
+import { TbApi, TbPlugConnected, TbBrain, TbSpider } from "react-icons/tb";
 import { VscTerminalPowershell, VscAzureDevops } from "react-icons/vsc";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { coreStack, stackGroups, type StackItem } from "../../data";
@@ -45,11 +50,12 @@ type IconCmp = ComponentType<{ className?: string; style?: React.CSSProperties }
 
 const ICON_MAP: Record<string, IconCmp> = {
   SiReact, SiTypescript, SiJavascript, SiPython, SiCplusplus, SiSharp, SiLua,
-  SiKotlin, SiNextdotjs, SiNodedotjs, SiTailwindcss, SiFramer, SiMui, SiVite,
+  SiKotlin, SiNextdotjs, SiNodedotjs, SiTailwindcss, SiFramer, SiVite,
   SiReactrouter, SiGit, SiGithub, SiDocker, SiLinux, SiOpencv, SiFfmpeg,
   SiMongodb, SiPostgresql, SiMysql, SiJsonwebtokens, SiJest, SiJunit5,
-  SiHeroku, SiArduino, SiGooglegemini,
-  FaJava, LuBrainCircuit, TbApi, VscTerminalPowershell, VscAzureDevops,
+  SiHeroku, SiArduino, SiGooglegemini, SiHuggingface, SiApachesolr, SiFlydotio,
+  FaJava, LuBrainCircuit, TbApi, TbPlugConnected, TbBrain, TbSpider,
+  VscTerminalPowershell, VscAzureDevops,
 };
 
 // Brand colors — applied to icons for personality.
@@ -69,7 +75,6 @@ const ICON_COLOR: Record<string, string> = {
   Lua: "#74C7EC",
   Kotlin: "#7F52FF",
   "Framer Motion": "#FFFFFF",
-  MUI: "#007FFF",
   Vite: "#646CFF",
   "React Router": "#CA4245",
   "Node.js / Express": "#5FA04E",
@@ -89,7 +94,13 @@ const ICON_COLOR: Record<string, string> = {
   Heroku: "#430098",
   Arduino: "#00979D",
   "Gemini API": "#8E75E2",
+  "Fly.io": "#8B5CF6",
   "LLM Integration": "#A78BFA",
+  DeepSeek: "#4D6BFE",
+  "Open-Weight LLMs": "#FFD21E",
+  "Apache Solr": "#D9411E",
+  Norconex: "#F59E0B",
+  Boomi: "#00B2A9",
 };
 
 function Chip({ item }: { item: StackItem }) {

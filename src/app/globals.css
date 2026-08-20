@@ -5,7 +5,7 @@
   --background: #0a0c12;
   --foreground: #e5e7eb;
 
-  /* Accent — used ONLY for MIT LL node, hero badge dot, Incoming pill */
+  /* Accent — used ONLY for MIT LL node, hero badge dot, Current pill */
   --accent-electric: #6366f1;
 
   /* Editorial neutrals (used for headings, copy, dividers, borders) */
@@ -69,7 +69,9 @@ a:disabled, button:disabled, [aria-disabled="true"] {
     radial-gradient(60% 60% at 20% 20%, rgba(56, 189, 248, 0.08), transparent 60%),
     radial-gradient(50% 50% at 80% 30%, rgba(99, 102, 241, 0.12), transparent 55%),
     radial-gradient(45% 45% at 50% 80%, rgba(20, 184, 166, 0.06), transparent 60%);
-  filter: blur(10px);
+  /* No blur filter: these gradients are already soft, so a 10px blur was
+     visually a no-op while forcing a filter pass over 140% of the viewport
+     every time the parent's opacity animation ticked. */
 }
 
 .edge-lights {
@@ -244,6 +246,44 @@ a:disabled, button:disabled, [aria-disabled="true"] {
 
 .section-divider::after {
   content: "";
+}
+
+/* =========================
+   Refinements: focus, typographic wrapping, surface depth
+   ========================= */
+
+/* There were no focus styles at all, so keyboard users got either the browser
+   default (which reads badly on this background) or nothing. Scoped to
+   :focus-visible, so pointer users see no change. */
+:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.8);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Balance headline line-breaks (kills orphaned last words) and let paragraphs
+   avoid ragged single-word final lines. Progressive enhancement — browsers
+   without support simply wrap as before. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Numerals in the sans face align in stat grids and counters. */
+.tabular-figures {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A lit top edge — one hairline of light where a surface catches the ambient
+   glow. Standard refined-dark-UI depth cue; costs nothing to paint since it's
+   a static inset shadow. */
+.surface-lift {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 /* Modern scrollbar styling */
@@ -490,9 +530,11 @@ a:disabled, button:disabled, [aria-disabled="true"] {
   animation: ambient-pulse 14s ease-in-out infinite;
 }
 
+/* No will-change here: 10 particles each forced a permanently promoted
+   compositor layer, consuming GPU memory that raster tiles need during scroll.
+   The transform/opacity animation is already compositor-driven without it. */
 .particle-float {
   animation: particle-float ease-in-out infinite;
-  will-change: transform, opacity;
 }
 
 @keyframes ring-pulse-1 {
@@ -547,10 +589,10 @@ section {
 }
 
 /* =========================
-   Incoming MIT LL accent
+   Current role (MIT LL) accent
    ========================= */
 
-@keyframes incoming-badge-pulse {
+@keyframes current-badge-pulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4),
                 0 0 0 0 rgba(99, 102, 241, 0);
@@ -561,20 +603,20 @@ section {
   }
 }
 
-.incoming-badge {
-  animation: incoming-badge-pulse 3.5s ease-in-out infinite;
+.current-badge {
+  animation: current-badge-pulse 3.5s ease-in-out infinite;
 }
 
-@keyframes incoming-pill-pulse {
+@keyframes current-pill-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.65; }
 }
 
-.incoming-pill {
-  animation: incoming-pill-pulse 2.4s ease-in-out infinite;
+.current-pill {
+  animation: current-pill-pulse 2.4s ease-in-out infinite;
 }
 
-@keyframes incoming-node-pulse {
+@keyframes current-node-pulse {
   0%, 100% {
     transform: scale(1);
     box-shadow: 0 0 22px rgba(99, 102, 241, 0.85);
@@ -585,11 +627,11 @@ section {
   }
 }
 
-.incoming-node-pulse {
-  animation: incoming-node-pulse 2.6s ease-in-out infinite;
+.current-node-pulse {
+  animation: current-node-pulse 2.6s ease-in-out infinite;
 }
 
-@keyframes incoming-dot-pulse {
+@keyframes current-dot-pulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.55),
                 0 0 8px rgba(99, 102, 241, 0.85);
@@ -600,15 +642,15 @@ section {
   }
 }
 
-.incoming-dot {
-  animation: incoming-dot-pulse 2.4s ease-in-out infinite;
+.current-dot {
+  animation: current-dot-pulse 2.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .incoming-badge,
-  .incoming-pill,
-  .incoming-node-pulse,
-  .incoming-dot {
+  .current-badge,
+  .current-pill,
+  .current-node-pulse,
+  .current-dot {
     animation: none;
   }
 }

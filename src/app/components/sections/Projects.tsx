@@ -114,7 +114,7 @@ export default function Projects() {
                 href={p.repo}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-center gap-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
+                className="surface-lift group flex items-center gap-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-2)] text-white/85 transition-colors duration-200 group-hover:text-white">
                   {Icon ? <Icon className="text-[22px]" /> : null}
@@ -165,7 +165,7 @@ function ProjectCard({
   return (
     <motion.div
       variants={staggerChild}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:shadow-[0_0_60px_rgba(99,102,241,0.06)]"
+      className="surface-lift group relative flex flex-col overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] transition-[border-color,background-color,box-shadow] duration-300 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:shadow-[0_0_60px_rgba(99,102,241,0.06)]"
     >
       <div
         aria-hidden
@@ -225,6 +225,8 @@ function ProjectCard({
           <img
             src={hero.src}
             alt={hero.alt}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 group-hover/hero:scale-[1.03]"
           />
           <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover/hero:bg-black/30" />
@@ -427,6 +429,7 @@ function Lightbox({
             <img
               src={state.images[state.index].src}
               alt={state.images[state.index].alt}
+              decoding="async"
               className="max-h-[72vh] max-w-[78vw] rounded-2xl border border-white/10 object-contain shadow-[0_30px_80px_rgba(0,0,0,0.55)]"
             />
             <div className="mt-3 max-w-[60ch] text-center text-[12px] tracking-tight text-white/70">
@@ -468,7 +471,13 @@ function Lightbox({
                         : "border-white/10 opacity-55 hover:opacity-100"
                     }`}
                   >
-                    <img src={img.src} alt="" className="h-full w-full object-cover" />
+                    <img
+                      src={img.src}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
                   </button>
                 ))}
               </div>

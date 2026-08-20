@@ -1,10 +1,45 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { fadeUp } from "../../lib/animations";
 import { withBasePath } from "../../data";
 
+/**
+ * Mounts the PDF iframe only once the section is near the viewport. Embedding a
+ * PDF spins up Chromium's PDFium viewer in its own process and makes it a
+ * participant in page compositing and scroll hit-testing — keeping it mounted
+ * from first paint made scrolling the whole page choppy.
+ */
+function useNearViewport<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [near, setNear] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setNear(true);
+          observer.disconnect();
+        }
+      },
+      // Start loading a screen early so it's ready by the time it's reached.
+      { rootMargin: "600px 0px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [near]);
+
+  return { ref, near };
+}
+
 export default function Resume() {
+  const { ref: frameRef, near: showFrame } = useNearViewport<HTMLDivElement>();
+
   return (
     <motion.section
       id="resume"
@@ -44,13 +79,25 @@ export default function Resume() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-black/30">
+      <div
+        ref={frameRef}
+        className="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-black/30"
+      >
         <div className="relative w-full" style={{ paddingTop: "129.4%" }}>
-          <iframe
-            src={`${withBasePath("/resume/resume.pdf")}#view=FitH&toolbar=0&navpanes=0`}
-            className="absolute inset-0 h-full w-full"
-            title="Ali Tleis Resume"
-          />
+          {showFrame ? (
+            <iframe
+              src={`${withBasePath("/resume/resume.pdf")}#view=FitH&toolbar=0&navpanes=0`}
+              className="absolute inset-0 h-full w-full"
+              title="Ali Tleis Resume"
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+                Loading preview…
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </motion.section>

@@ -7,6 +7,7 @@ import { heroContainer, heroItem, staggerParent, staggerChild } from "../../lib/
 import {
   withBasePath,
   aboutPillars,
+  aboutClearance,
   aboutLanguages,
   aboutHobbies,
 } from "../../data";
@@ -36,10 +37,10 @@ export default function Intro() {
             <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[rgba(99,102,241,0.28)] bg-[rgba(99,102,241,0.045)] px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white/85">
               <span
                 aria-hidden
-                className="incoming-dot relative block h-1.5 w-1.5 rounded-full"
+                className="current-dot relative block h-1.5 w-1.5 rounded-full"
                 style={{ background: "var(--accent-electric)" }}
               />
-              <span className="text-white/95">Incoming Web Application Developer</span>
+              <span className="text-white/95">Web Application Developer</span>
               <span className="text-[var(--text-faint)]">@</span>
               <span className="text-white/80">MIT Lincoln Laboratory</span>
             </span>
@@ -96,8 +97,10 @@ export default function Intro() {
             />
             <div className="relative aspect-[3/4] w-[15rem] overflow-hidden rounded-[2rem] border border-[var(--border-soft)] sm:w-[17rem] md:w-[20rem]">
               <img
-                src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.jpg")}
+                src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp")}
                 alt="Ali Tleis portrait"
+                decoding="async"
+                fetchPriority="high"
                 className="h-full w-full object-cover"
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent" />
@@ -116,12 +119,12 @@ export default function Intro() {
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
           <p className="text-[18px] leading-[1.7] text-[var(--text-muted)] md:text-[19px]">
-            Currently studying Computer Science at Northeastern, joining MIT
-            Lincoln Laboratory in July 2026 for a six-month co-op on the AI
-            integration team. The work I gravitate toward is the kind that
-            ships, full systems with database schemas underneath them, Python
-            and Lua pipelines handling the parts no one wants to do by hand,
-            and a clean front end on top.
+            Computer Science at Northeastern, currently on a six-month co-op at
+            MIT Lincoln Laboratory building AI-integrated internal web
+            applications. The work I gravitate toward is the kind that ships,
+            full systems with database schemas underneath them, Python and Lua
+            pipelines handling the parts no one wants to do by hand, and a clean
+            front end on top.
           </p>
           <p className="mt-5 text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
             I care about software that respects the person on the other side of
@@ -131,6 +134,19 @@ export default function Intro() {
 
         <motion.div variants={staggerChild} className="md:col-span-5">
           <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+                Clearance
+              </span>
+              <span className="inline-flex items-center gap-2 text-[13px] tracking-tight text-white/85">
+                <span
+                  aria-hidden
+                  className="current-dot block h-1.5 w-1.5 rounded-full"
+                  style={{ background: "var(--accent-electric)" }}
+                />
+                {aboutClearance}
+              </span>
+            </div>
             <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
                 Spoken Languages
@@ -179,7 +195,7 @@ export default function Intro() {
             {aboutPillars.map((p, i) => (
               <div
                 key={p.label}
-                className="group relative flex flex-col gap-4 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-7 transition-[border-color,background-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
+                className="surface-lift group relative flex flex-col gap-4 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-7 transition-[border-color,background-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] tracking-[0.22em] text-[var(--text-dim)]">

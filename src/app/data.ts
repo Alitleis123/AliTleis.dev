@@ -1,9 +1,15 @@
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const withBasePath = (path: string) => `${basePath}${path}`;
 
+/** Canonical origin — matches public/CNAME. Used for metadata, sitemap, robots. */
+export const SITE_URL = "https://alitleis.dev";
+
 export type TimelineEntry = {
   id: string;
+  /** Start month, "YYYY-MM". Also drives descending timeline order. */
   sortKey: string;
+  /** End month, "YYYY-MM". Omit for an open-ended role. */
+  endKey?: string;
   track: "experience" | "education";
   title: string;
   subtitle?: string;
@@ -17,7 +23,6 @@ export type TimelineEntry = {
   tech?: string[];
   badges?: { label: string; tone: "blue" | "green" | "amber" | "violet" }[];
   note?: string;
-  incoming?: boolean;
   /** Render education entry with stat-grid card layout. */
   education?: {
     stats: { label: string; value: string }[];
@@ -31,28 +36,43 @@ export const timeline: TimelineEntry[] = [
   {
     id: "mit-ll-2026",
     sortKey: "2026-07",
+    endKey: "2026-12",
     track: "experience",
     title: "MIT Lincoln Laboratory",
     subtitle: "Web Application Developer (AI Integration)",
     range: "Jul – Dec 2026",
     meta: "Lexington, MA",
-    desc: "Incoming co-op building AI-integrated internal web applications at MIT Lincoln Laboratory.",
+    desc: "Six-month co-op building an AI-assisted search layer over the Laboratory's Apache Solr index.",
     bullets: [
+      "Owning design and implementation of an AI-assisted search layer over the Laboratory's Apache Solr index, authoring the technical proposal and driving it through engineering review ahead of schedule.",
+      "Built the ingestion layer on Norconex, handling authenticated access, JavaScript-rendered pages, and mixed document formats to normalize content from multiple Laboratory web properties and SharePoint into the Solr index.",
+      "Engineered retrieval logic that ranks and narrows candidate documents before model invocation, optimizing result surfacing while holding response latency low and cutting token consumption per query.",
+      "Delivered a working end-to-end prototype and demoed it to the group, unifying content from SharePoint, internal documentation, and the public Laboratory site behind a single search interface.",
+      "Working across both frontier model APIs and self-hosted open-weight models, choosing per workload rather than defaulting to one provider, and keeping the retrieval layer independent of any single model.",
       "Designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers across classified and unclassified divisions of MIT Lincoln Laboratory.",
-      "Working full-stack with a primary focus on integrating LLM and AI workflows into production-grade internal tooling, turning research-grade capabilities into software the lab can actually use day to day.",
+      "Building inside an established enterprise environment — ServiceNow, SharePoint, Jira, and Confluence — so new tooling has to fit systems already in daily use across the lab rather than sit beside them.",
       "Operating inside a federally funded R&D center on a competitive Northeastern co-op placement, selected for the Web Application Developer (AI Integration) role specifically.",
-      "Owning features end to end: schema and API decisions, integration with existing internal systems, and the interface on top.",
     ],
-    icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.jpg"),
+    note: "Security clearance: DoD investigation in progress.",
+    icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
-    tech: ["React", "TypeScript", "Next.js", "Node.js", "AI Integration"],
-    badges: [{ label: "Incoming", tone: "blue" }],
-    incoming: true,
+    tech: [
+      "React",
+      "TypeScript",
+      "Next.js",
+      "Node.js",
+      "LLM Integration",
+      "Apache Solr",
+      "Norconex",
+      "SharePoint",
+      "Boomi",
+    ],
   },
   {
     id: "tcr-intern-2025",
     sortKey: "2025-06",
+    endKey: "2025-09",
     track: "experience",
     title: "Top Choice Realty",
     subtitle: "Frontend Developer Intern",
@@ -67,29 +87,30 @@ export const timeline: TimelineEntry[] = [
       "Architected and deployed Python and C# automation pipelines to synchronize MongoDB records across multiple distributed virtualized environments that were previously managed manually, reducing reconciliation time by 30% and eliminating an entire category of manual error.",
       "Operated as a trusted contributor despite being an intern, proposing, designing, and shipping solutions that went into production and are still in use.",
     ],
-    icon: withBasePath("/Timeline/Top%20Choice%20Realty.jpg"),
+    icon: withBasePath("/Timeline/Top%20Choice%20Realty.webp"),
     iconAlt: "Top Choice Realty logo",
     tech: ["React", "TypeScript", "MongoDB", "Python", "C#", "Azure DevOps"],
     images: [
       {
-        src: withBasePath("/projects/Top%20choice%20image%201.png"),
+        src: withBasePath("/projects/Top%20choice%20image%201.webp"),
         alt: "Top Choice Realty platform — listings view",
       },
       {
-        src: withBasePath("/projects/Top%20choice%20image%202.png"),
+        src: withBasePath("/projects/Top%20choice%20image%202.webp"),
         alt: "Top Choice Realty platform — agent dashboard",
       },
     ],
   },
   {
     id: "neu-edu",
-    sortKey: "2023-09",
+    sortKey: "2024-09",
+    endKey: "2028-05",
     track: "education",
     title: "Northeastern University",
     subtitle: "B.S. Computer Science",
-    range: "2023 – 2028",
+    range: "2024 – 2028",
     meta: "Boston, MA",
-    icon: withBasePath("/Timeline/nu-logo.jpg"),
+    icon: withBasePath("/Timeline/nu-logo.webp"),
     iconAlt: "Northeastern University seal",
     iconText: "NU",
     desc: "B.S. Computer Science via Northeastern's co-op program — coursework alternated with full-time engineering placements.",
@@ -117,6 +138,7 @@ export const timeline: TimelineEntry[] = [
   {
     id: "rdr-intern-2023",
     sortKey: "2023-06",
+    endKey: "2023-09",
     track: "experience",
     title: "Robert DeFalco Realty",
     subtitle: "Computer Technician Intern",
@@ -130,14 +152,58 @@ export const timeline: TimelineEntry[] = [
       "Managed virtual machine configuration and setup for internal use cases, coordinated version control through Azure DevOps, and supported CI workflow setup and maintenance.",
       "First technical internship, building foundational fluency in systems administration, enterprise scripting, and deployment workflows that directly informed the architecture and automation decisions made in every subsequent role.",
     ],
-    icon: withBasePath("/Timeline/RobertDe%20Falco.png"),
+    icon: withBasePath("/Timeline/RobertDe%20Falco.webp"),
     iconAlt: "Robert DeFalco Realty logo",
     tech: ["PowerShell", "Windows", "Linux", "Azure DevOps", "WinPE"],
   },
 ];
 
-export const NOW_MARKER_LABEL = "Now · May 2026";
-export const NOW_MARKER_SORTKEY = "2026-05";
+/**
+ * Resolved at build time in next.config.ts so the marker advances on every
+ * deploy instead of being hand-edited. Fallbacks only apply if the env vars
+ * are missing (e.g. a bare `next lint` run outside the normal build).
+ */
+export const NOW_MARKER_LABEL = `Now · ${
+  process.env.NEXT_PUBLIC_NOW_LABEL || "Present"
+}`;
+export const NOW_MARKER_SORTKEY = process.env.NEXT_PUBLIC_NOW_SORTKEY || "9999-12";
+
+/** Build year, for copyright lines. Advances via the monthly rebuild in pages.yml. */
+export const BUILD_YEAR =
+  process.env.NEXT_PUBLIC_BUILD_YEAR || String(new Date().getFullYear());
+
+/**
+ * A role is "current" when the build month falls inside its start/end window.
+ * Derived rather than hand-flagged so the accent pill retires itself when the
+ * co-op ends instead of needing an edit. Education is excluded — those entries
+ * get their own badge, and a multi-year degree would otherwise always match.
+ */
+export const isCurrentEntry = (entry: TimelineEntry) =>
+  entry.track === "experience" &&
+  entry.sortKey.localeCompare(NOW_MARKER_SORTKEY) <= 0 &&
+  (!entry.endKey || entry.endKey.localeCompare(NOW_MARKER_SORTKEY) >= 0);
+
+/**
+ * Inclusive month span, derived from the start/end keys rather than written by
+ * hand. Returns null when it can't produce something sensible — e.g. if the
+ * build-time NOW fallback is in play, an open-ended entry would compute an
+ * absurd span.
+ */
+export const entryDuration = (entry: TimelineEntry): string | null => {
+  const [sy, sm] = entry.sortKey.split("-").map(Number);
+  const [ey, em] = (entry.endKey || NOW_MARKER_SORTKEY).split("-").map(Number);
+  if ([sy, sm, ey, em].some(Number.isNaN)) return null;
+
+  const months = (ey - sy) * 12 + (em - sm) + 1;
+  if (months < 1 || months > 240) return null;
+
+  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"}`;
+  if (months < 12) return plural(months, "mo");
+
+  const years = Math.floor(months / 12);
+  const rest = months % 12;
+  return rest ? `${plural(years, "yr")} ${plural(rest, "mo")}` : plural(years, "yr");
+};
 
 // ───────────────────────────────────────────────────────────────────
 // Projects
@@ -179,15 +245,15 @@ export const featuredProjects: Project[] = [
       "Architected the system within DaVinci Resolve's plugin scripting environment, requiring deep reverse engineering of the API given limited official documentation.",
       "Live at eternal2x.com as a public release.",
     ],
-    icon: withBasePath("/projects/eternal2x%20about.png"),
+    icon: withBasePath("/projects/eternal2x%20about.webp"),
     iconAlt: "Eternal2x icon",
     tech: ["Python", "Lua", "OpenCV", "FFmpeg", "DaVinci Resolve"],
     demo: "https://eternal2x.com",
     repo: "https://github.com/Alitleis123/DaVinchi-Resolve-Smart-Upscale-Plugin",
     coverKey: "eternal2x",
     gallery: [
-      { src: withBasePath("/projects/eternal2x%20about.png"), alt: "Eternal2x — about page" },
-      { src: withBasePath("/projects/eternal2x%20download.png"), alt: "Eternal2x — download page" },
+      { src: withBasePath("/projects/eternal2x%20about.webp"), alt: "Eternal2x — about page" },
+      { src: withBasePath("/projects/eternal2x%20download.webp"), alt: "Eternal2x — download page" },
     ],
   },
   {
@@ -202,46 +268,55 @@ export const featuredProjects: Project[] = [
       "Handled the full scope of a senior full-stack developer as a solo project: schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
       "Built in parallel with the internship at Top Choice Realty, with learnings from each feeding directly into the other.",
     ],
-    icon: withBasePath("/projects/Top%20choice%20image%201.png"),
+    icon: withBasePath("/projects/Top%20choice%20image%201.webp"),
     iconAlt: "Top Choice Realty thumbnail",
     tech: ["React", "TypeScript", "Node.js", "MongoDB", "REST APIs"],
     demo: "https://alitleis123.github.io/topchoicerealty/",
     repo: "https://github.com/alitleis123/topchoicerealty",
     coverKey: "topChoiceRealty",
     gallery: [
-      { src: withBasePath("/projects/Top%20choice%20image%201.png"), alt: "Top Choice Realty — main listings page" },
-      { src: withBasePath("/projects/Top%20choice%20image%202.png"), alt: "Top Choice Realty — agent dashboard" },
-      { src: withBasePath("/projects/Top%20choice%20image%203.png"), alt: "Top Choice Realty — listing detail" },
-      { src: withBasePath("/projects/Top%20choice%20image%204.png"), alt: "Top Choice Realty — admin view" },
-      { src: withBasePath("/projects/Top%20choice%20image%205.png"), alt: "Top Choice Realty — client intake" },
+      { src: withBasePath("/projects/Top%20choice%20image%201.webp"), alt: "Top Choice Realty — main listings page" },
+      { src: withBasePath("/projects/Top%20choice%20image%202.webp"), alt: "Top Choice Realty — agent dashboard" },
+      { src: withBasePath("/projects/Top%20choice%20image%203.webp"), alt: "Top Choice Realty — listing detail" },
+      { src: withBasePath("/projects/Top%20choice%20image%204.webp"), alt: "Top Choice Realty — admin view" },
+      { src: withBasePath("/projects/Top%20choice%20image%205.webp"), alt: "Top Choice Realty — client intake" },
     ],
   },
   {
     id: "eternal-summary",
     title: "Eternal Summary",
     subtitle: "Chrome Extension",
-    range: "Sep 2023 – Nov 2024",
-    desc: "MV3 Chrome extension with async OpenAI summarization, server-side API proxying via Node and Express, and resilient HTML sanitization.",
+    range: "Sep 2023 – Present",
+    desc: "MV3 Chrome extension with one-click AI summaries, backed by a containerized Node and Express proxy on Fly.io that keeps Gemini credentials off the client.",
     bullets: [
       "Built on Chrome MV3, the most restrictive extension standard, which fundamentally changed how background processing and API calls are handled compared to MV2.",
+      "Used a background service worker with injected content scripts to extract live page text and return one-click AI-generated summaries.",
       "Implemented content-script extraction with custom sanitization logic designed for the extreme variation in real-world HTML structure across websites.",
-      "Built a Node and Express backend proxy to handle OpenAI calls server-side, keeping the API key off the client and enabling request queuing and graceful error handling.",
+      "Deployed a containerized Node and Express backend on Fly.io to proxy Gemini API calls, scoping host permissions to the backend origin and keeping credentials in runtime secrets.",
       "Implemented client-side async request queuing to keep the extension responsive under variable network conditions and slow API responses.",
       "Handled the full complexity of MV3 message passing between content scripts, ephemeral background service workers, and the popup UI.",
       "First project involving LLM API integration, directly informing the AI tooling direction of subsequent work.",
     ],
-    icon: withBasePath("/Timeline/eternal%20summary%20icon.png"),
+    icon: withBasePath("/Timeline/eternal%20summary%20icon.webp"),
     iconAlt: "Eternal Summary icon",
-    tech: ["JavaScript", "Chrome Extensions MV3", "OpenAI API", "Node.js", "Express"],
+    tech: [
+      "JavaScript",
+      "Chrome Extensions MV3",
+      "Gemini API",
+      "Node.js",
+      "Express",
+      "Docker",
+      "Fly.io",
+    ],
     demo: "https://alitleis123.github.io/Eternal-Summary/",
     repo: "https://github.com/Alitleis123/Eternal-Summary",
     coverKey: "eternalSummary",
     gallery: [
-      { src: withBasePath("/projects/EternalSummary.png"), alt: "Eternal Summary — main page" },
-      { src: withBasePath("/projects/EternalSummary%20image%201.png"), alt: "Eternal Summary — extension popup" },
-      { src: withBasePath("/projects/EternalSummary%20image%202.png"), alt: "Eternal Summary — summary output" },
-      { src: withBasePath("/projects/EternalSummary%20Image%203.png"), alt: "Eternal Summary — settings panel" },
-      { src: withBasePath("/projects/EternalSummary%20Image%204.png"), alt: "Eternal Summary — in-page integration" },
+      { src: withBasePath("/projects/EternalSummary.webp"), alt: "Eternal Summary — main page" },
+      { src: withBasePath("/projects/EternalSummary%20image%201.webp"), alt: "Eternal Summary — extension popup" },
+      { src: withBasePath("/projects/EternalSummary%20image%202.webp"), alt: "Eternal Summary — summary output" },
+      { src: withBasePath("/projects/EternalSummary%20Image%203.webp"), alt: "Eternal Summary — settings panel" },
+      { src: withBasePath("/projects/EternalSummary%20Image%204.webp"), alt: "Eternal Summary — in-page integration" },
     ],
   },
   {
@@ -317,6 +392,9 @@ export const aboutPillars = [
   },
 ];
 
+/** Mirrors the clearance line on the resume. */
+export const aboutClearance = "DoD investigation in progress";
+
 export const aboutLanguages = [
   { name: "Arabic", level: "Native" },
   { name: "English", level: "Fluent" },
@@ -374,7 +452,6 @@ export const stackGroups: StackGroup[] = [
       { name: "Next.js", iconKey: "SiNextdotjs" },
       { name: "Tailwind CSS", iconKey: "SiTailwindcss" },
       { name: "Framer Motion", iconKey: "SiFramer" },
-      { name: "MUI", iconKey: "SiMui" },
       { name: "Vite", iconKey: "SiVite" },
       { name: "React Router", iconKey: "SiReactrouter" },
     ],
@@ -384,6 +461,7 @@ export const stackGroups: StackGroup[] = [
     items: [
       { name: "Node.js / Express", iconKey: "SiNodedotjs" },
       { name: "REST APIs", iconKey: "TbApi" },
+      { name: "Boomi", iconKey: "TbPlugConnected" },
       { name: "JWT Auth", iconKey: "SiJsonwebtokens" },
       { name: "Git / GitHub", iconKey: "SiGithub" },
       { name: "Docker", iconKey: "SiDocker" },
@@ -394,23 +472,28 @@ export const stackGroups: StackGroup[] = [
       { name: "Azure DevOps", iconKey: "VscAzureDevops" },
       { name: "Jest", iconKey: "SiJest" },
       { name: "JUnit", iconKey: "SiJunit5" },
+      { name: "Fly.io", iconKey: "SiFlydotio" },
       { name: "Heroku", iconKey: "SiHeroku" },
       { name: "Arduino", iconKey: "SiArduino" },
     ],
   },
   {
-    title: "Databases",
+    title: "Databases & Search",
     items: [
       { name: "MongoDB", iconKey: "SiMongodb" },
       { name: "PostgreSQL", iconKey: "SiPostgresql" },
       { name: "MySQL", iconKey: "SiMysql" },
+      { name: "Apache Solr", iconKey: "SiApachesolr" },
+      { name: "Norconex", iconKey: "TbSpider" },
     ],
   },
   {
     title: "AI & ML",
     items: [
-      { name: "Gemini API", iconKey: "SiGooglegemini" },
       { name: "LLM Integration", iconKey: "LuBrainCircuit" },
+      { name: "Gemini API", iconKey: "SiGooglegemini" },
+      { name: "DeepSeek", iconKey: "TbBrain" },
+      { name: "Open-Weight LLMs", iconKey: "SiHuggingface" },
     ],
   },
 ];

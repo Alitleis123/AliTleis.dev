@@ -69,7 +69,7 @@ export default function TopChoiceRealtyCover() {
         <circle cx="400" cy="175" r="50" fill="#000000" />
         {/* Actual logo art */}
         <image
-          href={withBasePath("/Timeline/Top%20Choice%20Realty.jpg")}
+          href={withBasePath("/Timeline/Top%20Choice%20Realty.webp")}
           x="350"
           y="125"
           width="100"

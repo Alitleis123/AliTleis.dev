@@ -2,15 +2,48 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import ResetAnimationsOnLoad from "./components/ResetAnimationsOnLoad";
+import { BUILD_YEAR, SITE_URL } from "./data";
 import "./globals.css";
 import BackgroundRings from "./components/BackgroundRings";
 import NavBar from "./components/NavBar";
 import ScrollToTop from "./components/ScrollToTop";
 
+const DESCRIPTION =
+  "Personal portfolio of Ali Tleis. CS student at Northeastern, Web Application Developer (AI Integration) at MIT Lincoln Laboratory. Full-stack platforms, automation pipelines, and tooling that ships.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Ali Tleis · Portfolio",
-  description:
-    "Personal portfolio of Ali Tleis. CS student at Northeastern, incoming Web Application Developer at MIT Lincoln Laboratory.",
+  description: DESCRIPTION,
+  keywords: [
+    "Ali Tleis",
+    "software engineer",
+    "full-stack developer",
+    "Northeastern University",
+    "MIT Lincoln Laboratory",
+    "React",
+    "TypeScript",
+    "Next.js",
+  ],
+  authors: [{ name: "Ali Tleis", url: SITE_URL }],
+  creator: "Ali Tleis",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "Ali Tleis",
+    title: "Ali Tleis · Software Engineer",
+    description: DESCRIPTION,
+    locale: "en_US",
+    // og:image is wired automatically from src/app/opengraph-image.png
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ali Tleis · Software Engineer",
+    description: DESCRIPTION,
+  },
   icons: {
     icon: "/portrait/Portfolio ICON.png",
     apple: "/portrait/Portfolio ICON.png",
@@ -46,7 +79,7 @@ export default function RootLayout({
                 Built with Next.js, Tailwind CSS, and Framer Motion.
               </p>
               <p className="text-[11px] text-[var(--text-faint)]">
-                © {new Date().getFullYear()} Ali Tleis. All rights reserved.
+                © {BUILD_YEAR} Ali Tleis. All rights reserved.
               </p>
             </div>
           </footer>

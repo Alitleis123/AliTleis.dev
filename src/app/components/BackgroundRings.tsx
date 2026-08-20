@@ -20,8 +20,24 @@ export default function BackgroundRings() {
 
       <div className="noise-overlay" />
 
-      <div className="orb-left absolute -left-40 top-32 h-[520px] w-[520px] rounded-full bg-sky-500/[0.04] blur-[100px]" />
-      <div className="orb-right absolute right-[-180px] top-1/3 h-[560px] w-[560px] rounded-full bg-indigo-500/[0.05] blur-[120px]" />
+      {/* Ambient glows. These use radial gradients rather than `blur-[100px]` on
+          a solid circle: an animated large-radius blur filter has to be
+          re-rasterized every frame, which pinned the whole page at ~20fps while
+          scrolling. A gradient rasterizes once and renders identically here. */}
+      <div
+        className="orb-left absolute -left-[260px] top-7 h-[720px] w-[720px]"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(14,165,233,0.055), rgba(14,165,233,0.02) 40%, transparent 68%)",
+        }}
+      />
+      <div
+        className="orb-right absolute right-[-300px] top-[calc(33.333%-120px)] h-[800px] w-[800px]"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(99,102,241,0.065), rgba(99,102,241,0.022) 40%, transparent 68%)",
+        }}
+      />
 
       {particles.map((particle, index) => (
         <span

@@ -1,5 +1,7 @@
 "use client";
 
+import { BUILD_YEAR } from "../../data";
+
 const PURPLE = "#A855F7";
 const PINK = "#EC4899";
 const CYAN = "#60A5FA";
@@ -163,7 +165,7 @@ export default function EternalSummaryCover() {
             GitHub Repository
           </text>
           <text y="14" fontSize="7.5" fill="rgba(180,180,200,0.45)">
-            © 2026 Ali Tleis
+            © {BUILD_YEAR} Ali Tleis
           </text>
           <text y="25" fontSize="7.5" fill="rgba(180,180,200,0.45)">
             CS @ Northeastern University
