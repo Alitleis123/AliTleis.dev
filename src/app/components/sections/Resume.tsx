@@ -93,7 +93,7 @@ export default function Resume() {
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-mono text-[10.5px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+              <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
                 Loading preview…
               </span>
             </div>

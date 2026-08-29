@@ -10,7 +10,9 @@
     "lint": "eslint",
     "optimize:images": "node scripts/optimize-images.mjs",
     "predeploy": "next build",
-    "deploy": "gh-pages -d out --dotfiles"
+    "deploy": "gh-pages -d out --dotfiles",
+    "build:search": "node --experimental-strip-types scripts/build-search-index.mjs",
+    "prebuild": "npm run build:search"
   },
   "dependencies": {
     "framer-motion": "^12.24.10",
@@ -25,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@xenova/transformers": "^2.17.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "gh-pages": "^6.3.0",

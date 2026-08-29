@@ -41,7 +41,7 @@ function LogoTile({ entry }: { entry: TEntry }) {
       <div
         className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl border bg-[var(--surface-1)] md:h-16 md:w-16 ${
           isCurrent
-            ? "border-[rgba(99,102,241,0.4)]"
+            ? "border-[rgba(var(--signal-rgb),0.4)]"
             : "border-[var(--border-hairline)]"
         }`}
       >
@@ -67,9 +67,9 @@ function LogoTile({ entry }: { entry: TEntry }) {
       style={
         isCurrent
           ? {
-              borderColor: "rgba(99,102,241,0.45)",
+              borderColor: "rgba(var(--signal-rgb),0.45)",
               background:
-                "linear-gradient(135deg, rgba(99,102,241,0.22), rgba(99,102,241,0.04))",
+                "linear-gradient(135deg, rgba(var(--signal-rgb),0.22), rgba(var(--signal-rgb),0.04))",
               color: "#dbeafe",
             }
           : { borderColor: "var(--border-hairline)", color: "rgba(255,255,255,0.85)" }
@@ -86,13 +86,13 @@ function RailNode({ current, education }: { current?: boolean; education?: boole
       <span aria-hidden className="relative z-10 flex h-3 w-3 items-center justify-center">
         <span
           className="absolute h-6 w-6 rounded-full blur-md"
-          style={{ background: "rgba(99,102,241,0.45)" }}
+          style={{ background: "rgba(var(--signal-rgb),0.45)" }}
         />
         <span
           className="current-node-pulse relative block h-3 w-3 rounded-full"
           style={{
             background: "var(--accent-electric)",
-            boxShadow: "0 0 16px rgba(99,102,241,0.95)",
+            boxShadow: "0 0 16px rgba(var(--signal-rgb),0.95)",
           }}
         />
       </span>
@@ -147,23 +147,23 @@ function Entry({ entry }: { entry: TEntry }) {
           {entry.range}
         </div>
         {duration ? (
-          <div className="font-mono text-[10.5px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
+          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
             {duration}
           </div>
         ) : null}
         {entry.meta ? (
-          <div className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+          <div className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--text-dim)]">
             <HiOutlineLocationMarker className="text-[12px]" />
             {entry.meta}
           </div>
         ) : null}
         {isCurrent ? (
           <span
-            className="current-pill inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[9.5px] font-medium uppercase tracking-[0.18em] md:mt-1"
+            className="current-pill inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] md:mt-1"
             style={{
-              borderColor: "rgba(99,102,241,0.45)",
-              background: "rgba(99,102,241,0.10)",
-              color: "#c7d2fe",
+              borderColor: "rgba(var(--signal-rgb),0.45)",
+              background: "rgba(var(--signal-rgb),0.10)",
+              color: "var(--signal-tint)",
             }}
           >
             <span
@@ -171,14 +171,14 @@ function Entry({ entry }: { entry: TEntry }) {
               className="block h-1 w-1 rounded-full"
               style={{
                 background: "var(--accent-electric)",
-                boxShadow: "0 0 8px rgba(99,102,241,0.9)",
+                boxShadow: "0 0 8px rgba(var(--signal-rgb),0.9)",
               }}
             />
             Current
           </span>
         ) : null}
         {isEducation ? (
-          <span className="inline-flex w-fit rounded-full border border-[var(--border-hairline)] px-2 py-0.5 font-mono text-[9.5px] font-medium uppercase tracking-[0.18em] text-white/65 md:mt-1">
+          <span className="inline-flex w-fit rounded-full border border-[var(--border-hairline)] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white/65 md:mt-1">
             Education
           </span>
         ) : null}
@@ -221,14 +221,32 @@ function Entry({ entry }: { entry: TEntry }) {
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="flex"
             >
-              <FaChevronDown className="text-[9px]" />
+              <FaChevronDown className="text-[10px]" />
             </motion.span>
           </span>
         </button>
 
-        <p className="max-w-[42rem] text-[14.5px] leading-[1.75] text-[var(--text-muted)]">
+        <p className="max-w-[58ch] text-[14px] leading-[1.75] text-[var(--text-muted)]">
           {entry.desc}
         </p>
+
+        {/* Headline outcomes, visible collapsed. These are the strongest thing
+            an entry has to say, and burying them behind the toggle meant a
+            skim-reader never saw a single number. */}
+        {!open && entry.metrics?.length ? (
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            {entry.metrics.map((m) => (
+              <span key={m.label} className="flex items-baseline gap-2">
+                <span className="tabular-figures text-[15px] font-medium tracking-tight text-white">
+                  {m.value}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-dim)]">
+                  {m.label}
+                </span>
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         {/* Collapsed preview of the stack, so the timeline is scannable without
             opening every entry. */}
@@ -265,9 +283,9 @@ function Entry({ entry }: { entry: TEntry }) {
                   <div
                     className="flex w-fit items-center gap-2.5 rounded-xl border px-3.5 py-2 font-mono text-[11px] tracking-tight"
                     style={{
-                      borderColor: "rgba(99,102,241,0.28)",
-                      background: "rgba(99,102,241,0.06)",
-                      color: "#c7d2fe",
+                      borderColor: "rgba(var(--signal-rgb),0.28)",
+                      background: "rgba(var(--signal-rgb),0.06)",
+                      color: "var(--signal-tint)",
                     }}
                   >
                     <span
@@ -279,9 +297,32 @@ function Entry({ entry }: { entry: TEntry }) {
                   </div>
                 ) : null}
 
+                {/* Impact — the expansion's opening payoff. Large numerals in
+                    the same idiom as the education stat grid below. */}
+                {entry.metrics?.length ? (
+                  <RevealBlock index={0}>
+                    <SectionLabel>Impact</SectionLabel>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {entry.metrics.map((m) => (
+                        <div
+                          key={m.label}
+                          className="surface-lift flex flex-col gap-1.5 rounded-2xl border border-[rgba(var(--signal-rgb),0.18)] bg-[rgba(var(--signal-rgb),0.04)] p-5"
+                        >
+                          <span className="tabular-figures text-[2rem] font-light leading-none tracking-[-0.02em] text-white">
+                            {m.value}
+                          </span>
+                          <span className="font-mono text-[10px] uppercase leading-[1.5] tracking-[0.24em] text-[var(--text-dim)]">
+                            {m.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </RevealBlock>
+                ) : null}
+
                 {/* Education stats — only on expansion */}
                 {isEducation && entry.education ? (
-                  <div>
+                  <RevealBlock index={1}>
                     <SectionLabel>At a Glance</SectionLabel>
                     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                       {entry.education.stats.map((s) => (
@@ -289,7 +330,7 @@ function Entry({ entry }: { entry: TEntry }) {
                           key={s.label}
                           className="surface-lift flex flex-col gap-1 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-4"
                         >
-                          <span className="font-mono text-[9.5px] uppercase tracking-[0.24em] text-[var(--text-dim)]">
+                          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-dim)]">
                             {s.label}
                           </span>
                           <span className="tabular-figures text-[19px] font-light tracking-tight text-white">
@@ -298,31 +339,37 @@ function Entry({ entry }: { entry: TEntry }) {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </RevealBlock>
                 ) : null}
 
                 {/* Responsibilities & Impact */}
                 {entry.bullets.length ? (
-                  <div>
+                  <RevealBlock index={2}>
                     <SectionLabel>
                       {isEducation ? "Highlights" : "Responsibilities & Impact"}
                     </SectionLabel>
-                    <ul className="mt-4 max-w-[44rem] space-y-3.5 text-[13.5px] leading-[1.7] text-[var(--text-muted)]">
+                    {/* Numbered rather than dotted: eight equal-weight dots read
+                        as a wall, while an index column gives the list rhythm and
+                        matches the P/01 idiom used across the site. */}
+                    <ul className="mt-4 max-w-[46rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
                       {entry.bullets.map((b, i) => (
-                        <li key={i} className="flex gap-3.5">
+                        <li
+                          key={i}
+                          className="group/row flex gap-5 border-t border-[var(--border-hairline)] py-3.5 first:border-t-0 first:pt-0"
+                        >
                           <span
                             aria-hidden
-                            className="mt-[9px] block h-[3px] w-[3px] shrink-0 rounded-full"
-                            style={{
-                              background: "var(--accent-electric)",
-                              boxShadow: "0 0 6px rgba(99,102,241,0.55)",
-                            }}
-                          />
-                          <span>{b}</span>
+                            className="tabular-figures mt-[3px] shrink-0 font-mono text-[10px] tracking-[0.16em] text-[var(--text-faint)] transition-colors duration-200 group-hover/row:text-[var(--accent-electric)]"
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <span className={i === 0 ? "text-white/85" : undefined}>
+                            {b}
+                          </span>
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </RevealBlock>
                 ) : null}
 
                 {/* Stack / Coursework */}
@@ -387,6 +434,33 @@ function Entry({ entry }: { entry: TEntry }) {
   );
 }
 
+/**
+ * Staggered entrance for the blocks inside an expanded entry. The panel used to
+ * appear all at once, which read as a content dump; revealing top-down gives the
+ * expansion a direction and lets the impact numbers land first.
+ */
+function RevealBlock({
+  index,
+  children,
+}: {
+  index: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.4,
+        delay: 0.12 + index * 0.045,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
@@ -437,7 +511,7 @@ export default function Timeline() {
           className="absolute left-[13px] top-0 bottom-0 w-px md:left-[200px]"
           style={{
             background:
-              "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.18) 6%, rgba(99,102,241,0.45) 50%, rgba(255,255,255,0.12) 94%, transparent 100%)",
+              "linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.18) 6%, rgba(var(--signal-rgb),0.45) 50%, rgba(255,255,255,0.12) 94%, transparent 100%)",
           }}
         />
 

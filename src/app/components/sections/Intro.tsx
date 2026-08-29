@@ -6,7 +6,6 @@ import { HiOutlineLocationMarker } from "react-icons/hi";
 import { heroContainer, heroItem, staggerParent, staggerChild } from "../../lib/animations";
 import {
   withBasePath,
-  aboutPillars,
   aboutClearance,
   aboutLanguages,
   aboutHobbies,
@@ -28,13 +27,14 @@ export default function Intro() {
         <div className="flex flex-col">
           <motion.h1
             variants={heroItem}
-            className="font-mono text-[4rem] font-light leading-[0.95] tracking-[-0.045em] text-white md:text-[6.75rem]"
+            className="font-mono font-medium leading-[0.9] tracking-[-0.05em] text-[var(--text-strong)]"
+            style={{ fontSize: "var(--display)" }}
           >
             Ali Tleis<span className="text-[var(--accent-electric)]">.</span>
           </motion.h1>
 
           <motion.div variants={heroItem} className="mt-7">
-            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[rgba(99,102,241,0.28)] bg-[rgba(99,102,241,0.045)] px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white/85">
+            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[var(--signal-dim)] bg-[var(--signal-wash)] px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white/85">
               <span
                 aria-hidden
                 className="current-dot relative block h-1.5 w-1.5 rounded-full"
@@ -48,12 +48,12 @@ export default function Intro() {
 
           <motion.p
             variants={heroItem}
-            className="mt-8 max-w-[36rem] text-[16px] leading-[1.7] text-[var(--text-muted)]"
+            className="mt-8 max-w-[36rem] text-[15px] leading-[1.7] text-[var(--text-muted)]"
           >
-            CS student at Northeastern. I build production software
-            end-to-end. Full-stack web platforms, automation pipelines, and
-            tooling that real people actually use. Pragmatic by default,
-            polished where it matters.
+            CS student at Northeastern, currently on a seven-month co-op at
+            MIT Lincoln Laboratory. I build production software end-to-end —
+            full-stack platforms, automation pipelines, and tooling people
+            actually use.
           </motion.p>
 
           <motion.div
@@ -87,15 +87,8 @@ export default function Intro() {
           className="flex justify-center sm:justify-end"
         >
           <div className="relative">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] opacity-70 blur-2xl"
-              style={{
-                background:
-                  "radial-gradient(60% 60% at 30% 20%, rgba(99,102,241,0.18), transparent 70%), radial-gradient(50% 50% at 80% 80%, rgba(56,189,248,0.10), transparent 65%)",
-              }}
-            />
-            <div className="relative aspect-[3/4] w-[15rem] overflow-hidden rounded-[2rem] border border-[var(--border-soft)] sm:w-[17rem] md:w-[20rem]">
+            {/* No glow blob — the frame and the grid behind it do the work. */}
+            <div className="relative aspect-[3/4] w-[15rem] overflow-hidden rounded-lg border border-[var(--border-soft)] sm:w-[17rem] md:w-[20rem]">
               <img
                 src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp")}
                 alt="Ali Tleis portrait"
@@ -118,17 +111,11 @@ export default function Intro() {
         className="mt-24 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-x-16"
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
-          <p className="text-[18px] leading-[1.7] text-[var(--text-muted)] md:text-[19px]">
-            Computer Science at Northeastern, currently on a seven-month co-op at
-            MIT Lincoln Laboratory building AI-integrated internal web
-            applications. The work I gravitate toward is the kind that ships,
-            full systems with database schemas underneath them, Python and Lua
-            pipelines handling the parts no one wants to do by hand, and a clean
-            front end on top.
-          </p>
-          <p className="mt-5 text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
-            I care about software that respects the person on the other side of
-            it. Fast, considered, and quietly opinionated.
+          <p className="max-w-[54ch] text-[18px] leading-[1.7] text-[var(--text-muted)]">
+            The work I gravitate toward is the kind that ships: full systems
+            with database schemas underneath them, Python and Lua pipelines
+            handling the parts no one wants to do by hand, and a clean front
+            end on top. Fast, considered, and quietly opinionated.
           </p>
         </motion.div>
 
@@ -183,34 +170,6 @@ export default function Intro() {
                 Boston, MA
               </span>
             </div>
-          </div>
-        </motion.div>
-
-        <motion.div variants={staggerChild} className="md:col-span-12 mt-4">
-          <div className="mb-6 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
-            <span>What I do</span>
-            <span className="block h-px flex-1 bg-white/10" />
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {aboutPillars.map((p, i) => (
-              <div
-                key={p.label}
-                className="surface-lift group relative flex flex-col gap-4 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-7 transition-[border-color,background-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] tracking-[0.22em] text-[var(--text-dim)]">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="block h-px w-8 bg-white/15 transition-all duration-300 group-hover:w-12 group-hover:bg-[var(--accent-electric)]" />
-                </div>
-                <div className="text-[17px] font-medium tracking-tight text-white">
-                  {p.label}
-                </div>
-                <p className="text-[13.5px] leading-[1.7] text-[var(--text-muted)]">
-                  {p.desc}
-                </p>
-              </div>
-            ))}
           </div>
         </motion.div>
       </motion.div>

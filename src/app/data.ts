@@ -32,6 +32,8 @@ export type TimelineEntry = {
   iconAlt?: string;
   iconText?: string;
   tech?: string[];
+  /** Headline outcomes, surfaced without expanding the entry. */
+  metrics?: { value: string; label: string }[];
   badges?: { label: string; tone: "blue" | "green" | "amber" | "violet" }[];
   note?: string;
   /** Render education entry with stat-grid card layout. */
@@ -67,6 +69,10 @@ export const timeline: TimelineEntry[] = [
       "Building inside an established enterprise environment — ServiceNow, SharePoint, Jira, and Confluence — so new tooling has to fit systems already in daily use across the lab rather than sit beside them.",
       "Operating inside a federally funded R&D center on a competitive Northeastern co-op placement, selected for the Web Application Developer (AI Integration) role specifically.",
     ],
+    metrics: [
+      { value: "70%", label: "Faster query response" },
+      { value: "40%", label: "Fewer tokens per request" },
+    ],
     note: "Security clearance: DoD investigation in progress.",
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
@@ -101,6 +107,10 @@ export const timeline: TimelineEntry[] = [
       "Diagnosed deep data integrity failures in the existing MongoDB schema caused by unvalidated writes and inconsistent field naming. Refactored the schema design to enforce strict consistency across all client and agent records, eliminating duplicate entries that were cascading into downstream query failures and incorrect data displays.",
       "Architected and deployed Python and C# automation pipelines to synchronize MongoDB records across multiple distributed virtualized environments that were previously managed manually, reducing reconciliation time by 30% and eliminating an entire category of manual error.",
       "Operated as a trusted contributor despite being an intern, proposing, designing, and shipping solutions that went into production and are still in use.",
+    ],
+    metrics: [
+      { value: "30%", label: "Less reconciliation time" },
+      { value: "0", label: "Duplicate records after refactor" },
     ],
     icon: withBasePath("/Timeline/Top%20Choice%20Realty.webp"),
     iconAlt: "Top Choice Realty logo",
@@ -168,6 +178,9 @@ export const timeline: TimelineEntry[] = [
       "Managed virtual machine configuration and setup for internal use cases, coordinated version control through Azure DevOps, and supported CI workflow setup and maintenance.",
       "First technical internship, building foundational fluency in systems administration, enterprise scripting, and deployment workflows that directly informed the architecture and automation decisions made in every subsequent role.",
     ],
+    metrics: [
+      { value: "20+", label: "Workstations provisioned" },
+    ],
     icon: withBasePath("/Timeline/RobertDe%20Falco.webp"),
     iconAlt: "Robert DeFalco Realty logo",
     tech: ["PowerShell", "Windows", "Linux", "Azure DevOps", "WinPE"],
@@ -233,6 +246,8 @@ export type Project = {
   desc: string;
   bullets: string[];
   tech?: string[];
+  /** Headline outcomes, shown on the card without expanding it. */
+  metrics?: { value: string; label: string }[];
   icon?: string;
   iconAlt?: string;
   iconText?: string;
@@ -254,12 +269,9 @@ export const featuredProjects: Project[] = [
     range: "Jan 2026 – Present",
     desc: "Python and Lua pipeline that automates motion detection, timeline reconstruction, and 4K upscaling inside DaVinci Resolve.",
     bullets: [
-      "Identified a specific painful, time-consuming manual workflow inside DaVinci Resolve and engineered a complete automated pipeline to eliminate it.",
-      "Built a Python video processing pipeline using OpenCV for threshold-based motion detection, isolating active segments and filtering redundant static frames before upscaling.",
-      "Wrote custom Lua scripting to fully automate DaVinci Resolve's timeline layer: marker placement, clip segmentation, and timeline reconstruction all happen programmatically.",
-      "Piped detection output through an FFmpeg 4K upscaling and frame interpolation pipeline, automating the path from raw footage to finished timeline.",
-      "Architected the system within DaVinci Resolve's plugin scripting environment, requiring deep reverse engineering of the API given limited official documentation.",
-      "Live at eternal2x.com as a public release.",
+      "OpenCV threshold-based motion detection isolates active segments and filters redundant static frames, so only footage that changes is sent to the upscaler.",
+      "Lua scripting drives DaVinci Resolve's timeline directly — marker placement, clip segmentation, and timeline reconstruction all happen programmatically.",
+      "Built against Resolve's plugin scripting environment with limited official documentation, which meant reverse-engineering the API before anything could be automated.",
     ],
     icon: withBasePath("/projects/eternal2x%20about.webp"),
     iconAlt: "Eternal2x icon",
@@ -278,11 +290,9 @@ export const featuredProjects: Project[] = [
     range: "Jun – Sep 2025",
     desc: "Full-stack real estate management platform with JWT auth, role-based access control, and a scalable component architecture.",
     bullets: [
-      "Designed and built a complete full-stack real estate management platform from the ground up, production-ready for property listings, agent workflows, and client data.",
-      "Architected the backend API layer with secure RESTful endpoints, JWT-based authentication, and granular role-based access control separated cleanly at the API layer.",
-      "Built the frontend around a scalable reusable component architecture used consistently across listing views, agent dashboards, and client intake flows.",
-      "Handled the full scope of a senior full-stack developer as a solo project: schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
-      "Built in parallel with the internship at Top Choice Realty, with learnings from each feeding directly into the other.",
+      "Role-based access control enforced at the API layer rather than in the UI, with JWT auth and RESTful endpoints — the frontend cannot grant itself permissions it was not issued.",
+      "A reusable component architecture carries listing views, agent dashboards, and client intake flows, so new screens compose rather than duplicate.",
+      "Solo across the entire stack: schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
     ],
     icon: withBasePath("/projects/Top%20choice%20image%201.webp"),
     iconAlt: "Top Choice Realty thumbnail",
@@ -305,13 +315,9 @@ export const featuredProjects: Project[] = [
     range: "Sep 2023 – Present",
     desc: "MV3 Chrome extension with one-click AI summaries, backed by a containerized Node and Express proxy on Fly.io that keeps Gemini credentials off the client.",
     bullets: [
-      "Built on Chrome MV3, the most restrictive extension standard, which fundamentally changed how background processing and API calls are handled compared to MV2.",
-      "Used a background service worker with injected content scripts to extract live page text and return one-click AI-generated summaries.",
-      "Implemented content-script extraction with custom sanitization logic designed for the extreme variation in real-world HTML structure across websites.",
-      "Deployed a containerized Node and Express backend on Fly.io to proxy Gemini API calls, scoping host permissions to the backend origin and keeping credentials in runtime secrets.",
-      "Implemented client-side async request queuing to keep the extension responsive under variable network conditions and slow API responses.",
-      "Handled the full complexity of MV3 message passing between content scripts, ephemeral background service workers, and the popup UI.",
-      "First project involving LLM API integration, directly informing the AI tooling direction of subsequent work.",
+      "Gemini calls proxy through a containerized Node and Express backend on Fly.io, with host permissions scoped to that origin and credentials in runtime secrets — no API key ever reaches the client.",
+      "MV3's ephemeral service worker changes how background work and message passing behave versus MV2; the extension coordinates content scripts, a background worker that can be torn down at any time, and the popup UI.",
+      "Content-script extraction with custom sanitization, written for how inconsistent real-world HTML actually is, plus client-side async queuing so the popup stays responsive on slow responses.",
     ],
     icon: withBasePath("/Timeline/eternal%20summary%20icon.webp"),
     iconAlt: "Eternal Summary icon",
@@ -342,11 +348,9 @@ export const featuredProjects: Project[] = [
     range: "2025 – Present",
     desc: "Independent dev studio with a shared Next.js / Node web surface and a Python / Lua / FFmpeg media pipeline, shipping six products across desktop, browser, and full-stack web — a Resolve upscaling plugin, a Discord rich-presence client, a Chrome summarizer, a barbershop booking platform, and two cross-platform apps in development.",
     bullets: [
-      "Co-founded eternalreverse.dev as an independent two-person dev studio, housing multiple shipping software products across systems, web, and mobile under a single umbrella.",
-      "Own the web-facing surface — Next.js, TypeScript, React, Node.js, and Tailwind — for the studio site and per-product pages.",
-      "Author the Python, Lua, and FFmpeg pipeline that ships as Eternal2x under the studio, integrating with DaVinci Resolve's scripting environment.",
-      "Studio houses six products at different stages: Eternal2x (Resolve plugin, live), Eternal Summary (Chrome extension, live), EternalRichPresence (Discord client, live beta), Signature Cuts 413 (booking platform, live), EternalMonitor (display receiver, in dev), and Exerly Fitness (in dev).",
-      "Live at eternalreverse.dev.",
+      "Six products at different stages: Eternal2x (Resolve plugin, live), Eternal Summary (Chrome extension, live), EternalRichPresence (Discord client, live beta), Signature Cuts 413 (booking platform, live), EternalMonitor and Exerly Fitness (in dev).",
+      "I own the web surface — Next.js, TypeScript, React, Node.js, Tailwind — across the studio site and every product page.",
+      "I also author the Python, Lua, and FFmpeg pipeline that ships as Eternal2x, integrating with DaVinci Resolve's scripting environment.",
     ],
     iconText: "ER",
     tech: ["TypeScript", "Next.js", "React", "Node.js", "Python", "Lua", "MongoDB", "FFmpeg"],
@@ -393,20 +397,7 @@ export const otherWork: Project[] = [
 // About
 // ───────────────────────────────────────────────────────────────────
 
-export const aboutPillars = [
-  {
-    label: "Full-Stack Web",
-    desc: "Production platforms end-to-end — schema, auth, APIs, and the interface on top.",
-  },
-  {
-    label: "Tooling & Automation",
-    desc: "Python, Lua, and PowerShell pipelines that eliminate the manual parts of real workflows.",
-  },
-  {
-    label: "Shipping to Users",
-    desc: "Software with real people on the other side. Public releases, daily operators, classified workflows.",
-  },
-];
+
 
 /** Mirrors the clearance line on the resume. */
 export const aboutClearance = "DoD investigation in progress";

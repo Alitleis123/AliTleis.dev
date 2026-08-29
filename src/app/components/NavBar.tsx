@@ -46,7 +46,7 @@ export default function NavBar() {
     <header
       className={`fixed top-0 left-0 right-0 z-30 transition-[background-color,border-color,backdrop-filter] duration-300 ${
         scrolled
-          ? "border-b border-[var(--border-hairline)] bg-[rgba(10,12,18,0.78)] backdrop-blur-xl"
+          ? "border-b border-[var(--border-hairline)] bg-[rgba(10,10,11,0.82)] backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       }`}
     >
@@ -74,10 +74,24 @@ export default function NavBar() {
           ))}
         </nav>
 
+        {/* Opens the palette via a window event rather than lifted state —
+            the two components share nothing else. */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+          aria-label="Search this site"
+          className="ml-auto mr-3 hidden items-center gap-2 rounded-full border border-[var(--border-hairline)] px-3 py-1.5 text-[12px] text-white/55 transition-colors duration-200 hover:border-[var(--border-soft)] hover:bg-white/[0.03] hover:text-white/85 md:inline-flex"
+        >
+          Search
+          <kbd className="rounded border border-[var(--border-hairline)] px-1 font-mono text-[10px] tracking-wider text-[var(--text-faint)]">
+            ⌘K
+          </kbd>
+        </button>
+
         <a
           href={RESUME_HREF}
           download
-          className="hidden rounded-full border border-[var(--border-soft)] bg-transparent px-4 py-1.5 text-[12.5px] font-medium tracking-tight text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white md:inline-flex"
+          className="hidden rounded-full border border-[var(--border-soft)] bg-transparent px-4 py-1.5 text-[13px] font-medium tracking-tight text-white/85 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04] hover:text-white md:inline-flex"
         >
           Download Resume
         </a>
@@ -96,7 +110,7 @@ export default function NavBar() {
 
       {menuOpen ? (
         <div className="md:hidden">
-          <div className="mx-4 mb-4 flex flex-col gap-1 rounded-2xl border border-[var(--border-soft)] bg-[rgba(10,12,18,0.95)] p-3 text-sm backdrop-blur-xl">
+          <div className="mx-4 mb-4 flex flex-col gap-1 rounded-2xl border border-[var(--border-soft)] bg-[rgba(16,16,18,0.96)] p-3 text-sm backdrop-blur-xl">
             {NAV_SECTIONS.map(({ id, label }) => (
               <a
                 key={id}
@@ -111,11 +125,22 @@ export default function NavBar() {
                 {label}
               </a>
             ))}
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                window.dispatchEvent(new Event("open-command-palette"));
+              }}
+              className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
+            >
+              Search
+            </button>
+
             <a
               href={RESUME_HREF}
               download
               onClick={() => setMenuOpen(false)}
-              className="mt-2 inline-flex items-center justify-center rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-center text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
+              className="inline-flex items-center justify-center rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-center text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
             >
               Download Resume
             </a>

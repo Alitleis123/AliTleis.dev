@@ -203,7 +203,7 @@ function RowEntry({
       <div
         className={`flex items-start ${divider ? "md:border-t md:border-[var(--border-hairline)] md:pt-7" : ""}`}
       >
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
           {group.title}
         </span>
       </div>

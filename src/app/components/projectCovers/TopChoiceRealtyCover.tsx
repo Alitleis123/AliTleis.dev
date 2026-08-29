@@ -10,7 +10,7 @@ export default function TopChoiceRealtyCover() {
   return (
     <svg
       viewBox="0 0 800 450"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       aria-hidden
       className="absolute inset-0 h-full w-full"
       style={{ fontFamily: "var(--font-geist-sans), Georgia, serif" }}
@@ -75,7 +75,7 @@ export default function TopChoiceRealtyCover() {
           width="100"
           height="100"
           clipPath="url(#tcr-logo-clip)"
-          preserveAspectRatio="xMidYMid slice"
+          preserveAspectRatio="xMidYMid meet"
         />
       </g>
 

@@ -76,7 +76,7 @@ export default function EternalSummaryCover() {
   return (
     <svg
       viewBox="0 0 800 450"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       aria-hidden
       className="absolute inset-0 h-full w-full"
       style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}

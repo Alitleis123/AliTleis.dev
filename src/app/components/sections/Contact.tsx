@@ -27,7 +27,7 @@ export default function Contact() {
         <h2 className="text-[2.25rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.75rem]">
           Get in touch<span className="text-[var(--accent-electric)]">.</span>
         </h2>
-        <p className="mx-auto mt-5 max-w-xl text-[15.5px] leading-[1.7] text-[var(--text-muted)]">
+        <p className="mx-auto mt-5 max-w-xl text-[15px] leading-[1.7] text-[var(--text-muted)]">
           I&apos;m always open to interesting conversations, collaborations, and
           opportunities. Reach out, I reply to everything.
         </p>
@@ -35,7 +35,7 @@ export default function Contact() {
         <div className="mt-10 flex justify-center">
           <a
             href="mailto:tleis.a@northeastern.edu"
-            className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-[14.5px] font-medium text-black transition-[transform,box-shadow] duration-200 hover:shadow-[0_0_40px_rgba(255,255,255,0.18)]"
+            className="group inline-flex items-center gap-3 rounded-full bg-white px-7 py-4 text-[14px] font-medium text-black transition-[transform,box-shadow] duration-200 hover:shadow-[0_0_40px_rgba(255,255,255,0.18)]"
           >
             <FaEnvelope className="text-[15px]" />
             <span>tleis.a@northeastern.edu</span>
