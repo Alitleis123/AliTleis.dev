@@ -11,8 +11,7 @@
     "optimize:images": "node scripts/optimize-images.mjs",
     "predeploy": "next build",
     "deploy": "gh-pages -d out --dotfiles",
-    "build:search": "node --experimental-strip-types scripts/build-search-index.mjs",
-    "prebuild": "npm run build:search"
+    "build:search": "node --experimental-strip-types scripts/build-search-index.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.24.10",
