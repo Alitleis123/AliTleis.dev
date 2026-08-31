@@ -150,6 +150,49 @@ export default function SpaceField() {
     };
 
     /**
+     * Shooting stars. Kept genuinely rare: an earlier pass ran these at roughly
+     * one every three seconds, which is constant motion in peripheral vision
+     * while somebody is reading. At this rate one arrives about every eleven
+     * seconds, so it stays something you catch rather than something you watch.
+     */
+    const MAX_METEORS = 2;
+    type Meteor = {
+      x: number; y: number; vx: number; vy: number;
+      life: number; decay: number; len: number; bright: number;
+    };
+    const meteors: Meteor[] = [];
+    let nextMeteor = rand(3, 9);
+
+    const spawnMeteor = () => {
+      const fromLeft = Math.random() < 0.5;
+      const speed = rand(420, 760);
+      const ang = rand(0.3, 0.66);
+      meteors.push({
+        x: fromLeft ? rand(-0.1, 0.5) * w : rand(0.5, 1.1) * w,
+        y: rand(-0.05, 0.55) * h,
+        vx: Math.cos(ang) * speed * (fromLeft ? 1 : -1),
+        vy: Math.sin(ang) * speed,
+        life: 1,
+        // Varied burn time. A field where every streak lasts the same duration
+        // reads as a loop.
+        decay: rand(0.6, 1.05),
+        len: rand(70, 170),
+        bright: rand(0.4, 0.7),
+      });
+    };
+
+    /**
+     * One star at a time slowly flares and fades. Uniform twinkle averages out
+     * into texture; a single event gives the eye something to land on, and it
+     * costs no extra objects because it just borrows a star that is already
+     * there.
+     */
+    const FLARE_DUR = 2.2;
+    let flareIdx = -1;
+    let flareT = 0;
+    let nextFlare = rand(2, 6);
+
+    /**
      * Angular lighting for the rings as a single conic gradient, so each ring
      * is one seamless stroke. This used to be 40 separately-stroked segments,
      * which is what made the outer ring look pixelated: a 1px stroke at a
@@ -215,8 +258,24 @@ export default function SpaceField() {
       const inStars = stage(t, 0, 0.6);
       const inBodies = stage(t, 0.5, 0.5);
 
+      if (!reduced) {
+        if (flareIdx >= 0) {
+          flareT += dt;
+          if (flareT >= FLARE_DUR) { flareIdx = -1; nextFlare = rand(4, 11); }
+        } else {
+          nextFlare -= dt;
+          if (nextFlare <= 0 && stars.length) {
+            flareIdx = Math.floor(Math.random() * stars.length);
+            flareT = 0;
+          }
+        }
+      }
+
       // ── stars, in screen space so they do not turn with the system ──
-      for (const s of stars) {
+      for (let si = 0; si < stars.length; si++) {
+        const s = stars[si];
+        // Half a sine, so it swells and settles rather than blinking.
+        const flare = si === flareIdx ? Math.sin((flareT / FLARE_DUR) * Math.PI) : 0;
         if (!reduced) {
           s.x += (s.vx * dt) / w;
           s.y += (s.vy * dt) / h;
@@ -242,13 +301,49 @@ export default function SpaceField() {
         const y = py < -20 ? py + h + 40 : py;
         const x = s.x * w;
 
-        // Size breathes as well as brightness, but gently. Alpha alone at this
-        // scale is imperceptible; the earlier 0.72-1.20 swing was a pulse.
-        const scale = reduced ? 1 : 0.88 + 0.16 * (0.5 + 0.5 * tw);
-        const rad = s.r * HALO * scale;
+        // Size breathes as well as brightness. Alpha alone at this scale is
+        // imperceptible. A 0.72-1.20 swing read as a pulse and 0.88-1.04 was
+        // too faint to notice, so this sits between them.
+        const scale = reduced ? 1 : 0.80 + 0.32 * (0.5 + 0.5 * tw);
+        const rad = s.r * HALO * scale * (1 + flare * 0.55);
 
-        ctx.globalAlpha = s.base * twinkle * inStars;
+        ctx.globalAlpha = s.base * twinkle * inStars * (1 + flare * 1.7);
         ctx.drawImage(starSprite, x - rad, y - rad, rad * 2, rad * 2);
+      }
+
+      // ── shooting stars ──
+      if (!reduced && t >= 1) {
+        nextMeteor -= dt;
+        if (nextMeteor <= 0) {
+          if (meteors.length < MAX_METEORS) spawnMeteor();
+          nextMeteor = rand(6, 16);
+        }
+        // Reverse walk so a splice does not skip the next entry.
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          m.x += m.vx * dt;
+          m.y += m.vy * dt;
+          m.life -= dt * m.decay;
+          if (m.life <= 0 || m.y > h * 1.1 || m.x < -0.2 * w || m.x > 1.2 * w) {
+            meteors.splice(i, 1);
+            continue;
+          }
+          const sp = Math.hypot(m.vx, m.vy);
+          const tx = m.x - (m.vx / sp) * m.len;
+          const ty = m.y - (m.vy / sp) * m.len;
+          const lg = ctx.createLinearGradient(m.x, m.y, tx, ty);
+          lg.addColorStop(0, `rgba(237,237,234,${m.bright * m.life})`);
+          lg.addColorStop(1, "rgba(237,237,234,0)");
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = lg;
+          ctx.lineWidth = 1.4;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(tx, ty);
+          ctx.stroke();
+          ctx.lineCap = "butt";
+        }
       }
 
       // ── rings, centred above the fold and drifting slower than the page ──
