@@ -3,8 +3,8 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Page backdrop: measured rings, bodies tracking them, a quiet field of points,
- * and grain, all painted into one canvas on one animation loop.
+ * Page backdrop: measured rings, bodies tracking them, and a quiet field of
+ * points, painted into one canvas on one animation loop.
  *
  * The restraint is deliberate. This site speaks in letterspaced mono labels,
  * zero-padded counters and slash notation, which is an instrument-panel
@@ -13,6 +13,12 @@ import { useEffect, useRef } from "react";
  * It was a different aesthetic wearing the same page, and it was louder than
  * the work it sits behind. What is left is the part that agrees with the rest
  * of the site: geometry, measured motion, and depth.
+ *
+ * There is deliberately no grain. A CSS `.noise-overlay` used to tile a
+ * 120x120 SVG across the page, and feTurbulence is deterministic, so every
+ * tile was pixel identical and the repetition read as a 120px lattice.
+ * Regenerating it as one non-repeating viewport-sized field fixed the
+ * lattice but kept the texture nobody wanted, so it is gone entirely.
  *
  * The original version was ten absolutely-positioned divs, each with its own
  * infinite CSS keyframe, which promoted ten compositor layers that stayed
@@ -135,40 +141,6 @@ export default function SpaceField() {
     };
 
     /**
-     * Film grain, baked once at viewport size.
-     *
-     * This replaces a CSS `.noise-overlay` that tiled a 120x120 SVG across the
-     * page. feTurbulence is deterministic, so every tile was pixel-identical,
-     * twelve identical copies across a desktop viewport, which the eye reads as
-     * a 120px lattice. Generating one non-repeating field at viewport size has
-     * no period to lock onto.
-     */
-    let grain: HTMLCanvasElement | null = null;
-    let grainW = 0, grainH = 0;
-    const buildGrain = () => {
-      if (w === grainW && h === grainH) return;
-      const cv = document.createElement("canvas");
-      cv.width = Math.max(1, Math.round(w));
-      cv.height = Math.max(1, Math.round(h));
-      const g = cv.getContext("2d");
-      if (!g) return;
-      const img = g.createImageData(cv.width, cv.height);
-      const px = img.data;
-      for (let i = 0; i < px.length; i += 4) {
-        px[i] = 255;
-        px[i + 1] = 255;
-        px[i + 2] = 255;
-        // Cubed so the field is sparse specks rather than a flat grey veil.
-        const v = Math.random();
-        px[i + 3] = v * v * v * 42;
-      }
-      g.putImageData(img, 0, 0);
-      grain = cv;
-      grainW = w;
-      grainH = h;
-    };
-
-    /**
      * Angular lighting for the rings as a single conic gradient, so each ring
      * is one seamless stroke. This used to be 40 separately-stroked segments,
      * which is what made the outer ring look pixelated: a 1px stroke at a
@@ -209,7 +181,6 @@ export default function SpaceField() {
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (!stars.length) buildStars();
-      buildGrain();
     };
 
     let scrollY = window.scrollY;
@@ -225,11 +196,6 @@ export default function SpaceField() {
       if (!reduced) elapsed += dt;
 
       ctx.clearRect(0, 0, w, h);
-
-      if (grain) {
-        ctx.globalAlpha = 1;
-        ctx.drawImage(grain, 0, 0, w, h);
-      }
 
       // ── stars, in screen space so they do not turn with the system ──
       for (const s of stars) {
