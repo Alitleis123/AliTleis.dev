@@ -43,12 +43,21 @@ export default function SpaceField() {
 
     /** Orbit radius as a fraction of the smaller viewport axis. */
     const ORBITS = [
-      { r: 0.30, alpha: 0.055, period: 40 },
-      { r: 0.42, alpha: 0.042, period: 68 },
-      { r: 0.56, alpha: 0.032, period: 96 },
+      { r: 0.30, alpha: 0.055, period: 22 },
+      { r: 0.42, alpha: 0.042, period: 36 },
+      { r: 0.56, alpha: 0.032, period: 52 },
     ];
     /** Seconds for the whole system to turn once. */
     const SYSTEM_PERIOD = 180;
+    /** Seconds for one travelling highlight to lap a ring. */
+    const SWEEP_PERIOD = 26;
+
+    /** Seconds the whole backdrop takes to arrive. */
+    const INTRO = 1.6;
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    /** Slice `t` into a delayed, eased sub-window so layers arrive in order. */
+    const stage = (t: number, delay: number, span: number) =>
+      easeOut(Math.min(1, Math.max(0, (t - delay) / span)));
 
     type Body = { orbit: number; phase: number; radius: number };
     const bodies: Body[] = [
@@ -189,13 +198,22 @@ export default function SpaceField() {
     let raf = 0;
     let last = performance.now();
     let elapsed = 0;
+    let frames = 0;
+    /** Set to 1 to skip the intro, for reduced motion and the rAF fallback. */
+    let introOverride = reduced ? 1 : 0;
 
     const draw = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05); // clamp after tab switches
       last = now;
       if (!reduced) elapsed += dt;
+      frames++;
 
       ctx.clearRect(0, 0, w, h);
+
+      // The backdrop arrives rather than popping in, so the copy lands first.
+      const t = introOverride || Math.min(1, elapsed / INTRO);
+      const inStars = stage(t, 0, 0.6);
+      const inBodies = stage(t, 0.5, 0.5);
 
       // ── stars, in screen space so they do not turn with the system ──
       for (const s of stars) {
@@ -229,7 +247,7 @@ export default function SpaceField() {
         const scale = reduced ? 1 : 0.88 + 0.16 * (0.5 + 0.5 * tw);
         const rad = s.r * HALO * scale;
 
-        ctx.globalAlpha = s.base * twinkle;
+        ctx.globalAlpha = s.base * twinkle * inStars;
         ctx.drawImage(starSprite, x - rad, y - rad, rad * 2, rad * 2);
       }
 
@@ -245,18 +263,47 @@ export default function SpaceField() {
       // edge a soft skirt instead of one hard pixel row.
       const conic = ringLight(cx, cy);
       ctx.strokeStyle = conic ?? "rgba(237,237,234,0.65)";
-      for (const o of ORBITS) {
+      // Rings draw themselves in, outermost last, starting from the lit point.
+      const FROM = Math.PI * 1.25;
+      ORBITS.forEach((o, i) => {
+        const p = stage(t, 0.1 + i * 0.1, 0.6);
+        if (p <= 0) return;
         const rx = unit * o.r;
+        const span = Math.PI * 2 * p;
         for (const [lw, m] of RING_PASSES) {
           ctx.globalAlpha = o.alpha * m;
           ctx.lineWidth = lw;
           ctx.beginPath();
-          ctx.arc(cx, cy, rx, 0, Math.PI * 2);
+          ctx.arc(cx, cy, rx, FROM, FROM + span);
           ctx.stroke();
         }
-      }
 
-      for (const b of bodies) {
+        // A highlight lapping the ring. The rings are circles, so the system
+        // rotation is invisible on them and every other motion here is either
+        // very slow or confined to the bodies. This is the one thing that keeps
+        // the geometry alive, and it is the first thing to delete if it reads
+        // as a loading spinner.
+        if (!reduced && p >= 1) {
+          const head = FROM - (elapsed / SWEEP_PERIOD) * Math.PI * 2 + i * 2.1;
+          const SEG = 12;
+          const ARC = 0.5;
+          ctx.lineWidth = 1.7;
+          for (let k = 0; k < SEG; k++) {
+            const f = k / SEG;
+            // Raised cosine so the highlight has no hard ends.
+            ctx.globalAlpha = o.alpha * 1.5 * (0.5 - 0.5 * Math.cos(f * Math.PI * 2));
+            ctx.beginPath();
+            ctx.arc(
+              cx, cy, rx,
+              head + f * ARC,
+              head + ((k + 1) / SEG) * ARC + 0.004,
+            );
+            ctx.stroke();
+          }
+        }
+      });
+
+      if (inBodies > 0) for (const b of bodies) {
         const o = ORBITS[b.orbit];
         const rx = unit * o.r;
         // Inner orbits complete faster, so the system never looks locked.
@@ -276,7 +323,7 @@ export default function SpaceField() {
             // Squared falloff on both size and alpha tapers it to a point
             // instead of ending in a blunt stub.
             const tr = b.radius * HALO * (0.25 + 0.75 * f * f);
-            ctx.globalAlpha = 0.34 * f * f;
+            ctx.globalAlpha = 0.34 * f * f * inBodies;
             ctx.drawImage(
               bodySprite,
               cx + Math.cos(ta) * rx - tr,
@@ -290,7 +337,7 @@ export default function SpaceField() {
         // Halo from the same sprite rather than shadowBlur: shadowBlur is a
         // per-draw gaussian on the CPU and it banded visibly at these radii.
         const hr = b.radius * HALO * 1.35;
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.9 * inBodies;
         ctx.drawImage(bodySprite, x - hr, y - hr, hr * 2, hr * 2);
       }
 
@@ -318,8 +365,19 @@ export default function SpaceField() {
     draw(performance.now());
     if (!reduced) start();
 
+    // The intro is driven by elapsed frame time, so a tab whose rAF never fires
+    // would sit on frame one forever, which is a fully transparent backdrop.
+    // setTimeout still fires when throttled, so use it to force the end state.
+    const introGuard = window.setTimeout(() => {
+      if (frames < 4) {
+        introOverride = 1;
+        draw(performance.now());
+      }
+    }, INTRO * 1000 + 400);
+
     return () => {
       stop();
+      window.clearTimeout(introGuard);
       window.removeEventListener("resize", resize);
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("visibilitychange", onVisibility);
