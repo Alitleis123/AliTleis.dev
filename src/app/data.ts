@@ -382,6 +382,16 @@ export const otherWork: Project[] = [
     iconKey: "cplusplus",
   },
   {
+    id: "neu-calendar-ics",
+    title: "NEU Academic Calendar → ICS",
+    range: "2026 – Present",
+    desc: "Northeastern publishes its academic calendar only as a PDF. This scrapes it weekly and republishes a subscribable .ics feed filtered to Boston-campus undergraduates — no dependencies, standard library only.",
+    bullets: [],
+    tech: ["Python", "GitHub Actions", "iCalendar"],
+    repo: "https://github.com/Alitleis123/neu-academic-calendar-ics",
+    iconKey: "calendar",
+  },
+  {
     id: "better-canvas",
     title: "Better Canvas",
     range: "2026",
