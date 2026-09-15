@@ -138,7 +138,7 @@ function Entry({ entry }: { entry: TEntry }) {
       {/* Meta. On desktop this is a sticky left column; on phones a 200px column
           is impossible, so it becomes an inline wrapping row above the title.
           The outer div is left to stretch to the full grid-row height on
-          purpose: that box is the sticky containing block, so the inner div has
+          purpose, since that box is the sticky containing block, so the inner div has
           room to travel alongside a long expanded entry. Shrinking it
           (self-start) leaves nothing to stick within. */}
       <div>

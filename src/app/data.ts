@@ -499,7 +499,7 @@ export const offClockExtras = [
  * the evidence for how you would know.
  */
 export const offClockNote =
-  "I create anime edits for an audience of 11.8k, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.";
+  "I create edits from anime, shows and movies for an audience of 11.8k, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.";
 
 // ───────────────────────────────────────────────────────────────────
 // About

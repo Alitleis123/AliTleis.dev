@@ -96,13 +96,13 @@ add({
 add({
   id: "offclock",
   kind: "Off-clock",
-  title: "Anime editing",
+  title: "Editing",
   subtitle: `${offClockProfile.handle} · 11.8K followers`,
   meta: "Off-clock",
   href: "#offclock",
   text: [
     offClockNote,
-    "TikTok, anime edits, video editing, After Effects, motion graphics, compositing,",
+    "TikTok, anime, shows, movies, video editing, After Effects, motion graphics, compositing,",
     "3D space, camera moves, effects, sound design, easing, nulls, keyframes,",
     "11.8K followers, 1.2M likes, 2.8M views, audience, creator,",
     ...offClockFrames.map((f) => f.label),

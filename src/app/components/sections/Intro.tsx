@@ -112,7 +112,7 @@ export default function Intro() {
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
           <p className="max-w-[54ch] text-[18px] leading-[1.7] text-[var(--text-muted)]">
-            The work I gravitate toward is the kind that ships: full systems
+            The work I gravitate toward is the kind that ships. Full systems
             with database schemas underneath them, Python and Lua pipelines
             handling the parts no one wants to do by hand, and a clean front
             end on top. Fast, considered, and quietly opinionated.

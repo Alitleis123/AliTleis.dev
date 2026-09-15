@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { withBasePath } from "../data";
 
@@ -50,7 +50,7 @@ const askItem = {
 
 const SUGGESTED = [
   "What have you built with retrieval?",
-  "Do you have cleared experience?",
+  "Do you have a security clearance?",
   "What have you shipped in Python?",
   "Why did you write a Resolve plugin?",
 ];
@@ -145,20 +145,70 @@ export default function CommandPalette() {
   }, [turns, thinking, stickToBottom]);
 
   // ── retrieval ─────────────────────────────────────────────────
+  /**
+   * Query words that carry no signal. Without this, "do you have cleared
+   * experience" scored "do" against twelve documents, because a bare substring
+   * test matches it inside "documentation" and "DoD".
+   */
+  const STOP = useMemo(
+    () =>
+      new Set(
+        ("a an and are as at be been being by can could did do does for from had has have i if in into is it its me my " +
+          "of on or should that the their them there they this to was were what when where which who whose why will " +
+          "with would you your about any been more most" ).split(" "),
+      ),
+    [],
+  );
+
+  /** Words only, no punctuation. "experience?" matched nothing at all before. */
+  const words = useCallback(
+    (text: string) =>
+      text
+        .toLowerCase()
+        .replace(/[^a-z0-9+#.\s-]/g, " ")
+        .split(/\s+/)
+        .filter(Boolean),
+    [],
+  );
+
+  /**
+   * Per-document word sets plus a document frequency per word, built once per
+   * index rather than per keystroke.
+   *
+   * Two things this fixes. Matching whole words instead of substrings, and
+   * weighting a word by how rare it is, so "cleared" appearing in one document
+   * outranks "do" appearing in twelve instead of tying with it.
+   */
+  const lex = useMemo(() => {
+    if (!index) return null;
+    const sets = index.docs.map(
+      (d) => new Set(words(`${d.title} ${d.subtitle} ${d.kind} ${d.terms}`)),
+    );
+    const titles = index.docs.map((d) => new Set(words(d.title)));
+    const df = new Map<string, number>();
+    for (const set of sets) {
+      for (const w of set) df.set(w, (df.get(w) ?? 0) + 1);
+    }
+    return { sets, titles, df, n: index.docs.length };
+  }, [index, words]);
+
   const rank = useCallback(
     (q: string, queryVec: Float32Array | null): Hit[] => {
-      if (!index) return [];
-      const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!index || !lex) return [];
+      const tokens = words(q).filter((w) => w.length > 1 && !STOP.has(w));
 
-      const lexical = (d: Doc) => {
-        const hay = `${d.title} ${d.subtitle} ${d.kind} ${d.terms}`.toLowerCase();
-        let s = 0;
+      const lexical = (i: number) => {
+        if (!tokens.length) return 0;
+        let score = 0;
+        let total = 0;
         for (const tk of tokens) {
-          if (d.title.toLowerCase().includes(tk)) s += 3;
-          else if (hay.includes(tk)) s += 1;
-          else if (hay.split(" ").some((w) => w.startsWith(tk))) s += 0.5;
+          // A word nobody uses is worth more than one everybody uses.
+          const weight = Math.log(1 + lex.n / ((lex.df.get(tk) ?? 0) + 1));
+          total += weight * 2;
+          if (lex.titles[i].has(tk)) score += weight * 2;
+          else if (lex.sets[i].has(tk)) score += weight;
         }
-        return s / (tokens.length * 3);
+        return total ? score / total : 0;
       };
 
       // Max-pool each document's chunk similarities. A record is as relevant as
@@ -181,10 +231,12 @@ export default function CommandPalette() {
 
       return index.docs
         .map((d, i) => {
-          const lex = lexical(d);
+          const lexScore = lexical(i);
           // Lexical alone is brittle for natural-language questions, semantic
-          // alone loses exact tokens like "Solr". Blending keeps both.
-          const score = queryVec ? best[i] * 0.75 + lex * 0.25 : lex;
+          // alone loses exact tokens like "Solr" or "cleared". Blending keeps
+          // both, and a strong rare-word hit is allowed to carry a result on
+          // its own.
+          const score = queryVec ? best[i] * 0.62 + lexScore * 0.38 : lexScore;
           const chunk = bestChunk[i];
           // Without the encoder there is no winning chunk, so fall back to the
           // document's first, which chunksOf builds as its heading line.
@@ -199,7 +251,7 @@ export default function CommandPalette() {
         .sort((a, b) => b.score - a.score)
         .slice(0, 4);
     },
-    [index],
+    [index, lex, words, STOP],
   );
 
   const ask = useCallback(
