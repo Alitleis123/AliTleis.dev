@@ -1,7 +1,7 @@
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 export const withBasePath = (path: string) => `${basePath}${path}`;
 
-/** Canonical origin — matches public/CNAME. Used for metadata, sitemap, robots. */
+/** Canonical origin, matches public/CNAME. Used for metadata, sitemap, robots. */
 export const SITE_URL = "https://alitleis.dev";
 
 /**
@@ -66,14 +66,14 @@ export const timeline: TimelineEntry[] = [
       "Delivered a working end-to-end prototype and demoed it to the group, unifying content from SharePoint, internal documentation, and the public Laboratory site behind a single search interface.",
       "Working across both frontier model APIs and self-hosted open-weight models, choosing per workload rather than defaulting to one provider, and keeping the retrieval layer independent of any single model.",
       "Designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers across classified and unclassified divisions of MIT Lincoln Laboratory.",
-      "Building inside an established enterprise environment — ServiceNow, SharePoint, Jira, and Confluence — so new tooling has to fit systems already in daily use across the lab rather than sit beside them.",
+      "Building inside an established enterprise environment of ServiceNow, SharePoint, Jira, and Confluence, so new tooling has to fit systems already in daily use across the lab rather than sit beside them.",
       "Operating inside a federally funded R&D center on a competitive Northeastern co-op placement, selected for the Web Application Developer (AI Integration) role specifically.",
     ],
     metrics: [
       { value: "70%", label: "Faster query response" },
       { value: "40%", label: "Fewer tokens per request" },
     ],
-    note: "Security clearance: DoD investigation in progress.",
+    note: "Security clearance under DoD investigation, in progress.",
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
@@ -118,11 +118,11 @@ export const timeline: TimelineEntry[] = [
     images: [
       {
         src: withBasePath("/projects/Top%20choice%20image%201.webp"),
-        alt: "Top Choice Realty platform — listings view",
+        alt: "Top Choice Realty platform, listings view",
       },
       {
         src: withBasePath("/projects/Top%20choice%20image%202.webp"),
-        alt: "Top Choice Realty platform — agent dashboard",
+        alt: "Top Choice Realty platform, agent dashboard",
       },
     ],
   },
@@ -138,7 +138,7 @@ export const timeline: TimelineEntry[] = [
     icon: withBasePath("/Timeline/nu-logo.webp"),
     iconAlt: "Northeastern University seal",
     iconText: "NU",
-    desc: "B.S. Computer Science and Sociology via Northeastern's co-op program — coursework alternated with full-time engineering placements.",
+    desc: "B.S. Computer Science and Sociology via Northeastern's co-op program, with coursework alternating against full-time engineering placements.",
     bullets: [
       "Northeastern's signature co-op program integrates full-time engineering placements directly into the degree, allowing immediate progression between coursework and production work.",
       "Working through core CS fundamentals (algorithms, systems, software design, OOD) while building independent projects and shipping internships in parallel to sharpen engineering skills outside the classroom.",
@@ -204,7 +204,7 @@ export const BUILD_YEAR =
 /**
  * A role is "current" when the build month falls inside its start/end window.
  * Derived rather than hand-flagged so the accent pill retires itself when the
- * co-op ends instead of needing an edit. Education is excluded — those entries
+ * co-op ends instead of needing an edit. Education is excluded, because those entries
  * get their own badge, and a multi-year degree would otherwise always match.
  */
 export const isCurrentEntry = (entry: TimelineEntry) =>
@@ -214,7 +214,7 @@ export const isCurrentEntry = (entry: TimelineEntry) =>
 
 /**
  * Inclusive month span, derived from the start/end keys rather than written by
- * hand. Returns null when it can't produce something sensible — e.g. if the
+ * hand. Returns null when it can't produce something sensible, for example if the
  * build-time NOW fallback is in play, an open-ended entry would compute an
  * absurd span.
  */
@@ -257,7 +257,7 @@ export type Project = {
   iconKey?: string;
   /** Key referencing a custom SVG cover component (used when there's no gallery hero). */
   coverKey?: string;
-  /** Gallery — first image is shown as the card's showcase, rest available in lightbox. */
+  /** Gallery, first image is shown as the card's showcase, rest available in lightbox. */
   gallery?: { src: string; alt: string }[];
 };
 
@@ -267,12 +267,12 @@ export const featuredProjects: Project[] = [
     title: "Eternal2x",
     subtitle: "eternal2x.com",
     range: "Feb 2026 – Present",
-    desc: "DaVinci Resolve plugin for hand-drawn animation: it finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
+    desc: "DaVinci Resolve plugin for hand-drawn animation. It finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
     bullets: [
       "This one came out of my own edits. I create anime edits for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
-      "Anime is drawn on 2s or 3s — twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing: there is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
+      "Anime is drawn on 2s or 3s. Twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing. There is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
       "Frame-difference scoring finds the duplicates and infers whether a clip is on 1s, 2s or 3s, so the hold pattern is read off the footage rather than typed in. If a clip has no duplicated frames the plugin says so and stops, instead of inventing motion that was never drawn.",
-      "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree — exactly where flow normally tears — it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
+      "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree, which is exactly where flow normally tears, it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
       "The Lua panel is a thin wrapper over the Python modules, so every button has a command-line equivalent and --video runs the whole pipeline without opening Resolve at all.",
       "362 tests run green against a faked Resolve API, covering the bridge, the installer, the release builder and the site, so CI needs no copy of Resolve Studio. The Lua UI is driven from Python through an embedded Lua runtime.",
       "Ships a one-click installer that provisions its own Python when the machine has none, plus a startup updater that verifies each download against a SHA-256 checksum before applying it.",
@@ -284,8 +284,8 @@ export const featuredProjects: Project[] = [
     repo: "https://github.com/Alitleis123/Eternal2x.com",
     coverKey: "eternal2x",
     gallery: [
-      { src: withBasePath("/projects/eternal2x%20about.webp"), alt: "Eternal2x — about page" },
-      { src: withBasePath("/projects/eternal2x%20download.webp"), alt: "Eternal2x — download page" },
+      { src: withBasePath("/projects/eternal2x%20about.webp"), alt: "Eternal2x, about page" },
+      { src: withBasePath("/projects/eternal2x%20download.webp"), alt: "Eternal2x, download page" },
     ],
   },
   {
@@ -294,12 +294,12 @@ export const featuredProjects: Project[] = [
     range: "Jun – Sep 2025",
     desc: "Full-stack real estate platform with session auth, role-based access control, and a scalable component architecture.",
     bullets: [
-      "Role-based access control is enforced in API middleware rather than in the UI, so the frontend cannot grant itself a permission it was not issued. Auth is session-based: bcrypt-hashed credentials, sessions persisted to MongoDB through connect-mongo so a restart does not sign everyone out, and secure cookies.",
+      "Role-based access control is enforced in API middleware rather than in the UI, so the frontend cannot grant itself a permission it was not issued. Auth is session-based, with bcrypt-hashed credentials, sessions persisted to MongoDB through connect-mongo so a restart does not sign everyone out, and secure cookies.",
       "Every request body is parsed through a shared Zod schema at the route boundary, with sanitizing string, email and phone types underneath it and an error handler that turns a schema failure into a field-level 400. That is what keeps unvalidated writes off the collections, which is the failure mode that had produced the duplicate client records in the first place.",
       "A reusable component architecture carries listing views, agent dashboards, and client intake flows, so new screens compose rather than duplicate.",
-      "Laid out as a pnpm workspace — a React and Vite web app, an Express and Mongoose API, and shared infrastructure — with typecheck, lint and format running across both apps from the root.",
+      "Laid out as a pnpm workspace holding a React and Vite web app, an Express and Mongoose API, and shared infrastructure, with typecheck, lint and format running across both apps from the root.",
       "Inquiries submitted from the public site notify the listing agent over SMTP, with helmet and per-IP rate limiting in front of the public endpoints.",
-      "Solo across the entire stack: schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
+      "Solo across the entire stack, meaning schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
     ],
     icon: withBasePath("/projects/Top%20choice%20image%201.webp"),
     iconAlt: "Top Choice Realty thumbnail",
@@ -308,11 +308,11 @@ export const featuredProjects: Project[] = [
     repo: "https://github.com/alitleis123/topchoicerealty",
     coverKey: "topChoiceRealty",
     gallery: [
-      { src: withBasePath("/projects/Top%20choice%20image%201.webp"), alt: "Top Choice Realty — main listings page" },
-      { src: withBasePath("/projects/Top%20choice%20image%202.webp"), alt: "Top Choice Realty — agent dashboard" },
-      { src: withBasePath("/projects/Top%20choice%20image%203.webp"), alt: "Top Choice Realty — listing detail" },
-      { src: withBasePath("/projects/Top%20choice%20image%204.webp"), alt: "Top Choice Realty — admin view" },
-      { src: withBasePath("/projects/Top%20choice%20image%205.webp"), alt: "Top Choice Realty — client intake" },
+      { src: withBasePath("/projects/Top%20choice%20image%201.webp"), alt: "Top Choice Realty, main listings page" },
+      { src: withBasePath("/projects/Top%20choice%20image%202.webp"), alt: "Top Choice Realty, agent dashboard" },
+      { src: withBasePath("/projects/Top%20choice%20image%203.webp"), alt: "Top Choice Realty, listing detail" },
+      { src: withBasePath("/projects/Top%20choice%20image%204.webp"), alt: "Top Choice Realty, admin view" },
+      { src: withBasePath("/projects/Top%20choice%20image%205.webp"), alt: "Top Choice Realty, client intake" },
     ],
   },
   {
@@ -325,8 +325,8 @@ export const featuredProjects: Project[] = [
       "The panel is not a popup. It renders in a shadow root with its own stylesheet, inset beside the article, so a host rule like * { line-height: 1 !important } cannot collapse its text and it cannot leak styles back onto the page. The test fixture ships that CSS deliberately, along with uppercased buttons and forced letter spacing, to hold the boundary.",
       "Page-context code never sees the backend address. It names an endpoint, the content script forwards that to the MV3 service worker, and the worker checks the name against an allow list before it fetches anything. Gemini credentials live in Fly.io runtime secrets and .env is excluded from the image, so no key ships in a build or reaches the client.",
       "Every answer cites the passages it drew on. Clicking a source scrolls to that passage and highlights it in place without closing the panel, and the highlight is cleaned up afterwards rather than left on the page.",
-      "Four modes — summary, bullets, key points, plain English — thirteen output languages independent of whatever the page is written in, a reading-time estimate, and a one-line verdict on whether the page is worth reading at all. Switching mode re-reads the page and appends, so the conversation above it survives. Summaries cache in extension storage for thirty minutes.",
-      "69 end-to-end tests drive real Chrome over the DevTools Protocol. Only the chrome.* surface and the network are stubbed, so they exercise the real path: page to content script to service worker to backend. Coverage includes style isolation, cache expiry, focus trapping, rate-limit paths, and a check that repeated opens strand nothing on the page.",
+      "Four modes, summary and bullets and key points and plain English, plus thirteen output languages independent of whatever the page is written in, a reading-time estimate, and a one-line verdict on whether the page is worth reading at all. Switching mode re-reads the page and appends, so the conversation above it survives. Summaries cache in extension storage for thirty minutes.",
+      "69 end-to-end tests drive real Chrome over the DevTools Protocol. Only the chrome.* surface and the network are stubbed, so they exercise the real path, page to content script to service worker to backend. Coverage includes style isolation, cache expiry, focus trapping, rate-limit paths, and a check that repeated opens strand nothing on the page.",
       "The backend reads truncated and non-JSON model replies rather than dropping them, keeping the prose the model did manage to write instead of leaking raw JSON into the panel, and retries a busy model with backoff. A per-IP throttle sits in front, because an open endpoint on a metered key is an easy way to burn quota.",
     ],
     icon: withBasePath("/Timeline/eternal%20summary%20icon.webp"),
@@ -346,11 +346,11 @@ export const featuredProjects: Project[] = [
     repo: "https://github.com/Alitleis123/Eternal-Summary",
     coverKey: "eternalSummary",
     gallery: [
-      { src: withBasePath("/projects/es-panel.webp"), alt: "Eternal Summary — the rail open beside an article, with the reading time, the worth-reading verdict, the four modes, and numbered sources" },
-      { src: withBasePath("/projects/es-bullets.webp"), alt: "Eternal Summary — bullets mode rendering the summary as a list" },
-      { src: withBasePath("/projects/es-chat.webp"), alt: "Eternal Summary — a follow-up conversation in the same rail" },
-      { src: withBasePath("/projects/es-trigger.webp"), alt: "Eternal Summary — the floating Summarize button beside a highlight" },
-      { src: withBasePath("/projects/es-selection.webp"), alt: "Eternal Summary — the selection card anchored to the highlighted passage" },
+      { src: withBasePath("/projects/es-panel.webp"), alt: "Eternal Summary, the rail open beside an article, with the reading time, the worth-reading verdict, the four modes, and numbered sources" },
+      { src: withBasePath("/projects/es-bullets.webp"), alt: "Eternal Summary, bullets mode rendering the summary as a list" },
+      { src: withBasePath("/projects/es-chat.webp"), alt: "Eternal Summary, a follow-up conversation in the same rail" },
+      { src: withBasePath("/projects/es-trigger.webp"), alt: "Eternal Summary, the floating Summarize button beside a highlight" },
+      { src: withBasePath("/projects/es-selection.webp"), alt: "Eternal Summary, the selection card anchored to the highlighted passage" },
     ],
   },
   {
@@ -360,10 +360,10 @@ export const featuredProjects: Project[] = [
     range: "2025 – Present",
     desc: "Independent Boston software studio, four founders, shipping six products across desktop, browser, and web on a shared Next.js surface.",
     bullets: [
-      "Six products, four of them live: Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor — an iPad as a low-latency Windows display, in Rust and Swift — and Exerly Fitness are in development.",
-      "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page: Next.js 14 on the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
+      "Six products with four of them live. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor, an iPad as a low-latency Windows display in Rust and Swift, and Exerly Fitness are both in development.",
+      "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page, built on Next.js 14 with the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
       "I also author the Python and Lua pipeline that ships as Eternal2x, driving DaVinci Resolve's scripting environment from an embedded Lua panel.",
-      "The site carries an engineer roster rather than a single about page — a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
+      "The site carries an engineer roster rather than a single about page, a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
       "Playwright drives the pages in CI, alongside a copy-style check that fails the build on em dashes and semicolons in user-facing text, so four contributors cannot drift into four different voices.",
       "Started as Eternal Reverse and rebranded to Sideband in 2026, which meant moving a live site, its domain, and six product identities without breaking the existing links.",
     ],
@@ -373,9 +373,9 @@ export const featuredProjects: Project[] = [
     repo: "https://github.com/whoisaldo/sideband.studio",
     coverKey: "sideband",
     gallery: [
-      { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband — the studio home page, with the product marks and the interactive terminal" },
-      { src: withBasePath("/projects/sideband-products.webp"), alt: "Sideband — the stack row and the products close, six products and counting" },
-      { src: withBasePath("/projects/sideband-engineers.webp"), alt: "Sideband — the engineer dossiers, one card per founder" },
+      { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband, the studio home page, with the product marks and the interactive terminal" },
+      { src: withBasePath("/projects/sideband-products.webp"), alt: "Sideband, the stack row and the products close, six products and counting" },
+      { src: withBasePath("/projects/sideband-engineers.webp"), alt: "Sideband, the engineer dossiers, one card per founder" },
     ],
   },
 ];
@@ -385,7 +385,7 @@ export const otherWork: Project[] = [
     id: "calorie-calculator",
     title: "CalorieCalculator",
     range: "2024",
-    desc: "Calorie target calculator: Mifflin-St Jeor for BMR, an activity multiplier for TDEE, then a goal adjustment.",
+    desc: "Calorie target calculator. Mifflin-St Jeor for BMR, an activity multiplier for TDEE, then a goal adjustment.",
     bullets: [],
     tech: ["React", "Vite"],
     repo: "https://github.com/Alitleis123/CalorieCalculator",
@@ -405,7 +405,7 @@ export const otherWork: Project[] = [
     id: "neu-calendar-ics",
     title: "NEU Academic Calendar → ICS",
     range: "2026 – Present",
-    desc: "Northeastern publishes its academic calendar only as a PDF. This scrapes it weekly and republishes a subscribable .ics feed filtered to Boston-campus undergraduates — no dependencies, standard library only.",
+    desc: "Northeastern publishes its academic calendar only as a PDF. This scrapes it weekly and republishes a subscribable .ics feed filtered to Boston-campus undergraduates, with no dependencies and standard library only.",
     bullets: [],
     tech: ["Python", "GitHub Actions", "iCalendar"],
     repo: "https://github.com/Alitleis123/neu-academic-calendar-ics",
@@ -415,7 +415,7 @@ export const otherWork: Project[] = [
     id: "better-canvas",
     title: "Better Canvas",
     range: "2026 – In progress",
-    desc: "Canvas LMS customizer for Chrome and Firefox: skins, a kanban planner, Pomodoro, GPA and rubric predictors, and a command palette. Local only, no accounts, no telemetry.",
+    desc: "Canvas LMS customizer for Chrome and Firefox. Skins, a kanban planner, Pomodoro, GPA and rubric predictors, and a command palette, all local with no accounts and no telemetry.",
     bullets: [],
     tech: ["JavaScript", "Chrome MV3", "Firefox"],
     repo: "https://github.com/Alitleis123/Better-Canvas",
@@ -452,7 +452,7 @@ export const offClockProfile = {
     return v ? `${base}?v=${v}` : base;
   })(),
   src: withBasePath("/offclock/anime-editing-full.webp"),
-  alt: "TikTok profile for @.justlightt: 11.8K followers, 1.2M likes, and a post grid with 2.8M, 1.6M and 767.4K views",
+  alt: "TikTok profile for @.justlightt showing 11.8K followers, 1.2M likes, and a post grid with 2.8M, 1.6M and 767.4K views",
   href: "https://www.tiktok.com/@.justlightt",
   handle: "@.justlightt",
   stats: [
@@ -462,7 +462,7 @@ export const offClockProfile = {
   ],
 };
 
-/** The craft behind the posts: project files, not finished videos. */
+/** The craft behind the posts, meaning project files rather than finished videos. */
 export const offClockFrames: OffClockFrame[] = [
   {
     id: "eye-edit",
@@ -493,7 +493,7 @@ export const offClockExtras = [
 ];
 
 export const offClockNote =
-  "I create anime edits for an audience of 11.8k. The work happens in After Effects: nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut. It is also where Eternal2x came from. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
+  "I create anime edits for an audience of 11.8k. The work happens in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut. It is also where Eternal2x came from. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
 
 // ───────────────────────────────────────────────────────────────────
 // About

@@ -124,7 +124,7 @@ export default function EternalSummaryCover() {
 
         {/* Brand: ES logo + wordmark */}
         <g transform="translate(20, 30)">
-          {/* Logo mark — infinity-like ring */}
+          {/* Logo mark, infinity-like ring */}
           <g transform="translate(13, 13)">
             <circle r="11" fill="none" stroke="url(#es-logoStroke)" strokeWidth="1.5" />
             <path

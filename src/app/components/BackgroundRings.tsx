@@ -4,7 +4,7 @@ import SpaceField from "./SpaceField";
  * Page backdrop: orbital canvas, one warm light source, grain, and an edge
  * falloff so nothing competes with the reading column.
  *
- * The measured graph-paper grid that lived here is gone — it read as an
+ * The measured graph-paper grid that lived here is gone, since it read as an
  * instrument panel, which fought the orbits rather than supporting them.
  * The grain moved into the canvas too: as a repeating 120px CSS tile it read
  * as a lattice, which is a grid by another name.

@@ -10,7 +10,7 @@ const PREF_KEY = "ambient-audio";
 const VOLUME = 0.45;
 
 /**
- * Ambient audio bed — a 3-minute loop cut from a longer recording, with a
+ * Ambient audio bed, a 3-minute loop cut from a longer recording, with a
  * crossfaded seam so the wrap-around isn't audible. Fades rather than cuts
  * on both ends, since an abrupt start is the thing that makes site audio
  * feel like an accident.
@@ -56,7 +56,7 @@ export default function AmbientAudio() {
     disarmRef.current = null;
   }, []);
 
-  /** Browsers gate audio behind a gesture — start on the first interaction. */
+  /** Browsers gate audio behind a gesture, start on the first interaction. */
   const armGesture = useCallback(() => {
     setState("blocked");
     if (disarmRef.current) return; // already listening
@@ -75,7 +75,7 @@ export default function AmbientAudio() {
       const el = elRef.current;
       if (!el) return;
       // A click on the button also fires the armed pointerdown listener, so
-      // drop it first — two overlapping play() calls on one element race and
+      // drop it first, because two overlapping play() calls on one element race and
       // leave the UI reporting the wrong state.
       disarm();
       if (startingRef.current) return;

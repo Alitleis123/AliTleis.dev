@@ -75,15 +75,20 @@ export default function NavBar() {
           ))}
         </nav>
 
-        {/* Opens the palette via a window event rather than lifted state —
+        {/* Opens the palette via a window event rather than lifted state,
             the two components share nothing else. */}
         <button
           type="button"
           onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
-          aria-label="Search this site"
+          aria-label="Ask AI about this site"
           className="ml-auto mr-3 hidden items-center gap-2 rounded-full border border-[var(--border-hairline)] px-3 py-1.5 text-[12px] text-white/55 transition-colors duration-200 hover:border-[var(--border-soft)] hover:bg-white/[0.03] hover:text-white/85 md:inline-flex"
         >
-          Search
+          <span
+            aria-hidden
+            className="current-dot block h-1.5 w-1.5 rounded-full"
+            style={{ background: "var(--accent-electric)" }}
+          />
+          Ask AI
           <kbd className="rounded border border-[var(--border-hairline)] px-1 font-mono text-[10px] tracking-wider text-[var(--text-faint)]">
             ⌘K
           </kbd>
@@ -134,7 +139,7 @@ export default function NavBar() {
               }}
               className="mt-2 inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--border-soft)] px-4 py-2.5 text-sm font-medium text-white/90 transition-colors duration-200 hover:border-white/25 hover:bg-white/[0.04]"
             >
-              Search
+              Ask AI
             </button>
 
             <a

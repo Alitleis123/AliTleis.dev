@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { withBasePath } from "../data";
 
@@ -20,27 +20,41 @@ type Index = {
   scale: number;
   docs: Doc[];
   vectors: number[][];
-  /** vectors[i] belongs to docs[owners[i]] — several chunks per document. */
+  /** vectors[i] belongs to docs[owners[i]], several chunks per document. */
   owners: number[];
+  /** snippets[i] is the prose that vectors[i] was built from. */
+  snippets: string[];
 };
 
 type Mode = "lexical" | "loading" | "semantic";
+
+type Hit = { doc: Doc; score: number; snippet: string };
+
+/** One question and what came back for it. */
+type Turn = { q: string; hits: Hit[]; semantic: boolean };
 
 /** Any component can open the palette without prop drilling. */
 export const OPEN_EVENT = "open-command-palette";
 
 const CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
 
+const SUGGESTED = [
+  "What have you built with retrieval?",
+  "Do you have cleared experience?",
+  "What have you shipped in Python?",
+  "Why did you write a Resolve plugin?",
+];
+
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [index, setIndex] = useState<Index | null>(null);
   const [mode, setMode] = useState<Mode>("lexical");
-  const [queryVec, setQueryVec] = useState<Float32Array | null>(null);
-  const [active, setActive] = useState(0);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [thinking, setThinking] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
+  const threadRef = useRef<HTMLDivElement>(null);
   const encoderRef = useRef<((t: string) => Promise<Float32Array>) | null>(null);
   const loadingRef = useRef(false);
 
@@ -62,7 +76,7 @@ export default function CommandPalette() {
     };
   }, []);
 
-  // Index and encoder are fetched on first open, never on page load — the
+  // Index and encoder are fetched on first open, never on page load, because the
   // palette costs nothing to a visitor who never presses the key.
   useEffect(() => {
     if (!open || index) return;
@@ -91,36 +105,14 @@ export default function CommandPalette() {
         };
         setMode("semantic");
       } catch {
-        // Offline or CDN blocked — keyword ranking stays in charge.
+        // Offline or CDN blocked, so keyword ranking stays in charge.
         setMode("lexical");
       }
     })();
   }, [open]);
 
-  // Encode the query once the model is ready. Debounced so typing doesn't
-  // queue a forward pass per keystroke.
-  useEffect(() => {
-    if (mode !== "semantic" || !query.trim()) {
-      setQueryVec(null);
-      return;
-    }
-    let cancelled = false;
-    const t = setTimeout(async () => {
-      const v = await encoderRef.current?.(query);
-      if (!cancelled && v) setQueryVec(v);
-    }, 120);
-    return () => {
-      cancelled = true;
-      clearTimeout(t);
-    };
-  }, [query, mode]);
-
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 40);
-    else {
-      setQuery("");
-      setActive(0);
-    }
   }, [open]);
 
   useEffect(() => {
@@ -130,53 +122,90 @@ export default function CommandPalette() {
     };
   }, [open]);
 
-  // ── ranking ───────────────────────────────────────────────────
-  const results = useMemo(() => {
-    if (!index) return [];
-    const q = query.trim().toLowerCase();
-    if (!q) return index.docs.slice(0, 7).map((d) => ({ doc: d, score: 0 }));
-
-    const tokens = q.split(/\s+/).filter(Boolean);
-
-    const lexical = (d: Doc) => {
-      const hay = `${d.title} ${d.subtitle} ${d.kind} ${d.terms}`.toLowerCase();
-      let s = 0;
-      for (const tk of tokens) {
-        if (d.title.toLowerCase().includes(tk)) s += 3;
-        else if (hay.includes(tk)) s += 1;
-        else if (hay.split(" ").some((w) => w.startsWith(tk))) s += 0.5;
-      }
-      return s / (tokens.length * 3);
-    };
-
-    // Max-pool each document's chunk similarities: a record is as relevant as
-    // its single best-matching passage, not the average of all of them.
-    const best = new Array(index.docs.length).fill(0);
-    if (queryVec) {
-      for (let i = 0; i < index.vectors.length; i++) {
-        const v = index.vectors[i];
-        let dot = 0;
-        for (let k = 0; k < v.length; k++) dot += queryVec[k] * (v[k] / index.scale);
-        const o = index.owners[i];
-        if (dot > best[o]) best[o] = dot;
-      }
-    }
-
-    const scored = index.docs.map((d, i) => {
-      const lex = lexical(d);
-      // Lexical alone is brittle for natural-language questions; semantic alone
-      // loses exact tokens like "Solr". Blending keeps both.
-      const score = queryVec ? best[i] * 0.75 + lex * 0.25 : lex;
-      return { doc: d, score };
+  // Follow the newest turn.
+  useEffect(() => {
+    threadRef.current?.scrollTo({
+      top: threadRef.current.scrollHeight,
+      behavior: "smooth",
     });
+  }, [turns, thinking]);
 
-    return scored
-      .filter((r) => r.score > (queryVec ? 0.1 : 0.01))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 7);
-  }, [index, query, queryVec]);
+  // ── retrieval ─────────────────────────────────────────────────
+  const rank = useCallback(
+    (q: string, queryVec: Float32Array | null): Hit[] => {
+      if (!index) return [];
+      const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
 
-  useEffect(() => setActive(0), [query]);
+      const lexical = (d: Doc) => {
+        const hay = `${d.title} ${d.subtitle} ${d.kind} ${d.terms}`.toLowerCase();
+        let s = 0;
+        for (const tk of tokens) {
+          if (d.title.toLowerCase().includes(tk)) s += 3;
+          else if (hay.includes(tk)) s += 1;
+          else if (hay.split(" ").some((w) => w.startsWith(tk))) s += 0.5;
+        }
+        return s / (tokens.length * 3);
+      };
+
+      // Max-pool each document's chunk similarities. A record is as relevant as
+      // its single best-matching passage, not the average of all of them. The
+      // winning chunk is kept, since that passage is what gets quoted back.
+      const best = new Array(index.docs.length).fill(0);
+      const bestChunk = new Array(index.docs.length).fill(-1);
+      if (queryVec) {
+        for (let i = 0; i < index.vectors.length; i++) {
+          const v = index.vectors[i];
+          let dot = 0;
+          for (let k = 0; k < v.length; k++) dot += queryVec[k] * (v[k] / index.scale);
+          const o = index.owners[i];
+          if (dot > best[o]) {
+            best[o] = dot;
+            bestChunk[o] = i;
+          }
+        }
+      }
+
+      return index.docs
+        .map((d, i) => {
+          const lex = lexical(d);
+          // Lexical alone is brittle for natural-language questions, semantic
+          // alone loses exact tokens like "Solr". Blending keeps both.
+          const score = queryVec ? best[i] * 0.75 + lex * 0.25 : lex;
+          const chunk = bestChunk[i];
+          // Without the encoder there is no winning chunk, so fall back to the
+          // document's first, which chunksOf builds as its heading line.
+          const fallback = index.owners.findIndex((o) => o === i);
+          return {
+            doc: d,
+            score,
+            snippet: index.snippets[chunk >= 0 ? chunk : fallback] ?? "",
+          };
+        })
+        .filter((r) => r.score > (queryVec ? 0.1 : 0.01))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+    },
+    [index],
+  );
+
+  const ask = useCallback(
+    async (raw: string) => {
+      const q = raw.trim();
+      if (!q || thinking) return;
+      setQuery("");
+      setThinking(true);
+      let vec: Float32Array | null = null;
+      try {
+        vec = (await encoderRef.current?.(q)) ?? null;
+      } catch {
+        vec = null;
+      }
+      setTurns((t) => [...t, { q, hits: rank(q, vec), semantic: !!vec }]);
+      setThinking(false);
+      inputRef.current?.focus();
+    },
+    [rank, thinking],
+  );
 
   const go = useCallback((d: Doc) => {
     setOpen(false);
@@ -184,25 +213,6 @@ export default function CommandPalette() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     else window.location.hash = d.href;
   }, []);
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActive((a) => Math.min(a + 1, results.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActive((a) => Math.max(a - 1, 0));
-    } else if (e.key === "Enter" && results[active]) {
-      e.preventDefault();
-      go(results[active].doc);
-    }
-  };
-
-  useEffect(() => {
-    listRef.current
-      ?.querySelector(`[data-i="${active}"]`)
-      ?.scrollIntoView({ block: "nearest" });
-  }, [active]);
 
   const statusLabel =
     mode === "semantic"
@@ -219,94 +229,194 @@ export default function CommandPalette() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[12vh]"
+          className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[10vh]"
+          onClick={() => setOpen(false)}
           role="dialog"
           aria-modal="true"
-          aria-label="Search this site"
-          onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}
+          aria-label="Ask about this site"
         >
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
 
           <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            initial={{ opacity: 0, y: -10, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            exit={{ opacity: 0, y: -8, scale: 0.99 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-[38rem] overflow-hidden rounded-2xl border border-[var(--border-soft)] bg-[rgba(16,16,18,0.97)] shadow-[0_30px_80px_rgba(0,0,0,0.6)]"
+            onClick={(e) => e.stopPropagation()}
+            className="ai-ring relative isolate w-full max-w-[640px] rounded-[1.12rem] shadow-[0_40px_120px_rgba(0,0,0,0.75)]"
           >
-            <div className="flex items-center gap-3 border-b border-[var(--border-hairline)] px-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-faint)]">
-                Ask
-              </span>
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={onKeyDown}
-                placeholder="What have you built with retrieval?"
-                aria-label="Search query"
-                className="w-full bg-transparent py-4 text-[14px] text-white outline-none placeholder:text-[var(--text-faint)]"
-              />
-              <kbd className="hidden shrink-0 rounded border border-[var(--border-hairline)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--text-dim)] sm:block">
+            <div className="flex max-h-[76vh] flex-col overflow-hidden rounded-2xl bg-[#0c0c0f]">
+            {/* Header */}
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border-hairline)] px-5 py-3.5">
+              <div className="flex items-center gap-2.5">
+                <span
+                  aria-hidden
+                  className="current-dot block h-1.5 w-1.5 rounded-full"
+                  style={{ background: "var(--accent-electric)" }}
+                />
+                <span className="text-[13px] font-medium tracking-tight text-white">
+                  AI search
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                  in the browser
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md border border-[var(--border-hairline)] px-2 py-1 font-mono text-[10px] tracking-[0.18em] text-[var(--text-dim)] transition-colors duration-200 hover:border-[var(--border-soft)] hover:text-white"
+              >
                 ESC
-              </kbd>
+              </button>
             </div>
 
-            <div ref={listRef} className="max-h-[46vh] overflow-y-auto p-2">
-              {results.length ? (
-                results.map((r, i) => (
-                  <button
-                    key={r.doc.id}
-                    data-i={i}
-                    type="button"
-                    onMouseEnter={() => setActive(i)}
-                    onClick={() => go(r.doc)}
-                    className={`flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition-colors duration-150 ${
-                      i === active ? "bg-white/[0.06]" : "hover:bg-white/[0.03]"
-                    }`}
-                  >
-                    <span className="mt-[3px] w-[74px] shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
-                      {r.doc.kind}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[14px] tracking-tight text-white">
-                        {r.doc.title}
-                      </span>
-                      <span className="mt-0.5 block truncate text-[12px] text-[var(--text-muted)]">
-                        {r.doc.subtitle}
-                      </span>
-                    </span>
-                    {query.trim() ? (
-                      <span className="tabular-figures mt-[3px] shrink-0 font-mono text-[10px] text-[var(--text-faint)]">
-                        {r.score.toFixed(2)}
-                      </span>
-                    ) : null}
-                  </button>
-                ))
-              ) : (
-                <div className="px-3 py-8 text-center text-[13px] text-[var(--text-dim)]">
-                  {index ? "No matches." : "Loading index…"}
+            {/* Thread */}
+            <div ref={threadRef} className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+              {turns.length === 0 && !thinking ? (
+                <div className="flex flex-col gap-4">
+                  <p className="max-w-[46ch] text-[13px] leading-[1.7] text-[var(--text-muted)]">
+                    Ask a question in plain English. Every answer is a passage
+                    pulled from this page, with the section it came from, so you
+                    can go read the rest.
+                  </p>
+                  <div className="flex flex-col items-start gap-2">
+                    {SUGGESTED.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => ask(s)}
+                        className="rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-3 py-1.5 text-left text-[12px] tracking-tight text-[var(--text-muted)] transition-colors duration-200 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:text-white"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              )}
+              ) : null}
+
+              <div className="flex flex-col gap-7">
+                {turns.map((t, ti) => (
+                  <div key={ti} className="flex flex-col gap-3.5">
+                    {/* Question */}
+                    <div className="flex justify-end">
+                      <span className="max-w-[80%] rounded-2xl rounded-br-md bg-[var(--surface-2)] px-3.5 py-2 text-[13px] leading-[1.6] tracking-tight text-white">
+                        {t.q}
+                      </span>
+                    </div>
+
+                    {t.hits.length === 0 ? (
+                      <p className="text-[13px] leading-[1.7] text-[var(--text-muted)]">
+                        Nothing on the page matches that. Try naming a tool, a
+                        company, or the kind of work.
+                      </p>
+                    ) : (
+                      <>
+                        {/* The passage that matched, quoted rather than written. */}
+                        <div className="border-l-2 border-[rgba(var(--signal-rgb),0.45)] pl-4">
+                          <div className="flex flex-wrap items-baseline gap-x-2.5">
+                            <span className="text-[14px] font-medium tracking-tight text-white">
+                              {t.hits[0].doc.title}
+                            </span>
+                            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-dim)]">
+                              {t.hits[0].doc.kind}
+                            </span>
+                          </div>
+                          <p className="mt-1.5 text-[13px] leading-[1.75] text-[var(--text-muted)]">
+                            {t.hits[0].snippet}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => go(t.hits[0].doc)}
+                            className="group/g mt-2.5 inline-flex items-center gap-1.5 text-[12px] tracking-tight text-[var(--accent-electric)] transition-opacity duration-200 hover:opacity-80"
+                          >
+                            Go to {t.hits[0].doc.kind.toLowerCase()}
+                            <span aria-hidden className="transition-transform duration-200 group-hover/g:translate-x-0.5">
+                              &rarr;
+                            </span>
+                          </button>
+                        </div>
+
+                        {t.hits.length > 1 ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-faint)]">
+                              Also
+                            </span>
+                            {t.hits.slice(1).map((h) => (
+                              <button
+                                key={h.doc.id}
+                                type="button"
+                                onClick={() => go(h.doc)}
+                                className="rounded-full border border-[var(--border-hairline)] px-2.5 py-1 text-[11.5px] tracking-tight text-[var(--text-muted)] transition-colors duration-200 hover:border-[var(--border-soft)] hover:text-white"
+                              >
+                                {h.doc.title}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                ))}
+
+                {thinking ? (
+                  <div className="flex items-center gap-2 text-[12px] text-[var(--text-dim)]">
+                    <span className="flex items-end gap-[3px]">
+                      {[0, 1, 2].map((i) => (
+                        <span
+                          key={i}
+                          className={`vu-bar vu-bar-${i + 1} block w-[2px] rounded-full bg-[var(--accent-electric)]`}
+                        />
+                      ))}
+                    </span>
+                    Searching the page
+                  </div>
+                ) : null}
+              </div>
             </div>
 
-            <div className="flex items-center justify-between gap-3 border-t border-[var(--border-hairline)] px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
+            {/* Composer */}
+            <div className="shrink-0 border-t border-[var(--border-hairline)] px-5 py-3.5">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  ask(query);
+                }}
+                className="flex items-center gap-3"
+              >
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Ask about my work"
+                  aria-label="Ask a question"
+                  className="min-w-0 flex-1 bg-transparent text-[14px] tracking-tight text-white outline-none placeholder:text-[var(--text-faint)]"
+                />
+                <button
+                  type="submit"
+                  disabled={!query.trim() || thinking}
+                  aria-label="Ask"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--border-hairline)] text-[var(--text-muted)] transition-colors duration-200 enabled:hover:border-[var(--border-soft)] enabled:hover:text-white disabled:opacity-35"
+                >
+                  <span aria-hidden>&rarr;</span>
+                </button>
+              </form>
+            </div>
+
+            {/* Status */}
+            <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--border-hairline)] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
               <span className="flex items-center gap-2">
                 <span
                   aria-hidden
-                  className={`block h-1.5 w-1.5 rounded-full ${
-                    mode === "loading" ? "current-dot" : ""
-                  }`}
+                  className="block h-1 w-1 rounded-full"
                   style={{
                     background:
-                      mode === "semantic"
-                        ? "var(--accent-electric)"
-                        : "rgba(148,163,184,0.5)",
+                      mode === "semantic" ? "var(--accent-electric)" : "currentColor",
                   }}
                 />
                 {statusLabel}
               </span>
-              <span className="hidden sm:block">↑↓ navigate · ↵ open</span>
+              <span>Retrieved, not generated</span>
+            </div>
             </div>
           </motion.div>
         </motion.div>

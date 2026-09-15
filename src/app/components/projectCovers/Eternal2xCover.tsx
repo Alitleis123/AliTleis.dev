@@ -37,7 +37,7 @@ export default function Eternal2xCover() {
       <rect width="800" height="450" fill="#000000" />
       <rect width="800" height="450" fill="url(#e2x-amb)" />
 
-      {/* Top nav bar — minimal */}
+      {/* Top nav bar, minimal */}
       <g>
         <line x1="0" y1="42" x2="800" y2="42" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
         <text x="28" y="26" fontSize="11" fill="#ffffff" fontWeight="700" letterSpacing="0.4">

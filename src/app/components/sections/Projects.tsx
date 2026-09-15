@@ -81,7 +81,7 @@ export default function Projects() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
         // items-start, so expanding one card no longer stretches the one
-        // beside it — grid rows default to equal height and the sibling was
+        // beside it, since grid rows default to equal height and the sibling was
         // growing to match.
         className="grid grid-cols-1 items-start gap-5 md:grid-cols-2"
       >
@@ -184,7 +184,7 @@ function ProjectCard({
         }}
       />
 
-      {/* Cover area — custom SVG cover takes precedence over screenshot hero.
+      {/* Cover area, custom SVG cover takes precedence over screenshot hero.
           If a gallery exists, the cover is clickable to open the lightbox of real screenshots. */}
       {Cover ? (
         hasClickableGallery ? (
@@ -291,12 +291,12 @@ function ProjectCard({
           ) : null}
         </div>
 
-        {/* Description — clamped so a long one cannot outgrow a short one. */}
+        {/* Description, clamped so a long one cannot outgrow a short one. */}
         <p className="line-clamp-2 min-h-[2.75rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
           {project.desc}
         </p>
 
-        {/* Build notes — the per-project write-ups already in data.ts, which
+        {/* Build notes, the per-project write-ups already in data.ts, which
             were never rendered. Collapsed by default so the grid stays scannable,
             and numbered to match the timeline's expanded list. */}
         {project.bullets?.length ? (

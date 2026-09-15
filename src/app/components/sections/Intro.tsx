@@ -23,7 +23,7 @@ export default function Intro() {
         animate="visible"
         className="grid grid-cols-1 items-start gap-12 sm:grid-cols-[1.25fr_0.75fr] sm:gap-12 md:gap-20"
       >
-        {/* LEFT — name, role, bio, CTAs */}
+        {/* LEFT, name, role, bio, CTAs */}
         <div className="flex flex-col">
           <motion.h1
             variants={heroItem}
@@ -51,8 +51,8 @@ export default function Intro() {
             className="mt-8 max-w-[36rem] text-[15px] leading-[1.7] text-[var(--text-muted)]"
           >
             CS student at Northeastern, currently on a seven-month co-op at
-            MIT Lincoln Laboratory. I build production software end-to-end —
-            full-stack platforms, automation pipelines, and tooling people
+            MIT Lincoln Laboratory. I build production software end-to-end.
+            Full-stack platforms, automation pipelines, and tooling people
             actually use.
           </motion.p>
 
@@ -81,13 +81,13 @@ export default function Intro() {
           </motion.div>
         </div>
 
-        {/* RIGHT — portrait */}
+        {/* RIGHT, portrait */}
         <motion.div
           variants={heroItem}
           className="flex justify-center sm:justify-end"
         >
           <div className="relative">
-            {/* No glow blob — the frame and the grid behind it do the work. */}
+            {/* No glow blob, the frame and the grid behind it do the work. */}
             <div className="relative aspect-[3/4] w-[15rem] overflow-hidden rounded-lg border border-[var(--border-soft)] sm:w-[17rem] md:w-[20rem]">
               <img
                 src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp")}
@@ -102,7 +102,7 @@ export default function Intro() {
         </motion.div>
       </motion.div>
 
-      {/* Continuation — about narrative + capabilities, flows from hero */}
+      {/* Continuation, about narrative + capabilities, flows from hero */}
       <motion.div
         variants={staggerParent}
         initial="hidden"

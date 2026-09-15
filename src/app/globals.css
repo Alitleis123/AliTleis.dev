@@ -17,7 +17,7 @@
      arbitrary values cannot contain spaces, so call sites must write
      rgba(var(--signal-rgb),0.3) with no space after the comma. Writing
      rgba(34, 211, 238, 0.3) inside a className silently produces no CSS
-     at all — the class name splits on the spaces and Tailwind emits nothing.
+     at all, because the class name splits on the spaces and Tailwind emits nothing.
 
      Alternates, all contrast-checked against #0a0a0b:
        cyan    #22d3ee   34,211,238  10.95:1   ← current
@@ -35,7 +35,7 @@
   /* Kept as an alias so existing call sites stay valid. */
   --accent-electric: var(--signal);
 
-  /* Warm neutral ramp — no blue cast. */
+  /* Warm neutral ramp, no blue cast. */
   --text-strong: #f5f4f1;
   /* Alpha values chosen against #0a0a0b for contrast, not by eye: the previous
      ramp put 9px mono labels at 2.06:1, far under the 4.5:1 small text needs. */
@@ -97,7 +97,7 @@ body {
   cursor: default;
 }
 
-/* Suppress text I-beam everywhere — this site has no text inputs. */
+/* Suppress text I-beam everywhere, this site has no text inputs. */
 body, body * {
   cursor: default;
 }
@@ -199,7 +199,7 @@ a:disabled, button:disabled, [aria-disabled="true"] {
 }
 
 /* Balance headline line-breaks (kills orphaned last words) and let paragraphs
-   avoid ragged single-word final lines. Progressive enhancement — browsers
+   avoid ragged single-word final lines. Progressive enhancement, so browsers
    without support simply wrap as before. */
 h1,
 h2,
@@ -216,7 +216,7 @@ p {
   font-variant-numeric: tabular-nums;
 }
 
-/* A lit top edge — one hairline of light where a surface catches the ambient
+/* A lit top edge, one hairline of light where a surface catches the ambient
    glow. Standard refined-dark-UI depth cue; costs nothing to paint since it's
    a static inset shadow. */
 .surface-lift {
@@ -313,7 +313,7 @@ section {
    ========================= */
 
 /* Level meter on the ambient-audio button. Height-only animation on three
-   short bars — cheap to paint, and it reads as "sound is playing" without
+   short bars, cheap to paint, and it reads as "sound is playing" without
    needing an analyser node hooked to the graph. */
 @keyframes vu {
   0%, 100% { height: 2px; }
@@ -326,4 +326,51 @@ section {
 
 @media (prefers-reduced-motion: reduce) {
   .vu-bar { animation: none; height: 7px; }
+}
+
+/* The AI ring around the ask panel.
+   A rotating conic gradient behind a 1px inset, which marks the panel as the
+   model-backed surface without putting a badge on it. @property is what makes
+   the angle animatable, and where it is unsupported the gradient simply sits
+   still, which still reads as the same ring. */
+@property --ai-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ai-ring-spin {
+  to { --ai-angle: 360deg; }
+}
+
+.ai-ring {
+  padding: 1.25px;
+  background: conic-gradient(
+    from var(--ai-angle),
+    rgb(var(--signal-rgb)) 0deg,
+    #7B8CFF 70deg,
+    #A855F7 140deg,
+    #EC4899 200deg,
+    #F59E0B 260deg,
+    #34D399 320deg,
+    rgb(var(--signal-rgb)) 360deg
+  );
+  animation: ai-ring-spin 7s linear infinite;
+}
+
+/* The same spectrum, bloomed outward. Sits behind the panel so the ring reads
+   as emitting light rather than being a painted outline. */
+.ai-ring::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  z-index: -1;
+  border-radius: inherit;
+  background: inherit;
+  filter: blur(22px);
+  opacity: 0.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-ring { animation: none; }
 }

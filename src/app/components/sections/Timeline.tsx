@@ -129,7 +129,7 @@ function Entry({ entry }: { entry: TEntry }) {
       {/* The node hangs off the article rather than the meta column, so the
           column can be sticky without dragging the node down the rail. Its x
           matches the rail drawn by the parent (13px on mobile / 200px on
-          desktop). Padding doesn't shift it — absolute offsets resolve against
+          desktop). Padding doesn't shift it, because absolute offsets resolve against
           the article's padding edge. */}
       <div className="absolute left-[13px] top-[6px] z-10 -translate-x-1/2 md:left-[200px]">
         <RailNode current={isCurrent} education={isEducation} />
@@ -187,7 +187,7 @@ function Entry({ entry }: { entry: TEntry }) {
 
       {/* Right content */}
       <div className="flex flex-col gap-5 md:pl-6">
-        {/* The entire header is the toggle — a much larger hit area than the
+        {/* The entire header is the toggle, a much larger hit area than the
             old chip-sized button, and one control instead of two. */}
         <button
           type="button"
@@ -297,7 +297,7 @@ function Entry({ entry }: { entry: TEntry }) {
                   </div>
                 ) : null}
 
-                {/* Impact — the expansion's opening payoff. Large numerals in
+                {/* Impact, the expansion's opening payoff. Large numerals in
                     the same idiom as the education stat grid below. */}
                 {entry.metrics?.length ? (
                   <RevealBlock index={0}>
@@ -320,7 +320,7 @@ function Entry({ entry }: { entry: TEntry }) {
                   </RevealBlock>
                 ) : null}
 
-                {/* Education stats — only on expansion */}
+                {/* Education stats, only on expansion */}
                 {isEducation && entry.education ? (
                   <RevealBlock index={1}>
                     <SectionLabel>At a Glance</SectionLabel>
@@ -504,7 +504,7 @@ export default function Timeline() {
         </span>
       </div>
 
-      {/* Rail container — vertical line drawn between meta column and content column */}
+      {/* Rail container, vertical line drawn between meta column and content column */}
       <div className="relative">
         <div
           aria-hidden

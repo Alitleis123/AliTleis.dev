@@ -58,7 +58,7 @@ const ICON_MAP: Record<string, IconCmp> = {
   VscTerminalPowershell, VscAzureDevops,
 };
 
-// Brand colors — applied to icons for personality.
+// Brand colors, applied to icons for personality.
 const ICON_COLOR: Record<string, string> = {
   React: "#61DAFB",
   TypeScript: "#3178C6",
@@ -164,7 +164,7 @@ export default function Stack() {
         </span>
       </div>
 
-      {/* Core grid — featured, visual */}
+      {/* Core grid, featured, visual */}
       <motion.div
         variants={staggerParent}
         initial="hidden"
@@ -179,7 +179,7 @@ export default function Stack() {
         ))}
       </motion.div>
 
-      {/* Categorical breakdown — labeled rows */}
+      {/* Categorical breakdown, labeled rows */}
       <div className="mt-12 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-7 md:p-9">
         <div className="grid gap-x-10 gap-y-7 md:grid-cols-[180px_1fr]">
           {stackGroups.map((group, i) => (

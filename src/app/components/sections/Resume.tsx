@@ -8,7 +8,7 @@ import { RESUME_HREF } from "../../data";
 /**
  * Mounts the PDF iframe only once the section is near the viewport. Embedding a
  * PDF spins up Chromium's PDFium viewer in its own process and makes it a
- * participant in page compositing and scroll hit-testing — keeping it mounted
+ * participant in page compositing and scroll hit-testing, so keeping it mounted
  * from first paint made scrolling the whole page choppy.
  */
 function useNearViewport<T extends HTMLElement>() {

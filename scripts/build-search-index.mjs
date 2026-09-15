@@ -20,6 +20,9 @@ const {
   timeline,
   featuredProjects,
   otherWork,
+  offClockProfile,
+  offClockFrames,
+  offClockNote,
   stackGroups,
   coreStack,
   aboutClearance,
@@ -27,9 +30,15 @@ const {
   aboutHobbies,
 } = await import("../src/app/data.ts");
 
-/** One searchable record. `text` is embedded; the rest is for rendering. */
+/** One searchable record. `text` is embedded, the rest is for rendering. */
 const docs = [];
-const add = (d) => docs.push(d);
+/**
+ * Fields are joined with ". " and most of them already end in a period, which
+ * left ".." mid-passage. That was invisible while only keywords were indexed,
+ * and became visible the moment the palette started quoting the prose back.
+ */
+const tidy = (t) => t.replace(/\s*\.\s*\./g, ".").replace(/\s+/g, " ").trim();
+const add = (d) => docs.push({ ...d, text: tidy(d.text) });
 
 for (const e of timeline) {
   add({
@@ -82,6 +91,22 @@ add({
   meta: `${coreStack.length} tools`,
   href: "#stack",
   text: `Core stack, primary tools. ${coreStack.map((i) => i.name).join(", ")}`,
+});
+
+add({
+  id: "offclock",
+  kind: "Off-clock",
+  title: "Anime editing",
+  subtitle: `${offClockProfile.handle} · 11.8K followers`,
+  meta: "Off-clock",
+  href: "#offclock",
+  text: [
+    offClockNote,
+    "TikTok, anime edits, video editing, After Effects, motion graphics, compositing,",
+    "3D space, camera moves, effects, sound design, easing, nulls, keyframes,",
+    "11.8K followers, 1.2M likes, 2.8M views, audience, creator,",
+    ...offClockFrames.map((f) => f.label),
+  ].join(" "),
 });
 
 add({
@@ -143,16 +168,23 @@ const chunksOf = (d) => {
   for (let i = 1; i < sentences.length; i += 2) {
     rest.push(sentences.slice(i, i + 2).join(" "));
   }
-  return [head, ...rest].slice(0, 8);
+  // The head line splices title, subtitle and first sentence, any of which may
+  // already end in a period, so it needs the same tidy as the document text.
+  return [head, ...rest].slice(0, 8).map(tidy);
 };
 
 const vectors = [];
 const owners = [];
+// The chunk text is kept, not just its vector. The palette answers a question
+// by quoting the passage that actually matched, so it needs the prose back. The
+// keyword blob cannot serve here, it is deduplicated and unreadable.
+const snippets = [];
 for (let i = 0; i < docs.length; i++) {
   for (const chunk of chunksOf(docs[i])) {
     const out = await embed(chunk, { pooling: "mean", normalize: true });
     vectors.push(Array.from(out.data));
     owners.push(i);
+    snippets.push(chunk.replace(/\s+/g, " ").trim());
   }
 }
 console.log(`chunks: ${vectors.length} vectors across ${docs.length} documents`);
@@ -186,6 +218,7 @@ const index = {
   docs: docs.map(({ text, ...rest }) => ({ ...rest, terms: terms(text) })),
   vectors: quantised,
   owners,
+  snippets,
 };
 
 const out = path.join(process.cwd(), "public/search-index.json");
