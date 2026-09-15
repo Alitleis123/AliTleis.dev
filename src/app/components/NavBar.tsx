@@ -8,6 +8,7 @@ const NAV_SECTIONS = [
   { id: "projects", label: "Projects" },
   { id: "timeline", label: "Timeline" },
   { id: "stack",    label: "Stack" },
+  { id: "offclock", label: "Off-clock" },
   { id: "resume",   label: "Resume" },
   { id: "contact",  label: "Contact" },
 ];

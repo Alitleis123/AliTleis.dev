@@ -27,6 +27,8 @@ const TARGETS = [
   { dir: "Timeline", maxWidth: 192 },
   // Hero portrait renders at most 20rem / 320px wide.
   { dir: "portrait", maxWidth: 900 },
+  // Off-clock cards render ~360px in the 3-up grid, full-screen in the lightbox.
+  { dir: "offclock", maxWidth: 1600 },
 ];
 
 /** Favicon/apple-icon must stay PNG — keep the format, just shrink it. */

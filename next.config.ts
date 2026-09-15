@@ -4,16 +4,20 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 /**
- * Content hash of the resume PDF, used to cache-bust its URL.
+ * Content hash of a file in the repo, used to cache-bust its URL.
  *
- * The PDF lives at a fixed path, so browsers (and Chrome's embedded PDF viewer
- * especially) will happily serve a stale copy for as long as their cache
- * allows — meaning a freshly deployed resume can keep showing the old one.
- * Appending ?v=<hash> changes the URL only when the bytes change.
+ * An asset at a fixed path will be served from cache for as long as the
+ * browser likes, so replacing the bytes without changing the URL means a fresh
+ * deploy can keep showing the old file. Appending ?v=<hash> changes the URL
+ * only when the contents actually change.
+ *
+ * This bit the resume PDF first (Chrome's embedded viewer is especially
+ * stubborn), then the off-clock device render, which was replaced in place and
+ * kept rendering the previous orientation.
  */
-function resumeVersion(): string {
+function contentHash(relPath: string): string {
   try {
-    const buf = readFileSync(path.join(process.cwd(), "public/resume/resume.pdf"));
+    const buf = readFileSync(path.join(process.cwd(), relPath));
     return createHash("sha256").update(buf).digest("hex").slice(0, 10);
   } catch {
     return "";
@@ -36,6 +40,9 @@ const nowLabel = buildDate.toLocaleDateString("en-US", {
 });
 
 const nextConfig: NextConfig = {
+  // Next's dev badge anchors bottom-left, on top of the ambient-audio button.
+  // Development only, but it makes that control unclickable while working.
+  devIndicators: false,
   output: "export",
   trailingSlash: true,
   images: {
@@ -46,7 +53,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_NOW_SORTKEY: nowSortKey,
     NEXT_PUBLIC_NOW_LABEL: nowLabel,
     NEXT_PUBLIC_BUILD_YEAR: String(buildDate.getFullYear()),
-    NEXT_PUBLIC_RESUME_V: resumeVersion(),
+    NEXT_PUBLIC_RESUME_V: contentHash("public/resume/resume.pdf"),
+    NEXT_PUBLIC_PHONE_V: contentHash("public/offclock/phone.webp"),
   },
 };
 

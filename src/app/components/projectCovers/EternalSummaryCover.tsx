@@ -2,19 +2,20 @@
 
 import { BUILD_YEAR } from "../../data";
 
-const PURPLE = "#A855F7";
-const PINK = "#EC4899";
-const CYAN = "#60A5FA";
-const SIDEBAR_BG = "#0d0d12";
-const MAIN_BG = "#000000";
+// Straight from ui.css and the project site: --accent on --bg, with
+// --raise for the rail.
+const PURPLE = "#7B8CFF";
+const PINK = "#A78BFF";
+const CYAN = "#6EA8FF";
+const SIDEBAR_BG = "#17161C";
+const MAIN_BG = "#100F14";
 
 type NavItem = { label: string; icon: "home" | "star" | "play" | "gear" | "down" | "info"; active?: boolean };
 
 const NAV: NavItem[] = [
-  { label: "Home", icon: "home", active: true },
-  { label: "Features", icon: "star" },
-  { label: "Demo", icon: "play" },
-  { label: "How It Works", icon: "gear" },
+  { label: "What it does", icon: "star", active: true },
+  { label: "A look", icon: "play" },
+  { label: "How to use it", icon: "gear" },
   { label: "Install", icon: "down" },
   { label: "About", icon: "info" },
 ];
@@ -92,23 +93,23 @@ export default function EternalSummaryCover() {
           <stop offset="100%" stopColor={PINK} />
         </linearGradient>
         <radialGradient id="es-ambient" cx="50%" cy="40%" r="55%">
-          <stop offset="0%" stopColor="rgba(168,85,247,0.22)" />
-          <stop offset="55%" stopColor="rgba(168,85,247,0.04)" />
-          <stop offset="100%" stopColor="rgba(168,85,247,0)" />
+          <stop offset="0%" stopColor="rgba(123,140,255,0.20)" />
+          <stop offset="55%" stopColor="rgba(123,140,255,0.04)" />
+          <stop offset="100%" stopColor="rgba(123,140,255,0)" />
         </radialGradient>
         <radialGradient id="es-orbCenter" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#1a1525" />
-          <stop offset="60%" stopColor="#0a0610" />
-          <stop offset="100%" stopColor="#050308" />
+          <stop offset="0%" stopColor="#1C1B26" />
+          <stop offset="60%" stopColor="#131219" />
+          <stop offset="100%" stopColor="#0C0B10" />
         </radialGradient>
         <radialGradient id="es-orbGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(236,72,153,0.45)" />
-          <stop offset="55%" stopColor="rgba(168,85,247,0.18)" />
-          <stop offset="100%" stopColor="rgba(168,85,247,0)" />
+          <stop offset="0%" stopColor="rgba(167,139,255,0.40)" />
+          <stop offset="55%" stopColor="rgba(123,140,255,0.18)" />
+          <stop offset="100%" stopColor="rgba(123,140,255,0)" />
         </radialGradient>
         <linearGradient id="es-btn" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#9333EA" />
-          <stop offset="100%" stopColor="#A855F7" />
+          <stop offset="0%" stopColor="#5F73F5" />
+          <stop offset="100%" stopColor="#7B8CFF" />
         </linearGradient>
       </defs>
 
@@ -141,13 +142,13 @@ export default function EternalSummaryCover() {
 
         {/* Nav items */}
         {NAV.map((item, i) => {
-          const y = 90 + i * 32;
+          const y = 106 + i * 32;
           const labelColor = item.active ? "#ffffff" : "rgba(180,180,200,0.55)";
           const iconColor = item.active ? "#ffffff" : "rgba(180,180,200,0.55)";
           return (
             <g key={item.label} transform={`translate(0, ${y})`}>
               {item.active ? (
-                <rect x="10" y="-10" width={SIDEBAR_W - 20} height="22" rx="5" fill="rgba(168,85,247,0.10)" />
+                <rect x="10" y="-10" width={SIDEBAR_W - 20} height="22" rx="5" fill="rgba(123,140,255,0.12)" />
               ) : null}
               <g transform="translate(24, 1)">
                 <NavIcon kind={item.icon} color={iconColor} />
@@ -161,7 +162,7 @@ export default function EternalSummaryCover() {
 
         {/* Sidebar footer */}
         <g transform="translate(20, 395)">
-          <text fontSize="8.5" fill="rgba(168,85,247,0.85)" fontWeight="500">
+          <text fontSize="8.5" fill="rgba(123,140,255,0.90)" fontWeight="500">
             GitHub Repository
           </text>
           <text y="14" fontSize="7.5" fill="rgba(180,180,200,0.45)">
@@ -196,29 +197,29 @@ export default function EternalSummaryCover() {
       {/* Headline */}
       <g textAnchor="middle">
         <text x={mainCenterX} y="230" fontSize="36" fontWeight="800" fill="#ffffff" letterSpacing="-1">
-          Summarize any page
+          Read the page,
         </text>
         <text x={mainCenterX} y="272" fontSize="36" fontWeight="800" fill="url(#es-headlineGrad)" letterSpacing="-1">
-          in one click.
+          not all of it.
         </text>
       </g>
 
       {/* Subtitle */}
       <g textAnchor="middle" fill="rgba(180,180,200,0.65)" fontSize="11">
         <text x={mainCenterX} y="306">
-          Eternal Summary uses AI to instantly distill web pages
+          Summarizes whatever you are reading, answers questions about it,
         </text>
         <text x={mainCenterX} y="322">
-          into clear, concise summaries.
+          and shows you the passages it drew on.
         </text>
       </g>
 
       {/* Get Started button */}
       <g transform={`translate(${mainCenterX - 60}, 348)`}>
         <rect width="120" height="34" rx="17" fill="url(#es-btn)" />
-        <rect width="120" height="34" rx="17" fill="none" stroke="rgba(236,72,153,0.4)" strokeWidth="1" />
+        <rect width="120" height="34" rx="17" fill="none" stroke="rgba(167,139,255,0.40)" strokeWidth="1" />
         <text x="60" y="22" textAnchor="middle" fontSize="12" fontWeight="700" fill="#ffffff" letterSpacing="0.3">
-          Get Started
+          Install it
         </text>
       </g>
 

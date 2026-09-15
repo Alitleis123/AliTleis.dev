@@ -17,7 +17,7 @@ export default function Contact() {
     >
       <div className="mb-10 flex items-center justify-center gap-4">
         <span className="font-mono text-[11px] tracking-[0.28em] text-[var(--text-dim)]">
-          06
+          07
         </span>
         <span className="block h-px w-10 bg-white/15" />
         <span className="section-eyebrow">Contact</span>

@@ -1,9 +1,10 @@
 "use client";
 
-const CYAN = "#22D3EE";
+// Straight from the studio's own tokens: --sideband-accent on --sideband-black.
+const ACCENT = "#A855F7";
 const GREEN = "#34D399";
 const AMBER = "#F59E0B";
-const BG = "#07070A";
+const BG = "#06050E";
 
 type Product = { name: string; status: "LIVE" | "DEV" };
 
@@ -16,7 +17,7 @@ const PRODUCTS: Product[] = [
   { name: "Exerly Fitness", status: "DEV" },
 ];
 
-export default function EternalReverseCover() {
+export default function SidebandCover() {
   return (
     <svg
       viewBox="0 0 800 450"
@@ -27,13 +28,13 @@ export default function EternalReverseCover() {
     >
       <defs>
         <linearGradient id="er-bg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0c0c12" />
+          <stop offset="0%" stopColor="#0D0B1A" />
           <stop offset="100%" stopColor={BG} />
         </linearGradient>
         <radialGradient id="er-glow" cx="50%" cy="35%" r="65%">
-          <stop offset="0%" stopColor="rgba(34,211,238,0.10)" />
-          <stop offset="60%" stopColor="rgba(34,211,238,0.02)" />
-          <stop offset="100%" stopColor="rgba(34,211,238,0)" />
+          <stop offset="0%" stopColor="rgba(168,85,247,0.12)" />
+          <stop offset="60%" stopColor="rgba(168,85,247,0.03)" />
+          <stop offset="100%" stopColor="rgba(168,85,247,0)" />
         </radialGradient>
       </defs>
 
@@ -49,10 +50,10 @@ export default function EternalReverseCover() {
         y="28"
         fontSize="10"
         fontFamily="var(--font-geist-mono), ui-monospace, monospace"
-        fill={CYAN}
+        fill={ACCENT}
         letterSpacing="3"
       >
-        [ ETERNAL REVERSE · EST. 2025 ]
+        [ SIDEBAND · BOSTON, MA · EST. 2025 ]
       </text>
 
       {/* Nav links */}
@@ -62,34 +63,38 @@ export default function EternalReverseCover() {
         fill="rgba(255,255,255,0.55)"
         letterSpacing="2"
       >
-        <text x="540" y="28">PRODUCTS</text>
-        <text x="620" y="28">ABOUT</text>
-        <text x="670" y="28">GITHUB</text>
-        <text x="730" y="28" fill={CYAN}>↗</text>
+        <text x="470" y="28">PRODUCTS</text>
+        <text x="550" y="28">ENGINEERS</text>
+        <text x="636" y="28">ABOUT</text>
+        <text x="688" y="28">CONTACT</text>
+        <text x="752" y="28" fill={ACCENT}>↗</text>
       </g>
 
       {/* Centered hero headline */}
       <g textAnchor="middle">
-        <text x="400" y="148" fontSize="46" fontWeight="700" fill="#ffffff" letterSpacing="-1.2">
-          Software that endures.
+        <text x="400" y="140" fontSize="40" fontWeight="700" fill="#ffffff" letterSpacing="-1.2">
+          We build the things
         </text>
-        <text x="400" y="180" fontSize="13" fill="rgba(255,255,255,0.55)" letterSpacing="0.2">
-          A two-person studio shipping technically ambitious products.
+        <text x="400" y="180" fontSize="40" fontWeight="700" fill="#ffffff" letterSpacing="-1.2">
+          we wished existed<tspan fill={ACCENT}>.</tspan>
+        </text>
+        <text x="400" y="206" fontSize="12" fill="rgba(255,255,255,0.55)" letterSpacing="0.2">
+          Four friends, six products, four of them live.
         </text>
       </g>
 
       {/* Hero CTA buttons */}
-      <g transform="translate(400, 210)" textAnchor="middle">
+      <g transform="translate(400, 222)" textAnchor="middle">
         <g transform="translate(-90, 0)">
-          <rect x="-65" y="0" width="130" height="34" rx="6" fill={CYAN} />
-          <text y="22" fontSize="11" fill="#031318" fontWeight="700" letterSpacing="1.4">
+          <rect x="-65" y="0" width="130" height="34" rx="6" fill={ACCENT} />
+          <text y="22" fontSize="11" fill="#0B0616" fontWeight="700" letterSpacing="1.4">
             VIEW PRODUCTS  →
           </text>
         </g>
         <g transform="translate(90, 0)">
           <rect x="-65" y="0" width="130" height="34" rx="6" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="1" />
           <text y="22" fontSize="11" fill="rgba(255,255,255,0.85)" fontWeight="600" letterSpacing="1.4">
-            OUR STORY
+            THE ENGINEERS
           </text>
         </g>
       </g>
@@ -163,7 +168,7 @@ export default function EternalReverseCover() {
         fill="rgba(255,255,255,0.35)"
         letterSpacing="2.5"
       >
-        BUILT TO LAST  ·  SHIPPED TO MATTER
+        WE BUILD THE THINGS WE WISHED EXISTED
       </text>
       <text
         x="760"
@@ -171,10 +176,10 @@ export default function EternalReverseCover() {
         textAnchor="end"
         fontSize="8.5"
         fontFamily="var(--font-geist-mono), ui-monospace, monospace"
-        fill={CYAN}
+        fill={ACCENT}
         letterSpacing="2.5"
       >
-        ETERNALREVERSE.DEV
+        SIDEBAND.STUDIO
       </text>
     </svg>
   );

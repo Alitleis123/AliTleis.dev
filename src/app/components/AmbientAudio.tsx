@@ -22,6 +22,10 @@ export default function AmbientAudio() {
   const fadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const disarmRef = useRef<(() => void) | null>(null);
   const startingRef = useRef(false);
+  // What the listener last asked for. The fade-out pauses on a timer rather
+  // than from the fade's completion callback, so this is what tells that timer
+  // whether the request still stands.
+  const desiredRef = useRef<"on" | "off">("off");
   // Breaks the play <-> armGesture dependency cycle.
   const playRef = useRef<((remember?: boolean) => void) | null>(null);
 
@@ -76,6 +80,7 @@ export default function AmbientAudio() {
       disarm();
       if (startingRef.current) return;
       startingRef.current = true;
+      desiredRef.current = "on";
 
       el.volume = 0;
       el.play()
@@ -100,17 +105,34 @@ export default function AmbientAudio() {
 
   const pause = useCallback(() => {
     disarm();
-    fade(0, 600, () => elRef.current?.pause());
+    // Never leave this latched: a play() whose promise never settles would
+    // otherwise make every later press a no-op.
+    startingRef.current = false;
+    desiredRef.current = "off";
+    fade(0, 600);
+    // Pausing from the fade's completion callback loses the pause entirely if
+    // anything supersedes that fade, because starting a new one clears the
+    // interval before it finishes. The timer survives that; the intent check
+    // means a press of play in the meantime still wins.
+    window.setTimeout(() => {
+      if (desiredRef.current === "off") elRef.current?.pause();
+    }, 650);
     setState("off");
     localStorage.setItem(PREF_KEY, "off");
   }, [fade, disarm]);
 
   useEffect(() => {
-    if (localStorage.getItem(PREF_KEY) === "off") return; // respect opt-out
     const el = elRef.current;
     if (!el) return;
+    if (localStorage.getItem(PREF_KEY) === "off") {
+      // Defensive: a hot reload can hand us an element that is already
+      // playing, and the opt-out has to win over whatever state it is in.
+      el.pause();
+      return;
+    }
 
     el.volume = 0;
+    desiredRef.current = "on";
     el.play()
       .then(() => {
         fade(VOLUME, 4000);
@@ -123,6 +145,16 @@ export default function AmbientAudio() {
     () => () => {
       if (fadeRef.current) clearInterval(fadeRef.current);
       disarmRef.current?.();
+      // A detached element keeps playing. Without this, React's development
+      // double-mount leaves the first one audible and unreachable, so the
+      // button pauses the second element while the first plays on.
+      const el = elRef.current;
+      if (el) {
+        el.pause();
+        el.currentTime = 0;
+      }
+      startingRef.current = false;
+      desiredRef.current = "off";
     },
     [],
   );
@@ -134,6 +166,12 @@ export default function AmbientAudio() {
         src={withBasePath("/audio/ambient.m4a")}
         loop
         preload="auto"
+        // The element is the source of truth, not our own bookkeeping. Without
+        // this the label and the sound could disagree, and then the button
+        // does the opposite of what it says: it reads "off" while audio plays,
+        // so pressing it calls play() and the sound never stops.
+        onPlay={() => setState("on")}
+        onPause={() => setState("off")}
       />
       <button
         type="button"

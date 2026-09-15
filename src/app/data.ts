@@ -269,6 +269,7 @@ export const featuredProjects: Project[] = [
     range: "Feb 2026 – Present",
     desc: "DaVinci Resolve plugin for hand-drawn animation: it finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
     bullets: [
+      "This one came out of my own edits. I cut anime for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
       "Anime is drawn on 2s or 3s — twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing: there is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
       "Frame-difference scoring finds the duplicates and infers whether a clip is on 1s, 2s or 3s, so the hold pattern is read off the footage rather than typed in. If a clip has no duplicated frames the plugin says so and stops, instead of inventing motion that was never drawn.",
       "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree — exactly where flow normally tears — it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
@@ -345,31 +346,37 @@ export const featuredProjects: Project[] = [
     repo: "https://github.com/Alitleis123/Eternal-Summary",
     coverKey: "eternalSummary",
     gallery: [
-      { src: withBasePath("/projects/EternalSummary.webp"), alt: "Eternal Summary — main page" },
-      { src: withBasePath("/projects/EternalSummary%20image%201.webp"), alt: "Eternal Summary — extension popup" },
-      { src: withBasePath("/projects/EternalSummary%20image%202.webp"), alt: "Eternal Summary — summary output" },
-      { src: withBasePath("/projects/EternalSummary%20Image%203.webp"), alt: "Eternal Summary — settings panel" },
-      { src: withBasePath("/projects/EternalSummary%20Image%204.webp"), alt: "Eternal Summary — in-page integration" },
+      { src: withBasePath("/projects/es-panel.webp"), alt: "Eternal Summary — the rail open beside an article, with the reading time, the worth-reading verdict, the four modes, and numbered sources" },
+      { src: withBasePath("/projects/es-bullets.webp"), alt: "Eternal Summary — bullets mode rendering the summary as a list" },
+      { src: withBasePath("/projects/es-chat.webp"), alt: "Eternal Summary — a follow-up conversation in the same rail" },
+      { src: withBasePath("/projects/es-trigger.webp"), alt: "Eternal Summary — the floating Summarize button beside a highlight" },
+      { src: withBasePath("/projects/es-selection.webp"), alt: "Eternal Summary — the selection card anchored to the highlighted passage" },
     ],
   },
   {
-    id: "eternal-reverse",
-    title: "Eternal Reverse",
-    subtitle: "eternalreverse.dev",
+    id: "sideband",
+    title: "Sideband",
+    subtitle: "sideband.studio",
     range: "2025 – Present",
-    desc: "Independent dev studio shipping six products across desktop, browser, and web, on a shared Next.js surface with a three-engineer roster.",
+    desc: "Independent Boston software studio, four founders, shipping six products across desktop, browser, and web on a shared Next.js surface.",
     bullets: [
       "Six products, four of them live: Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor — an iPad as a low-latency Windows display, in Rust and Swift — and Exerly Fitness are in development.",
-      "I own the web surface across the studio site and every product page: Next.js 14 on the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
+      "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page: Next.js 14 on the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
       "I also author the Python and Lua pipeline that ships as Eternal2x, driving DaVinci Resolve's scripting environment from an embedded Lua panel.",
-      "The site carries an engineer roster rather than a single about page — a dossier per engineer, generated from structured data, with a careers route behind it.",
-      "Playwright drives the pages in CI, alongside a copy-style check that fails the build on em dashes and semicolons in user-facing text, so three contributors cannot drift into three different voices.",
+      "The site carries an engineer roster rather than a single about page — a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
+      "Playwright drives the pages in CI, alongside a copy-style check that fails the build on em dashes and semicolons in user-facing text, so four contributors cannot drift into four different voices.",
+      "Started as Eternal Reverse and rebranded to Sideband in 2026, which meant moving a live site, its domain, and six product identities without breaking the existing links.",
     ],
-    iconText: "ER",
+    iconText: "SB",
     tech: ["TypeScript", "Next.js", "React", "Node.js", "Tailwind CSS", "Framer Motion", "Python", "Lua", "Playwright"],
-    demo: "https://eternalreverse.dev",
-    repo: "https://github.com/whoisaldo/EternalReverse-dev",
-    coverKey: "eternalReverse",
+    demo: "https://sideband.studio",
+    repo: "https://github.com/whoisaldo/sideband.studio",
+    coverKey: "sideband",
+    gallery: [
+      { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband — the studio home page, with the product marks and the interactive terminal" },
+      { src: withBasePath("/projects/sideband-products.webp"), alt: "Sideband — the stack row and the products close, six products and counting" },
+      { src: withBasePath("/projects/sideband-engineers.webp"), alt: "Sideband — the engineer dossiers, one card per founder" },
+    ],
   },
 ];
 
@@ -415,6 +422,78 @@ export const otherWork: Project[] = [
     iconKey: "puzzle",
   },
 ];
+
+// ───────────────────────────────────────────────────────────────────
+// Off-clock
+// ───────────────────────────────────────────────────────────────────
+
+export type OffClockFrame = {
+  id: string;
+  /** Short label under the frame. */
+  label: string;
+  src: string;
+  alt: string;
+};
+
+/**
+ * The account, shown in a device frame rather than as a flat card, because a
+ * phone screenshot in a landscape card has to give up either the identity or
+ * the post grid.
+ */
+export const offClockProfile = {
+  /**
+   * A photoreal device render with the real screenshot composited onto it,
+   * generated rather than faked in CSS. Transparent, so it sits on the page
+   * background instead of inside a panel.
+   */
+  device: (() => {
+    const base = withBasePath("/offclock/phone.webp");
+    const v = process.env.NEXT_PUBLIC_PHONE_V;
+    return v ? `${base}?v=${v}` : base;
+  })(),
+  src: withBasePath("/offclock/anime-editing-full.webp"),
+  alt: "TikTok profile for @.justlightt: 11.8K followers, 1.2M likes, and a post grid with 2.8M, 1.6M and 767.4K views",
+  href: "https://www.tiktok.com/@.justlightt",
+  handle: "@.justlightt",
+  stats: [
+    { value: "11.8K", label: "Followers" },
+    { value: "1.2M", label: "Likes" },
+    { value: "2.8M", label: "Top post" },
+  ],
+};
+
+/** The craft behind the posts: project files, not finished videos. */
+export const offClockFrames: OffClockFrame[] = [
+  {
+    id: "eye-edit",
+    label: "AOT · 1.6M views",
+    src: withBasePath("/offclock/eye-edit.webp"),
+    alt: "After Effects composition for the AOT edit, timeline and keyframes below the preview",
+  },
+  {
+    id: "rengoku-edit",
+    label: "Demon Slayer",
+    src: withBasePath("/offclock/rengoku-edit.webp"),
+    alt: "After Effects composition for the Rengoku edit, fire-lettered title over the character",
+  },
+  {
+    id: "eye-flow",
+    label: "Easing curves",
+    src: withBasePath("/offclock/eye-flow.webp"),
+    alt: "The Flow panel open on a custom easing curve, 0.20 0.60 0.96 0.56, beside the composition",
+  },
+];
+
+/** Extra frames worth a look up close, but not worth a slot on the page. */
+export const offClockExtras = [
+  {
+    src: withBasePath("/offclock/eye-flowers.webp"),
+    alt: "The same AOT project on the flowers shot, nulls and keyframed transforms in the timeline",
+  },
+];
+
+export const offClockNote =
+  "I cut anime edits for an audience of 11.8k. The work happens in After Effects — frames in as a PNG sequence, nulls driving the parented transforms, easing hand-tuned on every move. It is also where Eternal2x came from: the footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
 
 // ───────────────────────────────────────────────────────────────────
 // About

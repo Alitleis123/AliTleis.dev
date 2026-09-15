@@ -51,7 +51,7 @@ export default function Resume() {
     >
       <div className="mb-10 flex items-center gap-4">
         <span className="font-mono text-[11px] tracking-[0.28em] text-[var(--text-dim)]">
-          05
+          06
         </span>
         <span className="block h-px w-10 bg-white/15" />
         <span className="section-eyebrow">Resume</span>

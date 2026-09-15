@@ -44,9 +44,9 @@ export default function Eternal2xCover() {
           Eternal2x
         </text>
         <g fontSize="9" fill="rgba(255,255,255,0.55)" letterSpacing="1.5">
-          <text x="640" y="26">ABOUT</text>
-          <text x="690" y="26">HELP</text>
-          <text x="730" y="26">DOCS</text>
+          <text x="612" y="26">DOWNLOAD</text>
+          <text x="684" y="26">HELP</text>
+          <text x="722" y="26">CONTACT</text>
         </g>
       </g>
 
@@ -77,8 +77,8 @@ export default function Eternal2xCover() {
           <tspan x="0" y="82">smarter.</tspan>
         </text>
         <text fontSize="12" fill="rgba(255,255,255,0.6)" letterSpacing="0.2">
-          <tspan x="0" y="118">Motion-aware upscaling built directly into</tspan>
-          <tspan x="0" y="135">your DaVinci Resolve timeline.</tspan>
+          <tspan x="0" y="118">Motion-aware upscaling and interpolation built</tspan>
+          <tspan x="0" y="135">directly into your DaVinci Resolve timeline.</tspan>
         </text>
       </g>
 
@@ -86,10 +86,10 @@ export default function Eternal2xCover() {
       <g transform="translate(0, 340)">
         <g fontFamily="var(--font-geist-mono), ui-monospace, monospace">
           {[
-            { label: "DETECT", x: 130 },
-            { label: "SEQUENCE", x: 290 },
-            { label: "REGROUP", x: 460 },
-            { label: "UPSCALE", x: 620 },
+            { label: "FIND DRAWINGS", x: 130 },
+            { label: "READ TIMING", x: 290 },
+            { label: "FILL GAPS", x: 460 },
+            { label: "UPSCALE 2X", x: 620 },
           ].map((step, i) => (
             <g key={step.label} transform={`translate(${step.x}, 0)`}>
               <circle cx="0" cy="0" r="11" fill="none" stroke={VIOLET} strokeWidth="1.4" />
@@ -135,7 +135,7 @@ export default function Eternal2xCover() {
         fill="rgba(255,255,255,0.35)"
         letterSpacing="2"
       >
-        v0.2.0  ·  RESOLVE 18+
+        v0.3.1  ·  RESOLVE 18+
       </text>
     </svg>
   );

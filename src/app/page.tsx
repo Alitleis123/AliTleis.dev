@@ -1,5 +1,6 @@
 import Contact from "./components/sections/Contact";
 import Intro from "./components/sections/Intro";
+import OffClock from "./components/sections/OffClock";
 import Projects from "./components/sections/Projects";
 import Resume from "./components/sections/Resume";
 import Stack from "./components/sections/Stack";
@@ -16,6 +17,7 @@ export default function Home() {
       <Projects />
       <Timeline />
       <Stack />
+      <OffClock />
       <Resume />
       <Contact />
     </div>
