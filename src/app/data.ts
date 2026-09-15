@@ -269,7 +269,7 @@ export const featuredProjects: Project[] = [
     range: "Feb 2026 – Present",
     desc: "DaVinci Resolve plugin for hand-drawn animation: it finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
     bullets: [
-      "This one came out of my own edits. I cut anime for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
+      "This one came out of my own edits. I create anime edits for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
       "Anime is drawn on 2s or 3s — twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing: there is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
       "Frame-difference scoring finds the duplicates and infers whether a clip is on 1s, 2s or 3s, so the hold pattern is read off the footage rather than typed in. If a clip has no duplicated frames the plugin says so and stops, instead of inventing motion that was never drawn.",
       "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree — exactly where flow normally tears — it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
@@ -493,7 +493,7 @@ export const offClockExtras = [
 ];
 
 export const offClockNote =
-  "I cut anime edits for an audience of 11.8k. The work happens in After Effects — frames in as a PNG sequence, nulls driving the parented transforms, easing hand-tuned on every move. It is also where Eternal2x came from: the footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
+  "I create anime edits for an audience of 11.8k. The work happens in After Effects: nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut. It is also where Eternal2x came from. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
 
 // ───────────────────────────────────────────────────────────────────
 // About
