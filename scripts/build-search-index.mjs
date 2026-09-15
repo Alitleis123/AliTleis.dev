@@ -1,7 +1,7 @@
 /**
  * Builds the static semantic-search index.
  *
- * Embeddings are computed here, at build time, and committed as JSON — the site
+ * Embeddings are computed here, at build time, and committed as JSON, since the site
  * is a static export on GitHub Pages, so there is no server to embed against at
  * request time. The browser loads the same model lazily to encode the query.
  *
@@ -190,7 +190,7 @@ for (let i = 0; i < docs.length; i++) {
 console.log(`chunks: ${vectors.length} vectors across ${docs.length} documents`);
 
 const dim = vectors[0].length;
-// int8 quantisation — see header note.
+// int8 quantisation, see the header note.
 const quantised = vectors.map((v) =>
   Array.from(v, (x) => Math.max(-127, Math.min(127, Math.round(x * 127)))),
 );
@@ -223,4 +223,4 @@ const index = {
 
 const out = path.join(process.cwd(), "public/search-index.json");
 writeFileSync(out, JSON.stringify(index));
-console.log(`wrote ${out} — ${docs.length} docs, ${dim}d, ${(JSON.stringify(index).length / 1024).toFixed(1)} KB`);
+console.log(`wrote ${out}, ${docs.length} docs, ${dim}d, ${(JSON.stringify(index).length / 1024).toFixed(1)} KB`);
