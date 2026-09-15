@@ -466,19 +466,19 @@ export const offClockProfile = {
 export const offClockFrames: OffClockFrame[] = [
   {
     id: "eye-edit",
-    label: "AOT · 1.6M views",
+    label: "Masks and effects",
     src: withBasePath("/offclock/eye-edit.webp"),
     alt: "After Effects composition for the AOT edit, timeline and keyframes below the preview",
   },
   {
     id: "rengoku-edit",
-    label: "Demon Slayer",
+    label: "Saber effect",
     src: withBasePath("/offclock/rengoku-edit.webp"),
     alt: "After Effects composition for the Rengoku edit, fire-lettered title over the character",
   },
   {
     id: "eye-flow",
-    label: "Easing curves",
+    label: "Flow graph",
     src: withBasePath("/offclock/eye-flow.webp"),
     alt: "The Flow panel open on a custom easing curve, 0.20 0.60 0.96 0.56, beside the composition",
   },
