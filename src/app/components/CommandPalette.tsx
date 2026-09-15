@@ -257,55 +257,86 @@ export default function CommandPalette() {
             exit={{ opacity: 0, y: -8, scale: 0.99 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="ai-ring relative isolate w-full max-w-[640px] rounded-[1.12rem] shadow-[0_40px_120px_rgba(0,0,0,0.75)]"
+            className="ai-ring relative isolate w-full max-w-[620px] rounded-[1.12rem] shadow-[0_40px_120px_rgba(0,0,0,0.75)]"
           >
-            <div className="flex max-h-[76vh] flex-col overflow-hidden rounded-2xl bg-[#0c0c0f]">
+            <div className="flex flex-col overflow-hidden rounded-2xl bg-[#0c0c0f]">
             {/* Header */}
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[var(--border-hairline)] px-5 py-3.5">
-              <div className="flex items-center gap-2.5">
-                <span
-                  aria-hidden
-                  className="current-dot block h-1.5 w-1.5 rounded-full"
-                  style={{ background: "var(--accent-electric)" }}
-                />
-                <span className="text-[13px] font-medium tracking-tight text-white">
-                  AI search
+            <div className="flex shrink-0 items-baseline justify-between gap-4 border-b border-[var(--border-hairline)] px-5 py-3">
+              <div className="flex items-baseline gap-3">
+                <span className="text-[13.5px] font-medium tracking-tight text-white">
+                  Ask
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-dim)]">
-                  in the browser
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
+                  {turns.length > 0
+                    ? `${String(turns.length).padStart(2, "0")} asked`
+                    : "retrieval over this page"}
                 </span>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md border border-[var(--border-hairline)] px-2 py-1 font-mono text-[10px] tracking-[0.18em] text-[var(--text-dim)] transition-colors duration-200 hover:border-[var(--border-soft)] hover:text-white"
+                className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-faint)] transition-colors duration-200 hover:text-white"
               >
-                ESC
+                Esc
               </button>
             </div>
 
             {/* Thread */}
-            <div ref={threadRef} className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+            <div
+              ref={threadRef}
+              className="ask-thread min-h-0 overflow-y-auto px-5 py-4"
+              style={{ maxHeight: "54vh" }}
+            >
               {turns.length === 0 && !thinking ? (
-                <div className="flex flex-col gap-4">
-                  <p className="max-w-[46ch] text-[13px] leading-[1.7] text-[var(--text-muted)]">
-                    Ask a question in plain English. Every answer is a passage
-                    pulled from this page, with the section it came from, so you
-                    can go read the rest.
-                  </p>
-                  <div className="flex flex-col items-start gap-2">
-                    {SUGGESTED.map((s) => (
-                      <button
-                        key={s}
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.05, delayChildren: 0.06 } },
+                  }}
+                  className="flex flex-col"
+                >
+                  <motion.p
+                    variants={askItem}
+                    className="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--text-muted)]"
+                  >
+                    Answers are passages quoted from this page, with the section
+                    each one came from.
+                  </motion.p>
+
+                  <motion.span
+                    variants={askItem}
+                    className="mt-5 font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--text-faint)]"
+                  >
+                    Try
+                  </motion.span>
+
+                  <div className="mt-1">
+                    {SUGGESTED.map((q, i) => (
+                      <motion.button
+                        key={q}
+                        variants={askItem}
                         type="button"
-                        onClick={() => ask(s)}
-                        className="rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-3 py-1.5 text-left text-[12px] tracking-tight text-[var(--text-muted)] transition-colors duration-200 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)] hover:text-white"
+                        onClick={() => ask(q)}
+                        className="group/s flex w-full items-center gap-4 border-b border-[var(--border-hairline)] py-2.5 text-left last:border-b-0"
                       >
-                        {s}
-                      </button>
+                        <span className="tabular-figures font-mono text-[10px] tracking-[0.16em] text-[var(--text-faint)] transition-colors duration-200 group-hover/s:text-[var(--accent-electric)]">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="flex-1 text-[13px] tracking-tight text-[var(--text-muted)] transition-colors duration-200 group-hover/s:text-white">
+                          {q}
+                        </span>
+                        <span
+                          aria-hidden
+                          className="text-[11px] text-[var(--text-faint)] opacity-0 transition-[opacity,transform] duration-200 group-hover/s:translate-x-0.5 group-hover/s:opacity-100"
+                        >
+                          &rarr;
+                        </span>
+                      </motion.button>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               ) : null}
 
               <div className="flex flex-col gap-7">
@@ -406,44 +437,46 @@ export default function CommandPalette() {
             </div>
 
             {/* Composer */}
-            <div className="shrink-0 border-t border-[var(--border-hairline)] px-5 py-3.5">
+            <div className="ask-composer shrink-0 border-t border-[var(--border-hairline)] px-5">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   ask(query);
                 }}
-                className="flex items-center gap-3"
+                className="flex items-center gap-3 py-3.5"
               >
+                <span
+                  aria-hidden
+                  className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--text-faint)]"
+                >
+                  Ask
+                </span>
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Ask about my work"
+                  placeholder="anything on this page"
                   aria-label="Ask a question"
-                  className="min-w-0 flex-1 bg-transparent text-[14px] tracking-tight text-white outline-none placeholder:text-[var(--text-faint)]"
+                  className="min-w-0 flex-1 bg-transparent text-[14px] tracking-tight text-white caret-[var(--accent-electric)] placeholder:text-[var(--text-faint)]"
                 />
                 <button
                   type="submit"
                   disabled={!query.trim() || thinking}
                   aria-label="Ask"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--border-hairline)] text-[var(--text-muted)] transition-colors duration-200 enabled:hover:border-[var(--border-soft)] enabled:hover:text-white disabled:opacity-35"
+                  className="shrink-0 font-mono text-[11px] tracking-[0.16em] text-[var(--text-faint)] transition-colors duration-200 enabled:hover:text-[var(--accent-electric)] disabled:opacity-40"
                 >
-                  <span aria-hidden>&rarr;</span>
+                  &crarr;
                 </button>
               </form>
             </div>
 
             {/* Status */}
             <div className="flex shrink-0 items-center justify-between gap-3 border-t border-[var(--border-hairline)] px-5 py-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
-              <span className="flex items-center gap-2">
-                <span
-                  aria-hidden
-                  className="block h-1 w-1 rounded-full"
-                  style={{
-                    background:
-                      mode === "semantic" ? "var(--accent-electric)" : "currentColor",
-                  }}
-                />
+              <span
+                className={
+                  mode === "semantic" ? "text-[var(--text-dim)]" : undefined
+                }
+              >
                 {statusLabel}
               </span>
               <span>Retrieved, not generated</span>

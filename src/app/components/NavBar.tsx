@@ -81,13 +81,8 @@ export default function NavBar() {
           type="button"
           onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
           aria-label="Ask AI about this site"
-          className="ml-auto mr-3 hidden items-center gap-2 rounded-full border border-[var(--border-hairline)] px-3 py-1.5 text-[12px] text-white/55 transition-colors duration-200 hover:border-[var(--border-soft)] hover:bg-white/[0.03] hover:text-white/85 md:inline-flex"
+          className="ai-pill relative ml-auto mr-3 hidden items-center gap-2 rounded-full border border-[var(--border-hairline)] px-3.5 py-1.5 text-[12px] text-white/70 transition-colors duration-200 hover:bg-white/[0.03] hover:text-white md:inline-flex"
         >
-          <span
-            aria-hidden
-            className="current-dot block h-1.5 w-1.5 rounded-full"
-            style={{ background: "var(--accent-electric)" }}
-          />
           Ask AI
           <kbd className="rounded border border-[var(--border-hairline)] px-1 font-mono text-[10px] tracking-wider text-[var(--text-faint)]">
             ⌘K

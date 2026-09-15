@@ -394,3 +394,90 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .ask-caret { animation: none; }
 }
+
+/* Animated gradient border for the Ask AI pill.
+   The two-layer padding-box trick needs a solid fill behind the text, and this
+   pill sits over a navbar that is transparent until you scroll. So the gradient
+   goes on a pseudo-element and is masked down to just the ring, leaving the
+   interior see-through. */
+@property --ai-pill-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes ai-pill-spin {
+  to { --ai-pill-angle: 360deg; }
+}
+
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .ai-pill {
+    /* The hairline underneath would read as a second, duller ring. */
+    border-color: transparent;
+  }
+
+  .ai-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--ai-pill-angle),
+      rgba(255, 255, 255, 0.25) 0deg,
+      #ffffff 60deg,
+      #9ecbff 140deg,
+      rgba(158, 203, 255, 0.35) 220deg,
+      #ffffff 300deg,
+      rgba(255, 255, 255, 0.25) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: ai-pill-spin 4.5s linear infinite;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-pill::before { animation: none; }
+}
+
+/* The ask panel's composer owns its own focus state.
+   The global :focus-visible outline is right for buttons and links, but on a
+   bare full-width text field it draws a 2px rectangle that reads as a browser
+   default. The row takes the signal instead, which stays just as visible to a
+   keyboard user. */
+.ask-composer:focus-within {
+  border-top-color: rgba(var(--signal-rgb), 0.55);
+  box-shadow: inset 0 1px 0 rgba(var(--signal-rgb), 0.22);
+}
+
+.ask-composer input:focus-visible {
+  outline: none;
+}
+
+/* A hairline scrollbar, so a long thread does not put a chrome-coloured bar
+   down the side of the panel. */
+.ask-thread {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(237, 237, 234, 0.14) transparent;
+}
+
+.ask-thread::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ask-thread::-webkit-scrollbar-thumb {
+  background: rgba(237, 237, 234, 0.14);
+  border-radius: 99px;
+}
+
+.ask-thread::-webkit-scrollbar-track {
+  background: transparent;
+}
