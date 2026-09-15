@@ -64,14 +64,14 @@ export default function OffClock() {
             {offClockNote}
           </p>
 
-          <div className="mt-9 grid grid-cols-3 gap-3">
+          <div className="ask-strip -mx-6 mt-9 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
             {offClockFrames.map((frame, i) => (
               <button
                 key={frame.id}
                 type="button"
                 // +1 because the profile is the gallery's first image.
                 onClick={() => openAt(i + 1)}
-                className="group/f text-left"
+                className="group/f w-[70%] shrink-0 snap-start text-left sm:w-auto sm:shrink"
                 aria-label={`Open ${frame.label} full size`}
               >
                 <span className="relative block aspect-[4/3] w-full overflow-hidden rounded-xl border border-[var(--border-hairline)] bg-black/40 transition-colors duration-300 group-hover/f:border-[var(--border-soft)]">
@@ -88,7 +88,7 @@ export default function OffClock() {
                     </span>
                   </span>
                 </span>
-                <span className="mt-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-dim)] transition-colors duration-200 group-hover/f:text-[var(--text-muted)]">
+                <span className="mt-2 block font-mono text-[10px] uppercase leading-[1.5] tracking-[0.16em] text-[var(--text-dim)] transition-colors duration-200 group-hover/f:text-[var(--text-muted)]">
                   {frame.label}
                 </span>
               </button>

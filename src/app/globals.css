@@ -501,3 +501,13 @@ section {
 .ask-thread::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* The off-clock frame strip on mobile. Scrollable, but without a bar running
+   under the thumbnails. */
+.ask-strip {
+  scrollbar-width: none;
+}
+
+.ask-strip::-webkit-scrollbar {
+  display: none;
+}

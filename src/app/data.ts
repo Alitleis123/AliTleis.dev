@@ -472,15 +472,15 @@ export const offClockFrames: OffClockFrame[] = [
   },
   {
     id: "rengoku-edit",
-    label: "Saber effect",
+    label: "Saber and overlays",
     src: withBasePath("/offclock/rengoku-edit.webp"),
     alt: "After Effects composition for the Rengoku edit, fire-lettered title over the character",
   },
   {
     id: "eye-flow",
-    label: "Flow graph",
+    label: "Flow graph and compositing",
     src: withBasePath("/offclock/eye-flow.webp"),
-    alt: "The Flow panel open on a custom easing curve, 0.20 0.60 0.96 0.56, beside the composition",
+    alt: "The Flow panel open on a custom easing curve, 0.20 0.60 0.96 0.56, beside a composited hand shot",
   },
 ];
 
