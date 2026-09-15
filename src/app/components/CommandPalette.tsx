@@ -38,6 +38,16 @@ export const OPEN_EVENT = "open-command-palette";
 
 const CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
 
+/** Each part of a turn rises in rather than appearing all at once. */
+const askItem = {
+  hidden: { opacity: 0, y: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.34, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
 const SUGGESTED = [
   "What have you built with retrieval?",
   "Do you have cleared experience?",
@@ -55,6 +65,7 @@ export default function CommandPalette() {
 
   const inputRef = useRef<HTMLInputElement>(null);
   const threadRef = useRef<HTMLDivElement>(null);
+  const typedRef = useRef<Set<number>>(new Set());
   const encoderRef = useRef<((t: string) => Promise<Float32Array>) | null>(null);
   const loadingRef = useRef(false);
 
@@ -123,12 +134,15 @@ export default function CommandPalette() {
   }, [open]);
 
   // Follow the newest turn.
+  const stickToBottom = useCallback((smooth = true) => {
+    const el = threadRef.current;
+    if (!el) return;
+    el.scrollTo({ top: el.scrollHeight, behavior: smooth ? "smooth" : "auto" });
+  }, []);
+
   useEffect(() => {
-    threadRef.current?.scrollTo({
-      top: threadRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [turns, thinking]);
+    stickToBottom();
+  }, [turns, thinking, stickToBottom]);
 
   // ── retrieval ─────────────────────────────────────────────────
   const rank = useCallback(
@@ -296,23 +310,35 @@ export default function CommandPalette() {
 
               <div className="flex flex-col gap-7">
                 {turns.map((t, ti) => (
-                  <div key={ti} className="flex flex-col gap-3.5">
+                  <motion.div
+                    key={ti}
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: {},
+                      visible: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+                    }}
+                    className="flex flex-col gap-3.5"
+                  >
                     {/* Question */}
-                    <div className="flex justify-end">
+                    <motion.div variants={askItem} className="flex justify-end">
                       <span className="max-w-[80%] rounded-2xl rounded-br-md bg-[var(--surface-2)] px-3.5 py-2 text-[13px] leading-[1.6] tracking-tight text-white">
                         {t.q}
                       </span>
-                    </div>
+                    </motion.div>
 
                     {t.hits.length === 0 ? (
-                      <p className="text-[13px] leading-[1.7] text-[var(--text-muted)]">
+                      <motion.p variants={askItem} className="text-[13px] leading-[1.7] text-[var(--text-muted)]">
                         Nothing on the page matches that. Try naming a tool, a
                         company, or the kind of work.
-                      </p>
+                      </motion.p>
                     ) : (
                       <>
                         {/* The passage that matched, quoted rather than written. */}
-                        <div className="border-l-2 border-[rgba(var(--signal-rgb),0.45)] pl-4">
+                        <motion.div
+                          variants={askItem}
+                          className="border-l-2 border-[rgba(var(--signal-rgb),0.45)] pl-4"
+                        >
                           <div className="flex flex-wrap items-baseline gap-x-2.5">
                             <span className="text-[14px] font-medium tracking-tight text-white">
                               {t.hits[0].doc.title}
@@ -322,7 +348,12 @@ export default function CommandPalette() {
                             </span>
                           </div>
                           <p className="mt-1.5 text-[13px] leading-[1.75] text-[var(--text-muted)]">
-                            {t.hits[0].snippet}
+                            <Typed
+                              text={t.hits[0].snippet}
+                              instant={typedRef.current.has(ti)}
+                              onGrow={() => stickToBottom(false)}
+                              onDone={() => typedRef.current.add(ti)}
+                            />
                           </p>
                           <button
                             type="button"
@@ -334,10 +365,10 @@ export default function CommandPalette() {
                               &rarr;
                             </span>
                           </button>
-                        </div>
+                        </motion.div>
 
                         {t.hits.length > 1 ? (
-                          <div className="flex flex-wrap items-center gap-2">
+                          <motion.div variants={askItem} className="flex flex-wrap items-center gap-2">
                             <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--text-faint)]">
                               Also
                             </span>
@@ -351,11 +382,11 @@ export default function CommandPalette() {
                                 {h.doc.title}
                               </button>
                             ))}
-                          </div>
+                          </motion.div>
                         ) : null}
                       </>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
 
                 {thinking ? (
@@ -422,5 +453,74 @@ export default function CommandPalette() {
         </motion.div>
       ) : null}
     </AnimatePresence>
+  );
+}
+
+/**
+ * Reveals the retrieved passage a character at a time.
+ *
+ * Driven off requestAnimationFrame elapsed time rather than a per-character
+ * interval, so the pace holds on a slow frame instead of stretching out. The
+ * text is quoted from the page either way, the reveal is presentation only.
+ */
+function Typed({
+  text,
+  instant,
+  onGrow,
+  onDone,
+}: {
+  text: string;
+  instant: boolean;
+  onGrow: () => void;
+  onDone: () => void;
+}) {
+  const [n, setN] = useState(instant ? text.length : 0);
+
+  useEffect(() => {
+    if (instant) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setN(text.length);
+      onDone();
+      return;
+    }
+
+    const MS_PER_CHAR = 7;
+    let raf = 0;
+    let start: number | null = null;
+    let lastScroll = 0;
+
+    const tick = (now: number) => {
+      if (start === null) start = now;
+      const chars = Math.floor((now - start) / MS_PER_CHAR);
+      if (chars >= text.length) {
+        setN(text.length);
+        onDone();
+        onGrow();
+        return;
+      }
+      setN(chars);
+      // The block grows as it fills, so keep the tail visible without asking
+      // the scroller to recompute on every single frame.
+      if (now - lastScroll > 120) {
+        lastScroll = now;
+        onGrow();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+    // Runs once per mounted answer. onGrow and onDone are deliberately not
+    // dependencies: the parent rebuilds them every render, and reacting to that
+    // would restart the reveal from the first character on each keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [text, instant]);
+
+  return (
+    <>
+      {text.slice(0, n)}
+      {n < text.length ? <span aria-hidden className="ask-caret" /> : null}
+    </>
   );
 }

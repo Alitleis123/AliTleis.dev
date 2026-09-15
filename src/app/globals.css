@@ -374,3 +374,23 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .ai-ring { animation: none; }
 }
+
+/* Caret for the typed answer in the ask panel. Steps rather than a fade, so it
+   blinks like a terminal cursor instead of pulsing. */
+@keyframes ask-caret {
+  50% { opacity: 0; }
+}
+
+.ask-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: var(--accent-electric);
+  animation: ask-caret 1s steps(2, start) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-caret { animation: none; }
+}
