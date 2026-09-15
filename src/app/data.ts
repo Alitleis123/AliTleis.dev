@@ -492,8 +492,14 @@ export const offClockExtras = [
   },
 ];
 
+/**
+ * The causal link leads, because it is the part that is rare. Plenty of people
+ * edit well. Editing well enough to notice a problem and then ship a tested
+ * tool for it is the claim worth making first, so the craft detail follows as
+ * the evidence for how you would know.
+ */
 export const offClockNote =
-  "I create anime edits for an audience of 11.8k. The work happens in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut. It is also where Eternal2x came from. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate.";
+  "I create anime edits for an audience of 11.8k, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.";
 
 // ───────────────────────────────────────────────────────────────────
 // About
