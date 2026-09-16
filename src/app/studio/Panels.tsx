@@ -175,8 +175,13 @@ export function TopBar({
         portfolio.aep
       </span>
 
-      {/* Transport. J K L is muscle memory for anyone who edits. */}
-      <div className="ml-auto flex items-center gap-1.5">
+      {/* Transport. J K L is muscle memory for anyone who edits.
+
+          Shares a transition name with the reading view's section links, so
+          toggling slides one group into the other. The wordmark only grows
+          13px to 15px, which is too small to read as a morph on its own; this
+          is the pair that actually carries the movement. */}
+      <div className="vt-barcontrols ml-auto flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => onStep(-1)}

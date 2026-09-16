@@ -3,9 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { LuAlignLeft, LuClapperboard } from "react-icons/lu";
 import { withBasePath } from "../data";
+import { untilRouteCommits } from "../lib/viewTransition";
 
 /**
  * The switch between the two ways to read this site.
@@ -71,16 +72,10 @@ export default function ViewSwitch({
    * ViewTransition component rather than wrapping router pushes. Verified by
    * listening for animations on the pseudo-elements, which never fired.
    *
-   * startViewTransition takes its "after" snapshot when the callback settles,
-   * and router.push resolves long before React has committed the new route,
-   * so the promise is held open until the pathname actually changes.
+   * The wait for the new route lives in lib/viewTransition rather than here,
+   * because this component is inside the bar being navigated away from and so
+   * unmounts mid-transition.
    */
-  const commitRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    commitRef.current?.();
-    commitRef.current = null;
-  }, [pathname]);
 
   const navigate = useCallback(
     (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -99,19 +94,11 @@ export default function ViewSwitch({
       }
 
       e.preventDefault();
-      const transition = document.startViewTransition(
-        () =>
-          new Promise<void>((resolve) => {
-            commitRef.current = resolve;
-            router.push(href);
-            // A push that never commits would otherwise leave the page frozen
-            // under a snapshot with no way out.
-            window.setTimeout(() => {
-              commitRef.current = null;
-              resolve();
-            }, 1200);
-          }),
-      );
+      const transition = document.startViewTransition(() => {
+        const landed = untilRouteCommits();
+        router.push(href);
+        return landed;
+      });
 
       // A skipped transition rejects `ready`, and an unhandled rejection is a
       // console error for something that is working as intended: the browser

@@ -1117,20 +1117,40 @@ section {
   view-transition-name: filename;
 }
 
+/* The transport on one side, the section links on the other. Paired so the
+   group travels rather than dissolving in place. */
+.vt-barcontrols {
+  view-transition-name: barcontrols;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* One curve for everything that morphs, so the bar does not arrive before
      the text inside it. */
   ::view-transition-group(topbar),
   ::view-transition-group(wordmark),
-  ::view-transition-group(viewswitch) {
-    animation-duration: 440ms;
+  ::view-transition-group(viewswitch),
+  ::view-transition-group(barcontrols) {
+    animation-duration: 560ms;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  ::view-transition-old(wordmark),
+  /* Long enough to watch the group travel, and the contents cross-fade over
+     most of it rather than snapping at either end. */
+  ::view-transition-old(barcontrols),
+  ::view-transition-new(barcontrols) {
+    animation-duration: 560ms;
+    animation-timing-function: ease-in-out;
+  }
+
+  /* A 13px to 15px wordmark is a two pixel change, so the cross-fade alone
+     reads as nothing happening. A short lift underneath it makes the swap
+     legible as a swap. */
+  ::view-transition-old(wordmark) {
+    animation: vt-mark-out 300ms ease-in both;
+  }
+
   ::view-transition-new(wordmark) {
-    animation-duration: 440ms;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation: vt-mark-in 420ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
   }
 
   /* The switch is the thing that was clicked, so it should look like it never
@@ -1191,5 +1211,28 @@ section {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+
+@keyframes vt-mark-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes vt-mark-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

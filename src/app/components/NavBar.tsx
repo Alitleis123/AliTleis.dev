@@ -88,7 +88,7 @@ export default function NavBar() {
           Ali Tleis
         </a>
 
-        <nav className="hidden items-center gap-6 text-[13px] lg:flex">
+        <nav className="vt-barcontrols hidden items-center gap-6 text-[13px] lg:flex">
           {NAV_SECTIONS.map(({ id, label }) => (
             <a
               key={id}

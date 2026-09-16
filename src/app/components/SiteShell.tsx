@@ -1,9 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { BUILD_YEAR } from "../data";
 import BackgroundRings from "./BackgroundRings";
 import NavBar from "./NavBar";
+import { routeCommitted } from "../lib/viewTransition";
 import ScrollToTop from "./ScrollToTop";
 import AmbientAudio from "./AmbientAudio";
 import CommandPalette from "./CommandPalette";
@@ -28,6 +30,17 @@ import CommandPalette from "./CommandPalette";
  */
 export default function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  /*
+   * Lets a pending view transition take its "after" snapshot.
+   *
+   * This lives here because the root layout keeps SiteShell mounted across
+   * every route, and the view switch that starts the transition does not
+   * survive its own navigation.
+   */
+  useEffect(() => {
+    routeCommitted();
+  }, [pathname]);
   // Two routes bring their own frame. The suite is a full viewport
   // application, and the chooser is a single screen that would look absurd
   // under a nav offering to take you to the page you are choosing between.
