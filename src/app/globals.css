@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* White through light blue and back. Used by the ask panel's ring and the
+  /* White through warm gold and back. Used by the ask panel's ring and the
      Ask AI pill, so the two never drift apart. A conic gradient seams unless
      the first and last stop match, and it bands unless the steps between them
      are small, so this is deliberately over-stopped. */
@@ -9,10 +9,10 @@
     rgba(255, 255, 255, 0.16) 0deg,
     rgba(255, 255, 255, 0.55) 40deg,
     rgba(255, 255, 255, 0.95) 80deg,
-    #c9e4ff 120deg,
-    #9ecbff 160deg,
-    #7cb8ff 200deg,
-    #9ecbff 240deg,
+    #ffe7bd 120deg,
+    #ffd58f 160deg,
+    #f2a93b 200deg,
+    #ffd58f 240deg,
     rgba(255, 255, 255, 0.95) 285deg,
     rgba(255, 255, 255, 0.55) 325deg,
     rgba(255, 255, 255, 0.16) 360deg;
@@ -35,18 +35,23 @@
      rgba(34, 211, 238, 0.3) inside a className silently produces no CSS
      at all, because the class name splits on the spaces and Tailwind emits nothing.
 
+     Amber rather than cyan, to sit with the warm near-black above and with
+     the warm light in the portrait. Cyan on black is also the default palette
+     of every generated developer portfolio, which was the thing this file set
+     out to avoid in the first place.
+
      Alternates, all contrast-checked against #0a0a0b:
-       cyan    #22d3ee   34,211,238  10.95:1   ← current
-       amber   #f2a93b  242,169,59    9.91:1
+       amber   #f2a93b  242,169,59    9.91:1   ← current
+       cyan    #22d3ee   34,211,238  10.95:1
        lime    #a3e635  163,230,53   13.12:1
        ice     #cbd5e1  203,213,225  13.33:1
      ─────────────────────────────────────────────────────────── */
-  --signal-rgb: 34, 211, 238;
+  --signal-rgb: 242, 169, 59;
   --signal: rgb(var(--signal-rgb));
   --signal-dim: rgba(var(--signal-rgb), 0.30);
   --signal-wash: rgba(var(--signal-rgb), 0.06);
   /* Light tint for text sitting on a signal-washed surface. */
-  --signal-tint: #a5f3fc;
+  --signal-tint: #fbe3b6;
 
   /* Kept as an alias so existing call sites stay valid. */
   --accent-electric: var(--signal);
