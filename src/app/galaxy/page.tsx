@@ -4,7 +4,6 @@ import OffClock from "../components/sections/OffClock";
 import Projects from "../components/sections/Projects";
 import Resume from "../components/sections/Resume";
 import Stack from "../components/sections/Stack";
-import StudioInvite from "../components/StudioInvite";
 import Timeline from "../components/sections/Timeline";
 
 /**
@@ -22,7 +21,6 @@ export default function Galaxy() {
   return (
     <div className="relative min-h-screen overflow-x-clip text-white">
       <Intro />
-      <StudioInvite />
       <Projects />
       <Timeline />
       <Stack />
