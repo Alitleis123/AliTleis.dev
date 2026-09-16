@@ -354,16 +354,31 @@ export default function CommandPalette() {
         const read = readerRef.current;
         if (!read) throw new Error("reader unavailable");
 
-        // Read every retrieved passage and keep the most confident span,
-        // because the best passage by similarity is not always the one that
-        // contains the answer to the question as phrased.
-        let best: Answer | null = null;
+        /*
+         * Read every retrieved passage, then weight each span by how well its
+         * passage matched the question.
+         *
+         * Ranking on the reader's raw score alone is wrong: that confidence
+         * is calibrated inside one context, so it does not compare across
+         * two. Asked how much faster the query response was, an unrelated
+         * passage answered "thirty minutes" more confidently than the Lincoln
+         * Laboratory passage answered "70%", and won, with the correct figure
+         * quoted on screen directly underneath it.
+         *
+         * Weights are relative to the top hit, so the best passage keeps its
+         * confidence intact and the rest are discounted in proportion. A
+         * lower-ranked passage can still win, but only by being much more
+         * certain rather than slightly.
+         */
+        const topScore = hits[0].score || 1;
+        let best: (Answer & { weighted: number }) | null = null;
         for (let i = 0; i < hits.length; i++) {
           const r = await read(q, hits[i].snippet);
           const text = r.answer?.trim();
           if (!text) continue;
-          if (!best || r.score > best.score) {
-            best = { text, score: r.score, from: i };
+          const weighted = r.score * (hits[i].score / topScore);
+          if (!best || weighted > best.weighted) {
+            best = { text, score: r.score, from: i, weighted };
           }
         }
         settle(best && best.score >= ANSWER_FLOOR ? best : null);
