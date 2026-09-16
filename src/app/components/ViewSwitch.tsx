@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef } from "react";
 import { LuAlignLeft, LuClapperboard } from "react-icons/lu";
 import { withBasePath } from "../data";
 
@@ -58,7 +59,69 @@ export default function ViewSwitch({
   hideCurrent?: boolean;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const onStudio = pathname?.startsWith("/studio") ?? false;
+
+  /**
+   * Navigate inside a view transition, so the two bars morph.
+   *
+   * The elements are named in globals.css, but naming alone does nothing:
+   * something has to call startViewTransition around the navigation, and
+   * Next's experimental.viewTransition flag only enables React's
+   * ViewTransition component rather than wrapping router pushes. Verified by
+   * listening for animations on the pseudo-elements, which never fired.
+   *
+   * startViewTransition takes its "after" snapshot when the callback settles,
+   * and router.push resolves long before React has committed the new route,
+   * so the promise is held open until the pathname actually changes.
+   */
+  const commitRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    commitRef.current?.();
+    commitRef.current = null;
+  }, [pathname]);
+
+  const navigate = useCallback(
+    (href: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+      // Let the browser handle anything that is not a plain left click, and
+      // fall back to a normal navigation where the API is missing.
+      if (
+        e.button !== 0 ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.shiftKey ||
+        e.altKey ||
+        typeof document.startViewTransition !== "function" ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        return;
+      }
+
+      e.preventDefault();
+      const transition = document.startViewTransition(
+        () =>
+          new Promise<void>((resolve) => {
+            commitRef.current = resolve;
+            router.push(href);
+            // A push that never commits would otherwise leave the page frozen
+            // under a snapshot with no way out.
+            window.setTimeout(() => {
+              commitRef.current = null;
+              resolve();
+            }, 1200);
+          }),
+      );
+
+      // A skipped transition rejects `ready`, and an unhandled rejection is a
+      // console error for something that is working as intended: the browser
+      // declined to animate and the navigation went through regardless. Seen
+      // for real in an unfocused tab, where every call aborts with
+      // InvalidStateError.
+      transition.ready.catch(() => {});
+    },
+    [router],
+  );
 
   const shell = hideCurrent
     ? ""
@@ -69,7 +132,7 @@ export default function ViewSwitch({
       }`;
 
   return (
-    <div className={`flex shrink-0 items-center gap-0.5 ${shell}`}>
+    <div className={`vt-switch flex shrink-0 items-center gap-0.5 ${shell}`}>
       {VIEWS.map((v) => {
         const current = v.href === "/studio" ? onStudio : !onStudio;
         const Icon = v.Icon;
@@ -154,6 +217,7 @@ export default function ViewSwitch({
           <Link
             key={v.href}
             href={v.href}
+            onClick={navigate(v.href)}
             className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] transition-colors duration-150 ${
               tone === "studio"
                 ? "text-[var(--st-dim)] hover:bg-[var(--st-hover)] hover:text-[var(--st-text)]"

@@ -80,10 +80,10 @@ export default function NavBar() {
           Everything steps at lg rather than md now. Below that the row cannot
           hold seven links plus two buttons plus the switch, so the menu takes
           over, which is also where the links were legible anyway. */}
-      <div className="relative flex items-center justify-between gap-4 px-3 py-2">
+      <div className="vt-topbar relative flex items-center justify-between gap-4 px-3 py-2">
         <a
           href="#about"
-          className="shrink-0 text-[15px] font-medium tracking-tight text-white/90 transition-colors duration-200 hover:text-white"
+          className="vt-wordmark shrink-0 text-[15px] font-medium tracking-tight text-white/90 transition-colors duration-200 hover:text-white"
         >
           Ali Tleis
         </a>

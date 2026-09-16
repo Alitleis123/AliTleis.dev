@@ -1080,3 +1080,116 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .ask-reading { animation: none; opacity: 0.7; }
 }
+
+
+/* =========================
+   View transitions
+   ========================= */
+
+/* Morphing the two top bars into each other.
+
+   The bars are 50px and 49px tall, both put the wordmark at x=12, and both
+   put the view switch at y=8 within four pixels of the same x. At face value
+   they are the same bar holding different content, so cutting between them
+   threw away the one thing the layout had already established. Naming the
+   shared parts lets the browser interpolate them instead: the wordmark grows
+   from 13px to 15px and cross-fades its glyphs, the bar's background and
+   border slide between palettes, and the switch holds still under the cursor
+   that just clicked it.
+
+   Only the shared chrome is named. Everything else in the bar, the transport
+   on one side and seven section links on the other, is genuinely different
+   content and cross-fades with the bar it sits in. */
+
+.vt-topbar {
+  view-transition-name: topbar;
+}
+
+.vt-wordmark {
+  view-transition-name: wordmark;
+}
+
+.vt-switch {
+  view-transition-name: viewswitch;
+}
+
+.vt-filename {
+  view-transition-name: filename;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* One curve for everything that morphs, so the bar does not arrive before
+     the text inside it. */
+  ::view-transition-group(topbar),
+  ::view-transition-group(wordmark),
+  ::view-transition-group(viewswitch) {
+    animation-duration: 440ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  ::view-transition-old(wordmark),
+  ::view-transition-new(wordmark) {
+    animation-duration: 440ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* The switch is the thing that was clicked, so it should look like it never
+     moved. No cross-fade, only the box interpolating. */
+  ::view-transition-old(viewswitch),
+  ::view-transition-new(viewswitch) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* portfolio.aep belongs to the suite alone, so it has nothing to morph into.
+     It arrives after the bar has settled, which reads as the file opening
+     rather than as a label fading in. */
+  ::view-transition-new(filename) {
+    animation: vt-filename-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
+  }
+
+  ::view-transition-old(filename) {
+    animation: vt-filename-out 200ms ease-in both;
+  }
+
+  /* The page under the bar is different content on each side, so it fades
+     rather than pretending to be the same thing moved. */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 380ms;
+  }
+}
+
+@keyframes vt-filename-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.86);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes vt-filename-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-3px) scale(0.9);
+  }
+}
+
+/* Nothing moves for anyone who asked for less motion. The navigation still
+   happens, it just cuts. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

@@ -165,11 +165,13 @@ export function TopBar({
    * else in this route goes above z-20, so 40 clears all of it.
    */
   return (
-    <header className="relative z-40 flex shrink-0 items-center gap-3 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2">
-      <span className="text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
+    <header className="vt-topbar relative z-40 flex shrink-0 items-center gap-3 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2">
+      <span className="vt-wordmark text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
         Ali&nbsp;Tleis
       </span>
-      <span className="st-tc hidden text-[var(--st-faint)] sm:block">
+      {/* Named on its own so it pops rather than cross-fading. It exists in
+          this bar only, so there is nothing on the other side to morph into. */}
+      <span className="vt-filename st-tc hidden text-[var(--st-faint)] sm:block">
         portfolio.aep
       </span>
 
