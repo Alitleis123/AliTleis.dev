@@ -41,10 +41,11 @@ export const metadata: Metadata = {
     title: "Ali Tleis · Software Engineer",
     description: DESCRIPTION,
   },
-  icons: {
-    icon: "/portrait/Portfolio ICON.png",
-    apple: "/portrait/Portfolio ICON.png",
-  },
+  // No icons block on purpose. src/app/icon.png and src/app/apple-icon.png
+  // are picked up by Next's file convention, which content-hashes them and
+  // emits the sizes and type attributes. An explicit icons entry here
+  // overrides that convention, which is what kept the old mark live after the
+  // files were replaced.
 };
 
 export default function RootLayout({
