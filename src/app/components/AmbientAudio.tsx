@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { withBasePath } from "../data";
 
-type AudioState = "off" | "on" | "blocked";
+type AudioState = "off" | "on";
 
 /** Remembers an explicit opt-out so the bed doesn't restart on every visit. */
 const PREF_KEY = "ambient-audio";
@@ -26,8 +26,6 @@ export default function AmbientAudio() {
   // than from the fade's completion callback, so this is what tells that timer
   // whether the request still stands.
   const desiredRef = useRef<"on" | "off">("off");
-  // Breaks the play <-> armGesture dependency cycle.
-  const playRef = useRef<((remember?: boolean) => void) | null>(null);
 
   const fade = useCallback((to: number, ms: number, onDone?: () => void) => {
     const el = elRef.current;
@@ -56,20 +54,6 @@ export default function AmbientAudio() {
     disarmRef.current = null;
   }, []);
 
-  /** Browsers gate audio behind a gesture, start on the first interaction. */
-  const armGesture = useCallback(() => {
-    setState("blocked");
-    if (disarmRef.current) return; // already listening
-    const evts = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
-    const go = () => {
-      disarm();
-      playRef.current?.(false);
-    };
-    evts.forEach((e) => window.addEventListener(e, go, { passive: true }));
-    disarmRef.current = () =>
-      evts.forEach((e) => window.removeEventListener(e, go));
-  }, [disarm]);
-
   const play = useCallback(
     (remember = true) => {
       const el = elRef.current;
@@ -91,17 +75,14 @@ export default function AmbientAudio() {
           if (remember) localStorage.setItem(PREF_KEY, "on");
         })
         .catch(() => {
-          // Re-arm rather than latching into a dead "blocked" state.
+          // A press is a gesture, so this is a genuine failure rather than
+          // the autoplay policy. Report it rather than pretending.
           startingRef.current = false;
-          armGesture();
+          setState("off");
         });
     },
-    [fade, disarm, armGesture],
+    [fade, disarm],
   );
-
-  useEffect(() => {
-    playRef.current = play;
-  }, [play]);
 
   const pause = useCallback(() => {
     disarm();
@@ -121,12 +102,22 @@ export default function AmbientAudio() {
     localStorage.setItem(PREF_KEY, "off");
   }, [fade, disarm]);
 
+  /**
+   * Resume only for someone who asked for it before.
+   *
+   * This used to attempt playback on every arrival and, when the browser
+   * refused, arm pointerdown, keydown, wheel and touchstart so the bed came
+   * up on the visitor's first scroll. That is autoplay with extra steps: the
+   * policy it routed around exists precisely to stop a portfolio playing
+   * music at someone reading it in an open office, and the visitor was never
+   * asked. Nothing starts here now without a press of the button.
+   */
   useEffect(() => {
     const el = elRef.current;
     if (!el) return;
-    if (localStorage.getItem(PREF_KEY) === "off") {
+    if (localStorage.getItem(PREF_KEY) !== "on") {
       // Defensive: a hot reload can hand us an element that is already
-      // playing, and the opt-out has to win over whatever state it is in.
+      // playing, and silence has to win over whatever state it is in.
       el.pause();
       return;
     }
@@ -138,8 +129,8 @@ export default function AmbientAudio() {
         fade(VOLUME, 4000);
         setState("on");
       })
-      .catch(armGesture);
-  }, [fade, armGesture]);
+      .catch(() => setState("off"));
+  }, [fade]);
 
   useEffect(
     () => () => {
@@ -165,7 +156,9 @@ export default function AmbientAudio() {
         ref={elRef}
         src={withBasePath("/audio/ambient.m4a")}
         loop
-        preload="auto"
+        // Nobody who leaves this off should pay 1.4MB for it. The fetch
+        // happens on the first press instead.
+        preload="none"
         // The element is the source of truth, not our own bookkeeping. Without
         // this the label and the sound could disagree, and then the button
         // does the opposite of what it says: it reads "off" while audio plays,
@@ -183,9 +176,7 @@ export default function AmbientAudio() {
         className={`fixed bottom-6 left-6 z-50 inline-flex h-10 items-center gap-2.5 rounded-full border bg-black/60 px-3.5 text-[12px] font-medium tracking-tight backdrop-blur-md transition-colors duration-300 ${
           state === "on"
             ? "border-[rgba(var(--signal-rgb),0.32)] text-white/85"
-            : state === "blocked"
-              ? "border-[rgba(var(--signal-rgb),0.32)] text-[var(--accent-electric)]"
-              : "border-white/15 text-white/60 hover:bg-white/10 hover:text-white"
+            : "border-white/15 text-white/60 hover:bg-white/10 hover:text-white"
         }`}
       >
         <span aria-hidden className="flex h-3 items-end gap-[2px]">
@@ -200,7 +191,7 @@ export default function AmbientAudio() {
             />
           ))}
         </span>
-        {state === "blocked" ? "Enable audio" : "Audio"}
+        {state === "on" ? "Audio" : "Enable audio"}
       </button>
     </>
   );
