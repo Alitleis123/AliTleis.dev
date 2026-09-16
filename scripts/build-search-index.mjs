@@ -50,9 +50,20 @@ for (const e of timeline) {
     href: "#timeline",
     text: [
       e.title, e.subtitle, e.meta, e.desc, e.note,
+      // The dates, as a sentence. They were only ever in the `meta` and
+      // `subtitle` columns, so "when does he graduate" retrieved the right
+      // entry and then found nothing in the prose to answer with.
+      `${e.title}, ${e.range}.`,
       ...(e.bullets ?? []),
       ...(e.tech ?? []),
       ...(e.metrics ?? []).map((m) => `${m.value} ${m.label}`),
+      // Stat tiles as one sentence, not one each. They hold the graduation
+      // date, the GPA and the program type, and the chunker groups sentences
+      // in pairs, so four separate ones scattered them across chunks and a
+      // question about the GPA retrieved the chunk holding the degree.
+      (e.education?.stats ?? []).length
+        ? e.education.stats.map((t) => `${t.label} ${t.value}`).join(", ") + "."
+        : null,
       ...(e.education?.coursework ?? []),
     ].filter(Boolean).join(". "),
   });
