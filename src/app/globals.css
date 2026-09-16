@@ -1061,3 +1061,22 @@ section {
     transform: none;
   }
 }
+
+
+/* Pulse while the reader works through the retrieved passages. */
+.ask-reading {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: rgb(var(--signal-rgb));
+  animation: ask-reading 1.1s ease-in-out infinite;
+}
+
+@keyframes ask-reading {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-reading { animation: none; opacity: 0.7; }
+}
