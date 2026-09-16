@@ -145,7 +145,7 @@ export default function SpaceField() {
     // Read once. getComputedStyle inside the loop forced a style resolution on
     // every frame, and the accent cannot change without a reload anyway.
     const signal = getComputedStyle(document.documentElement)
-      .getPropertyValue("--signal-rgb").trim() || "34, 211, 238";
+      .getPropertyValue("--signal-rgb").trim() || "242, 169, 59";
 
     // Real starfields are not uniformly white. A few percent of warm and cool
     // stars is what stops a field this dense from reading as noise.
@@ -284,11 +284,11 @@ export default function SpaceField() {
 
     /**
      * Angular lighting for the rings as a single conic gradient, so each ring
-     * is one seamless stroke. This used to be 40 separately-stroked segments,
-     * which is what made the outer ring look pixelated: a 1px stroke at a
-     * 1075px radius has almost no anti-aliasing gradient to work with, and the
-     * overlap between segments was ~6.5px of double-compositing at every one of
-     * 40 joints, so the ring beaded.
+     * is a single unbroken stroke. This used to be 40 separately-stroked
+     * segments, which is what made the outer ring look pixelated. A 1px stroke
+     * at a 1075px radius has almost no anti-aliasing gradient to work with,
+     * and the overlap between segments was ~6.5px of double-compositing at
+     * every one of 40 joints, so the ring beaded.
      *
      * Falls back to a flat colour where createConicGradient is unavailable. The
      * ring loses its lit edge but keeps the soft profile.

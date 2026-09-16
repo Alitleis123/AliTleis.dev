@@ -266,7 +266,7 @@ export const featuredProjects: Project[] = [
     id: "eternal2x",
     title: "Eternal2x",
     subtitle: "eternal2x.com",
-    range: "Feb 2026 – Present",
+    range: "Jan 2026 – Present",
     desc: "DaVinci Resolve plugin for hand-drawn animation. It finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
     bullets: [
       "This one came out of my own edits. I create anime edits for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
@@ -319,7 +319,7 @@ export const featuredProjects: Project[] = [
     id: "eternal-summary",
     title: "Eternal Summary",
     subtitle: "Chrome Extension",
-    range: "Oct 2025 – Present",
+    range: "Sep 2023 – Present",
     desc: "Chrome extension that summarizes the page you are reading, explains what you highlight, and answers follow-ups in a rail beside the article.",
     bullets: [
       "The panel is not a popup. It renders in a shadow root with its own stylesheet, inset beside the article, so a host rule like * { line-height: 1 !important } cannot collapse its text and it cannot leak styles back onto the page. The test fixture ships that CSS deliberately, along with uppercased buttons and forced letter spacing, to hold the boundary.",
@@ -508,6 +508,32 @@ export const offClockNote =
 
 
 /** Mirrors the clearance line on the resume. */
+/**
+ * The links that appear on the slate, the end card and the written page.
+ *
+ * These were written out three times with the LinkedIn vanity path spelled
+ * differently in the display text than in the href, which is the kind of
+ * thing that only breaks once the display text gets copied by hand.
+ */
+export const socials = {
+  email: "tleis.a@northeastern.edu",
+  github: "https://github.com/Alitleis123",
+  githubLabel: "github.com/Alitleis123",
+  linkedin: "https://www.linkedin.com/in/ali-tleis-091800247/",
+  linkedinLabel: "linkedin.com/in/ali-tleis",
+  tiktok: "https://www.tiktok.com/@.justlightt",
+  tiktokLabel: "@.justlightt",
+} as const;
+
+/**
+ * Where he is, in the words the resume uses.
+ *
+ * One export rather than a string typed into each surface, because the slate
+ * and the end card were already drifting: one said the city, the other listed
+ * hobbies in the slot a recruiter scans for a location.
+ */
+export const LOCATION = "Greater Boston";
+
 export const aboutClearance = "DoD investigation in progress";
 
 export const aboutLanguages = [

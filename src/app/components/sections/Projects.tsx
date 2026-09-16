@@ -10,13 +10,10 @@ import {
 } from "react-icons/fa6";
 import { TbCalculator, TbCalendarEvent, TbPuzzle } from "react-icons/tb";
 import { SiCplusplus } from "react-icons/si";
+import { COVER_MAP } from "../../lib/projectCovers";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { featuredProjects, otherWork, type Project } from "../../data";
 import Lightbox, { type LightboxState } from "../Lightbox";
-import SidebandCover from "../projectCovers/SidebandCover";
-import Eternal2xCover from "../projectCovers/Eternal2xCover";
-import TopChoiceRealtyCover from "../projectCovers/TopChoiceRealtyCover";
-import EternalSummaryCover from "../projectCovers/EternalSummaryCover";
 
 type IconCmp = ComponentType<{ className?: string }>;
 
@@ -25,13 +22,6 @@ const OTHER_ICON: Record<string, IconCmp> = {
   calendar: TbCalendarEvent,
   cplusplus: SiCplusplus,
   puzzle: TbPuzzle,
-};
-
-const COVER_MAP: Record<string, ComponentType> = {
-  sideband: SidebandCover,
-  eternal2x: Eternal2xCover,
-  topChoiceRealty: TopChoiceRealtyCover,
-  eternalSummary: EternalSummaryCover,
 };
 
 export default function Projects() {

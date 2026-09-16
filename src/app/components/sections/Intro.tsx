@@ -9,6 +9,7 @@ import {
   aboutClearance,
   aboutLanguages,
   aboutHobbies,
+  LOCATION,
 } from "../../data";
 
 export default function Intro() {
@@ -167,7 +168,7 @@ export default function Intro() {
               </span>
               <span className="inline-flex items-center gap-1.5 text-[13px] tracking-tight text-white/85">
                 <HiOutlineLocationMarker className="text-[14px] text-[var(--text-dim)]" />
-                Boston, MA
+                {LOCATION}
               </span>
             </div>
           </div>

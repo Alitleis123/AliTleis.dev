@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { fadeUp } from "../../lib/animations";
+import { LOCATION } from "../../data";
 
 export default function Contact() {
   return (
@@ -65,7 +66,7 @@ export default function Contact() {
 
         <p className="mt-8 inline-flex items-center justify-center gap-1.5 text-[12px] tracking-tight text-[var(--text-dim)]">
           <HiOutlineLocationMarker className="text-[13px]" />
-          Boston, MA
+          {LOCATION}
         </p>
       </div>
     </motion.section>

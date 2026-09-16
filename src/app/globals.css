@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* White through light blue and back. Used by the ask panel's ring and the
+  /* White through warm gold and back. Used by the ask panel's ring and the
      Ask AI pill, so the two never drift apart. A conic gradient seams unless
      the first and last stop match, and it bands unless the steps between them
      are small, so this is deliberately over-stopped. */
@@ -9,10 +9,10 @@
     rgba(255, 255, 255, 0.16) 0deg,
     rgba(255, 255, 255, 0.55) 40deg,
     rgba(255, 255, 255, 0.95) 80deg,
-    #c9e4ff 120deg,
-    #9ecbff 160deg,
-    #7cb8ff 200deg,
-    #9ecbff 240deg,
+    #ffe7bd 120deg,
+    #ffd58f 160deg,
+    #f2a93b 200deg,
+    #ffd58f 240deg,
     rgba(255, 255, 255, 0.95) 285deg,
     rgba(255, 255, 255, 0.55) 325deg,
     rgba(255, 255, 255, 0.16) 360deg;
@@ -35,18 +35,23 @@
      rgba(34, 211, 238, 0.3) inside a className silently produces no CSS
      at all, because the class name splits on the spaces and Tailwind emits nothing.
 
+     Amber rather than cyan, to sit with the warm near-black above and with
+     the warm light in the portrait. Cyan on black is also the default palette
+     of every generated developer portfolio, which was the thing this file set
+     out to avoid in the first place.
+
      Alternates, all contrast-checked against #0a0a0b:
-       cyan    #22d3ee   34,211,238  10.95:1   ← current
-       amber   #f2a93b  242,169,59    9.91:1
+       amber   #f2a93b  242,169,59    9.91:1   ← current
+       cyan    #22d3ee   34,211,238  10.95:1
        lime    #a3e635  163,230,53   13.12:1
        ice     #cbd5e1  203,213,225  13.33:1
      ─────────────────────────────────────────────────────────── */
-  --signal-rgb: 34, 211, 238;
+  --signal-rgb: 242, 169, 59;
   --signal: rgb(var(--signal-rgb));
   --signal-dim: rgba(var(--signal-rgb), 0.30);
   --signal-wash: rgba(var(--signal-rgb), 0.06);
   /* Light tint for text sitting on a signal-washed surface. */
-  --signal-tint: #a5f3fc;
+  --signal-tint: #fbe3b6;
 
   /* Kept as an alias so existing call sites stay valid. */
   --accent-electric: var(--signal);
@@ -510,4 +515,549 @@ section {
 
 .ask-strip::-webkit-scrollbar {
   display: none;
+}
+
+/* =========================
+   Studio route
+   ========================= */
+
+/* An editing application reads as neutral grey panels with hairline seams and
+   one accent, which is the opposite of the warm near-black the document uses.
+   Scoped to .st-root so the classic route keeps its own palette.
+
+   The first pass ran chrome #1b1b1d against panel #232326 against stage
+   #0e0e10. Eight points of luminance between neighbouring surfaces is not
+   enough to read as depth, so the whole application looked like one flat grey
+   rectangle with lines drawn on it. These four steps are spaced far enough
+   apart that the stage reads as a hole cut through the chrome, which is what
+   an actual viewer looks like. */
+.st-root {
+  --st-chrome: #101013;
+  --st-panel: #191A1E;
+  /* Panel headers and track gutters, one step up so seams need less contrast. */
+  --st-panel-hi: #23242A;
+  --st-stage: #06060A;
+
+  --st-line: rgba(255, 255, 255, 0.06);
+  --st-line-strong: rgba(255, 255, 255, 0.14);
+  --st-hover: rgba(255, 255, 255, 0.05);
+
+  /* Selection is the accent, not a lighter grey. Every NLE tints the selected
+     row and clip, and it is the single strongest cue for where you are. */
+  --st-sel: rgba(var(--signal-rgb), 0.11);
+  --st-sel-line: rgba(var(--signal-rgb), 0.5);
+
+  --st-clip: rgba(122, 136, 158, 0.2);
+  --st-clip-on: rgba(var(--signal-rgb), 0.18);
+  /* Audio is green in every editor, and colour-coding by track type is
+     function rather than decoration, so it keeps a hue of its own. Pulled
+     toward olive though: against an amber accent a mint green was the only
+     cool thing on screen and read as a leftover from the previous palette. */
+  --st-audio: rgba(186, 196, 104, 0.82);
+  --st-audio-dim: rgba(186, 196, 104, 0.3);
+
+  /* Text ramp, all contrast-checked against --st-panel #191A1E.
+     The previous ramp put 9px labels at 34% alpha, which measures about
+     3.1:1 and reads as disabled rather than secondary. */
+  --st-text: #F4F4F1;          /* ~15.6:1 */
+  --st-dim: rgba(244, 244, 241, 0.74);  /* ~10.5:1 */
+  --st-faint: rgba(244, 244, 241, 0.5); /* ~5.6:1, the floor for 10px */
+
+  --st-accent: rgb(var(--signal-rgb));
+  --st-accent-dim: rgba(var(--signal-rgb), 0.4);
+}
+
+/* Content type, for anything inside the stage rather than the chrome.
+   Chrome is 10px mono and deliberately quiet. Content is not: it is the
+   reason the page exists, and the first pass had it at 13px and 70% alpha,
+   which is why every comp read as fine print. */
+.st-body {
+  font-size: 14.5px;
+  line-height: 1.72;
+  letter-spacing: -0.005em;
+  color: rgba(244, 244, 241, 0.88);
+}
+
+.st-lede {
+  font-size: clamp(15px, 1.15vw, 17.5px);
+  line-height: 1.6;
+  letter-spacing: -0.012em;
+  color: rgba(244, 244, 241, 0.94);
+}
+
+/* Headline inside a comp. Tight and large, so the frame has one clear subject
+   instead of six competing 13px blocks. */
+.st-h {
+  font-size: clamp(1.75rem, 3.2vw, 2.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  color: var(--st-text);
+  font-weight: 300;
+}
+
+/* A measured outcome, given the size the number deserves. */
+.st-metric-v {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--st-accent);
+}
+
+.st-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--st-faint);
+  white-space: nowrap;
+}
+
+/* The one label per comp that names what you are looking at. Accent, so it
+   reads as a heading rather than as more chrome. */
+.st-eyebrow {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--st-accent);
+  white-space: nowrap;
+}
+
+/* Timecode wants tabular digits, or the playhead readout jitters as it runs. */
+.st-tc {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.st-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--st-line-strong);
+  border-radius: 3px;
+  background: var(--st-panel);
+  color: var(--st-dim);
+  font-size: 9px;
+  transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.st-btn:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--st-hover);
+}
+
+.st-btn-primary {
+  min-width: 34px;
+  color: #fff;
+  font-size: 11px;
+}
+
+/* Play, which the reel now waits on. Filled rather than outlined, because a
+   paused page whose only invitation is a 22px grey button with a triangle in
+   it does not read as an invitation at all. */
+.st-btn-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: var(--st-accent);
+  color: #2a1a02;
+  font-size: 11px;
+  transition: filter 150ms ease, box-shadow 150ms ease;
+  box-shadow: 0 0 0 0 rgba(var(--signal-rgb), 0.5);
+}
+
+.st-btn-play:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 0 14px 0 rgba(var(--signal-rgb), 0.45);
+}
+
+/* A 22px control is fine under a mouse and too small under a thumb. Touch
+   pointers get the taller target without changing the desktop chrome, which is
+   sized to look like an application rather than a web page. */
+@media (pointer: coarse) {
+  .st-btn {
+    min-width: 40px;
+    height: 34px;
+  }
+
+  .st-btn-primary {
+    min-width: 48px;
+  }
+
+  .st-btn-play {
+    min-width: 58px;
+    height: 34px;
+  }
+}
+
+/* A clip with no thumbnail is drawn as hatching in every NLE. */
+.st-hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.05) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* Comps fill the frame. The first pass let a centred document measure sit
+   inside the viewer, which is why it read as the old page in a grey panel. */
+.st-comp {
+  min-height: 100%;
+  height: 100%;
+}
+
+/* ── Cross dissolve between comps ─────────────────────────────────
+   Comps are stacked layers rather than a document flow, so the outgoing and
+   incoming frames can overlap for the length of the dissolve. Only the two
+   taking part are painted: everything else stays display:none, which also
+   keeps its images from loading, since a lazy image inside a hidden subtree
+   never intersects anything.
+
+   Animations rather than transitions, deliberately. A transition needs a
+   starting style to interpolate from, and an element arriving out of
+   display:none has none, so the first time a visitor reached any given comp
+   it would have popped in rather than dissolved. An animation restarts
+   cleanly on a newly displayed element.
+
+   The opacity outside the media query is the resting state, so a reduced
+   motion visitor still gets one comp visible and one hidden rather than both.
+   ─────────────────────────────────────────────────────────────── */
+.st-layer {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--st-line-strong) transparent;
+}
+
+.st-layer-in {
+  opacity: 1;
+  z-index: 2;
+}
+
+.st-layer-out {
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.st-layer-off {
+  display: none;
+}
+
+@keyframes st-dissolve-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes st-dissolve-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* A reveal for anything that opens inside a comp: the notes panels, and the
+   detail block when the guided run steps to the next project or role. */
+@keyframes st-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .st-layer-in {
+    animation: st-dissolve-in 460ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .st-layer-out {
+    animation: st-dissolve-out 460ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .st-reveal {
+    animation: st-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   Motion
+
+   Three separate jobs, which is why there are three groups rather than one
+   fade applied everywhere.
+
+   1. Boot. The application assembles itself once, on arrival: chrome in from
+      the edge it lives on, stage last. This is the only animation that does
+      not repeat.
+   2. Comp entry. Every cut restages the comp's blocks. This is free rather
+      than wired up, because a layer leaves `display: none` when it becomes
+      active and an element arriving out of `display: none` restarts its
+      animations.
+   3. Continuous. A slow push on the plate and on the portrait, so the frame
+      is never completely still. A static image in a viewer is the thing that
+      gives away that this is a web page and not a running application.
+
+   Everything here sits behind prefers-reduced-motion, and every animated
+   property is opacity or transform, so none of it costs layout. An earlier
+   pass settled the title's letter-spacing, which looked expensive and was a
+   reflow of the largest text on the page on every frame, and which also
+   widened the line enough to clip inside its own wipe mask on a narrow
+   viewport.
+   ─────────────────────────────────────────────────────────────── */
+
+@keyframes st-boot-top {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes st-boot-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+@keyframes st-boot-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes st-boot-stage {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+}
+
+/* A title reveal: the line rides up from behind its own bottom edge. The
+   wrapper clips, so this needs no mask and no gradient. */
+@keyframes st-wipe-up {
+  from {
+    transform: translateY(102%);
+  }
+}
+
+/* Overshoots, so the accent lands rather than appears. */
+@keyframes st-pop {
+  0% {
+    transform: scale(0);
+  }
+  64% {
+    transform: scale(1.32);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* The comp entry reveal settles down into place rather than rising into it.
+   Rising from +6px pushes content past the layer's bottom edge, and downward
+   overflow counts toward scrollHeight, so every staggered comp grew a ~6px
+   scrollbar for the length of its own animation. Overflow above the top edge
+   is not scrollable, so coming from -7px costs nothing, and the comps all
+   carry enough top padding to absorb it. */
+@keyframes st-stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes st-ken-burns {
+  from {
+    transform: scale(1.075);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes st-plate-drift {
+  from {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.09) translate3d(-1.4%, -0.8%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* 1. Boot. Stage last, so the chrome is already framing it when it arrives. */
+  .st-root > header {
+    animation: st-boot-top 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .st-boot-panel {
+    animation: st-boot-left 460ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+  }
+
+  .st-boot-timeline {
+    animation: st-boot-bottom 500ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
+  }
+
+  .st-boot-stage {
+    animation: st-boot-stage 560ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
+  }
+
+  /* 2. Comp entry. One step per block, and capped: past about six the last
+     one arrives late enough that a visitor has started reading the first. */
+  .st-layer-in .st-seq > * {
+    animation: st-stage-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .st-layer-in .st-seq > *:nth-child(1) { animation-delay: 60ms; }
+  .st-layer-in .st-seq > *:nth-child(2) { animation-delay: 115ms; }
+  .st-layer-in .st-seq > *:nth-child(3) { animation-delay: 170ms; }
+  .st-layer-in .st-seq > *:nth-child(4) { animation-delay: 225ms; }
+  .st-layer-in .st-seq > *:nth-child(5) { animation-delay: 275ms; }
+  .st-layer-in .st-seq > *:nth-child(n + 6) { animation-delay: 320ms; }
+
+  /* A backdrop is not a block of content. Without this it would stagger in
+     behind the text it sits behind, and take a translate with it. */
+  .st-layer-in .st-seq > .st-plate {
+    animation: none;
+  }
+
+  /* The title card is the landing frame, so it gets the longer version. The
+     heading opts out of the stagger above: its lines are already hidden behind
+     their own clip, so a fade on the parent would only fight the wipe. */
+  .st-layer-in .st-title {
+    animation: none;
+  }
+
+  .st-layer-in .st-wipe > * {
+    animation: st-wipe-up 780ms cubic-bezier(0.16, 1, 0.3, 1) 170ms both;
+  }
+
+  .st-layer-in .st-wipe:nth-of-type(2) > * {
+    animation-delay: 265ms;
+  }
+
+  .st-layer-in .st-pop {
+    animation: st-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 620ms both;
+  }
+
+  /* 3. Continuous. Long enough that it reads as a slow push rather than as
+     something moving. */
+  .st-layer-in .st-ken {
+    animation: st-ken-burns 14s cubic-bezier(0.33, 0, 0.67, 1) both;
+  }
+
+  .st-layer-in .st-drift {
+    animation: st-plate-drift 26s ease-in-out infinite alternate both;
+  }
+}
+
+/* Grain over the stage. A clean gradient reads as a web page, and every
+   viewer shows a little sensor noise, so this is the cheapest thing that
+   stops the panel looking like CSS. */
+.st-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.st-viewer-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--st-line-strong) transparent;
+}
+
+.st-viewer-scroll::-webkit-scrollbar {
+  width: 9px;
+}
+
+.st-viewer-scroll::-webkit-scrollbar-thumb {
+  background: var(--st-line-strong);
+  border-radius: 99px;
+}
+
+.st-viewer-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* =========================
+   Chooser
+   ========================= */
+
+/* Pointing at one half dims the other, so the page answers before the click.
+   :has() rather than JavaScript, and where it is unsupported nothing happens,
+   which is a fine resting state. */
+.choose-half {
+  transition: opacity 420ms ease;
+}
+
+.choose-split:has(.choose-half:hover) .choose-half:not(:hover),
+.choose-split:has(.choose-half:focus-visible) .choose-half:not(:focus-visible) {
+  opacity: 0.5;
+}
+
+/* The seam. A hairline with the accent bleeding through its middle, so the
+   two halves are divided by something deliberate rather than by an edge. */
+.choose-seam {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 255, 255, 0.14),
+    transparent
+  );
+}
+
+@media (min-width: 768px) {
+  .choose-seam {
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(var(--signal-rgb), 0.38) 45%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choose-half,
+  .choose-half * {
+    transition: none !important;
+  }
+
+  .choose-half:hover img {
+    transform: none;
+  }
 }
