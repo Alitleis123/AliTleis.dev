@@ -30,7 +30,10 @@ import { LOCATION, RESUME_HREF, socials, withBasePath } from "../../data";
 export function DocPanel() {
   return (
     <div className="st-seq relative flex h-full min-h-full flex-col px-[4%] py-[3%]">
-      <Plate src="plate-resume.webp" scrim={0.6} />
+      {/* Less scrim than the others carry. The rendered page is a large white
+          rectangle, and next to it a plate at 0.6 reads as flat black however
+          much is actually behind the wash. */}
+      <Plate src="plate-resume.webp" scrim={0.4} />
 
       <span className="st-eyebrow relative shrink-0">Render queue</span>
 

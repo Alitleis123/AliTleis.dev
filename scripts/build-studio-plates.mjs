@@ -140,7 +140,7 @@ const render = (fn, grainSeed) => {
       const c = Math.pow(knee(Math.max(0, cool)), CURVE) * PEAK;
       // Vignette last, so it pulls every layer away from the panel edge.
       const vig =
-        1 - 0.72 * Math.pow(Math.min(1, Math.hypot((u - 0.5) / 0.62, (v - 0.42) / 0.68)), 2.1);
+        1 - 0.6 * Math.pow(Math.min(1, Math.hypot((u - 0.5) / 0.66, (v - 0.42) / 0.72)), 2.1);
       const n = (grain() - 0.5) * 0.008;
       const i = (y * W + x) * 3;
       for (let ch = 0; ch < 3; ch++) {
@@ -185,28 +185,34 @@ const scatter = (seed, count, weight, gainScale = 1) => {
  */
 const resume = () => {
   const n = octaves(20260917, 3);
-  const lampX = 0.31;
-  const lampY = 0.3;
-  // Denser and hotter near the lamp, gone by the far corners.
+  // Pushed out to the margin on purpose. The rendered page is centred, full
+  // height, and carries a 70px black shadow, so anything lit behind it is
+  // hidden by it. The only parts of this plate anyone ever sees are the strip
+  // down the left and the gap before the output module, so that is where the
+  // light is put.
+  const lampX = 0.16;
+  const lampY = 0.4;
   const near = (x, y) => {
-    const d = Math.hypot((x - lampX) / 0.72, (y - lampY) / 0.8);
-    return Math.max(0, 1 - d);
+    const a = Math.max(0, 1 - Math.hypot((x - lampX) / 0.62, (y - lampY) / 0.9));
+    // The gap between the page and the panel, the other place it shows.
+    const b = Math.max(0, 1 - Math.hypot((x - 0.72) / 0.34, (y - 0.66) / 0.5)) * 0.8;
+    return Math.max(a, b);
   };
-  const specks = scatter(9901, 190, (x, y) => Math.pow(near(x, y), 1.3));
+  const specks = scatter(9901, 230, (x, y) => Math.pow(near(x, y), 1.15), 1.5);
   return (u, v) => {
     const field = 0.8 + 0.2 * n(u, v);
 
-    let warm = 0.07 + 0.05 * n(u * 1.3, v * 1.3);
-    warm += bloom(u, v, lampX, lampY, 0.54, 0.6) * 0.26 * field;
-    warm += bloom(u, v, lampX, lampY, 0.13, 0.15) * 0.34;
-    warm += bloom(u, v, 0.79, 0.75, 0.36, 0.32) * 0.13 * field;
+    let warm = 0.08 + 0.055 * n(u * 1.3, v * 1.3);
+    warm += bloom(u, v, lampX, lampY, 0.46, 0.7) * 0.34 * field;
+    warm += bloom(u, v, lampX, lampY, 0.12, 0.16) * 0.4;
+    warm += bloom(u, v, 0.74, 0.68, 0.32, 0.4) * 0.22 * field;
 
     for (const p of specks) {
       const d = disc(u, v, p.cx, p.cy, p.r, p.aspect);
       if (d > 0) warm += d * p.gain;
     }
 
-    const cool = bloom(u, v, 0.89, 0.13, 0.42, 0.46) * 0.22;
+    const cool = bloom(u, v, 0.9, 0.12, 0.4, 0.44) * 0.2;
     return { warm, cool };
   };
 };
