@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RESUME_HREF } from "../data";
 import Link from "next/link";
 import { LuClapperboard } from "react-icons/lu";
+import BackToChooser from "./BackToChooser";
 import ViewSwitch from "./ViewSwitch";
 
 const NAV_SECTIONS = [
@@ -89,7 +90,8 @@ export default function NavBar({
         {/* The two outer groups are flex-1, so the middle run sits dead
             centre. The nav used to get there with absolute positioning, which
             reserved no width and let it run under the right hand controls. */}
-        <div className="flex flex-1 justify-start">
+        <div className="flex flex-1 items-center justify-start gap-3">
+          <BackToChooser tone="document" />
           <a
             href="#about"
             className="shrink-0 text-[15px] font-medium tracking-tight text-white/90 transition-colors duration-200 hover:text-white"
