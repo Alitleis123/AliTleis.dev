@@ -66,7 +66,7 @@ export default function Studio() {
   const { muted, toggle: toggleMuted } = useReelAudioPref();
 
   /**
-   * Boot the chrome on a cold open, hold still on a morph.
+   * Boot the chrome on a cold open, skip it on a toggle.
    *
    * Read once on mount rather than every render, and read during render
    * rather than in an effect, so the very first paint already carries the

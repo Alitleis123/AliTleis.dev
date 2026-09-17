@@ -172,8 +172,9 @@ export function TopBar({
       <span className="text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
         Ali&nbsp;Tleis
       </span>
-      {/* Named on its own so it pops rather than cross-fading. It exists in
-          this bar only, so there is nothing on the other side to morph into. */}
+      {/* The file name belongs to the suite alone, so arriving from the
+          reading view it is new rather than changed, and it leads the
+          stagger. */}
       <span
         className={`st-tc hidden text-[var(--st-faint)] sm:block ${
           entering ? "enter-swap enter-swap-1" : ""

@@ -19,17 +19,13 @@ import { markSwitchNavigation } from "../lib/switchArrival";
  * These are not themes. One is an application with a timeline for navigation,
  * the other is a page you scroll, so they are labelled for what they are.
  *
- * The two surfaces need different densities, so `hideCurrent` exists. The
- * studio is the unfamiliar interface and has to advertise that a plain page
- * exists at all, which takes both labels. The reading view does not need to
- * tell you that you are reading, and its nav bar is already carrying seven
- * section links, Ask AI and a resume button, so there it is one link out.
- *
  * The previews are real screenshots of each route rather than drawn mockups,
  * regenerated from the running site:
- *   chrome --headless=new --window-size=1440,900 --screenshot=… /?c=intro
- *   chrome --headless=new --window-size=1440,900 --screenshot=… /document/
- * then resized to 360x225 into public/switch.
+ *   chrome --headless=new --window-size=1440,900 --screenshot=… /studio/?c=projects
+ *   chrome --headless=new --window-size=1440,900 --screenshot=… /galaxy/
+ * then resized to 360x225 into public/switch. Reshoot them after a change to
+ * either route's chrome, or the switch advertises a version of the site that
+ * no longer exists.
  */
 
 const VIEWS = [
@@ -51,23 +47,18 @@ const VIEWS = [
 
 export default function ViewSwitch({
   tone = "studio",
-  hideCurrent = false,
 }: {
   /** Matches the palette of whichever route it is sitting in. */
   tone?: "studio" | "document";
-  /** Render only the way out, for bars with no room for both. */
-  hideCurrent?: boolean;
 }) {
   const pathname = usePathname();
   const onStudio = pathname?.startsWith("/studio") ?? false;
 
-  const shell = hideCurrent
-    ? ""
-    : `rounded-full border p-0.5 ${
-        tone === "studio"
-          ? "border-[var(--st-line-strong)] bg-[var(--st-panel)]"
-          : "border-[var(--border-soft)] bg-white/[0.04]"
-      }`;
+  const shell = `rounded-full border p-0.5 ${
+    tone === "studio"
+      ? "border-[var(--st-line-strong)] bg-[var(--st-panel)]"
+      : "border-[var(--border-soft)] bg-white/[0.04]"
+  }`;
 
   return (
     <div className={`flex shrink-0 items-center gap-0.5 ${shell}`}>
@@ -79,10 +70,10 @@ export default function ViewSwitch({
          * Only the side you are not on spells itself out.
          *
          * Both labels came to 218px, which made this the widest control in
-         * either bar and wider than the resume button beside it, for something
-         * secondary. The current view does not need naming, because you are
-         * looking at it: a marked glyph says "here" and the word says where
-         * the other one goes. That reads the same and costs about 90px.
+         * either bar, for something secondary. The current view does not need
+         * naming, because you are looking at it: a marked glyph says "here"
+         * and the word says where the other one goes. That reads the same and
+         * costs about 90px.
          */
         const body = (
           <>
@@ -133,12 +124,11 @@ export default function ViewSwitch({
 
         // The current view is not a link to itself.
         if (current) {
-          if (hideCurrent) return null;
           return (
             <span
               key={v.href}
               aria-current="page"
-                className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] ${
+              className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] ${
                 tone === "studio"
                   ? "bg-[var(--st-sel)] text-[var(--st-text)]"
                   : "bg-white/10 text-white"
