@@ -1,0 +1,48 @@
+name: Refresh TikTok counts
+
+on:
+  # Monday 06:00 UTC. Follower counts move slowly enough that daily would be
+  # noise in the history, and every commit here triggers a full rebuild and
+  # redeploy through pages.yml.
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+# Needed to push the refreshed module back to main.
+permissions:
+  contents: write
+
+concurrency:
+  group: "tiktok-stats"
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # The script exits zero whatever happens, so a bot wall or a changed
+      # payload leaves the committed numbers alone instead of failing the run.
+      # Runners sit in datacenter ranges that TikTok treats far more harshly
+      # than a home connection, so this job doing nothing is a normal outcome.
+      - name: Fetch counts
+        run: node scripts/fetch-tiktok-stats.mjs
+
+      - name: Commit if the numbers moved
+        run: |
+          if git diff --quiet -- src/app/tiktokStats.ts; then
+            echo "No change to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/tiktokStats.ts
+          git commit -m "Refresh the TikTok counts"
+          git push

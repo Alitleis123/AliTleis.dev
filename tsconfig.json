@@ -9,6 +9,10 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    // data.ts is imported directly by scripts/build-search-index.mjs under
+    // --experimental-strip-types, and Node's resolver needs the extension
+    // where webpack does not.
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
