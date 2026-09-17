@@ -917,10 +917,10 @@ section {
   /* 1. Boot. Stage last, so the chrome is already framing it when it arrives.
 
      Gated on .st-boots, which Studio withholds when the suite is entered
-     through the view switch. The header here is the same element that carries
-     the topbar transition name, so booting it during a morph meant the
-     transition snapshotted a bar that was still translated off the top and
-     part transparent. A cold open still boots. */
+     through the view switch. Replaying half a second of chrome
+     assembling itself makes a toggle between two views of one site feel
+     slow, and the bar sits in the same place on both routes, so there is
+     nothing for it to arrive from. A cold open still boots. */
   .st-boots > header {
     animation: st-boot-top 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
