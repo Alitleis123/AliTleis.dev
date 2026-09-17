@@ -304,7 +304,7 @@ export const featuredProjects: Project[] = [
     icon: withBasePath("/projects/Top%20choice%20image%201.webp"),
     iconAlt: "Top Choice Realty thumbnail",
     tech: ["React", "TypeScript", "Node.js", "Express", "MongoDB", "Zod", "REST APIs"],
-    demo: "https://alitleis123.github.io/topchoicerealty/",
+    demo: "https://topchoicerealtyny.com/",
     repo: "https://github.com/alitleis123/topchoicerealty",
     coverKey: "topChoiceRealty",
     gallery: [
