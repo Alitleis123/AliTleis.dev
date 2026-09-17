@@ -1057,6 +1057,95 @@ section {
   }
 }
 
+/* The entry.
+   
+   The bare domain painted the finished page in one frame, which left the most
+   considered screen on the site as the only one that arrived without being
+   composed. The suite boots, the reading view fades, and this did nothing.
+
+   So the seam draws, and the two halves open away from it. That is the page's
+   own argument put as a movement: one set of facts splitting into the two ways
+   you can read it. A wipe rather than a fade because a wipe is what the thing
+   behind the right half does for a living.
+
+   Not an opacity fade on the halves, deliberately. They carry their hover dim
+   on `transition: opacity`, and a filled animation on that same property wins
+   the cascade for good, which would strand both halves at full brightness the
+   moment the entry finished. clip-path has no such quarrel and it composites
+   off the main thread. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .choose-seam {
+    /* `scale` rather than `transform`, which would throw away the Tailwind
+       translate that centres this on the seam. The line grows from its middle
+       outward, and the scale across a single pixel of thickness is invisible. */
+    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Stacked on a phone, so the halves open up and down off a horizontal seam. */
+  .choose-open-1 {
+    animation: choose-open-up 460ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+  }
+
+  .choose-open-2 {
+    animation: choose-open-down 460ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+  }
+
+  /* Last, so the name lands on a page that has finished arranging itself. */
+  .choose-enter-header {
+    animation: choose-header-in 340ms cubic-bezier(0.32, 0.72, 0, 1) 240ms both;
+  }
+}
+
+/* Side by side from md, so the same two halves open left and right instead. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .choose-open-1 {
+    animation-name: choose-open-left;
+  }
+
+  .choose-open-2 {
+    animation-name: choose-open-right;
+  }
+}
+
+@keyframes choose-seam-in {
+  from {
+    scale: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes choose-open-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@keyframes choose-open-down {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes choose-open-left {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes choose-open-right {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+@keyframes choose-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .choose-half,
   .choose-half * {
