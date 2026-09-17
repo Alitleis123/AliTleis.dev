@@ -41,7 +41,7 @@ export default function Choose() {
           of the viewport, so an absolute header sat on top of the first one's
           copy: 98px of overlap at 360x640. In flow it takes its own space and
           the halves divide what is left. */}
-      <header className="pointer-events-none relative z-20 shrink-0 px-6 pt-6 text-center sm:px-10 sm:pt-11 md:absolute md:inset-x-0 md:top-0">
+      <header className="choose-enter-header pointer-events-none relative z-20 shrink-0 px-6 pt-6 text-center sm:px-10 sm:pt-11 md:absolute md:inset-x-0 md:top-0">
         <h1 className="font-mono text-[clamp(1.75rem,3.6vw,2.7rem)] font-medium leading-[0.94] tracking-[-0.045em] text-[var(--text-strong)] [text-shadow:0_2px_24px_rgba(0,0,0,0.85)]">
           Ali Tleis<span className="text-[var(--accent-electric)]">.</span>
         </h1>
@@ -54,7 +54,7 @@ export default function Choose() {
       {/* ── The portfolio ───────────────────────────────────────────── */}
       <Link
         href="/galaxy"
-        className="choose-half group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
+        className="choose-half choose-join-1 group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
       >
         {/* The galaxy route's own canvas, shooting stars and all.
             SpaceField sizes its canvas to the viewport rather than to its
@@ -91,7 +91,7 @@ export default function Choose() {
       {/* ── The editing suite ───────────────────────────────────────── */}
       <Link
         href="/studio"
-        className="choose-half choose-half-accent group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
+        className="choose-half choose-half-accent choose-join-2 group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
       >
         <span aria-hidden className="pointer-events-none absolute inset-0">
           {/* The same plate the end card sits on, so this half is a frame from

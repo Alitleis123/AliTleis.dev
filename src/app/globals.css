@@ -1057,6 +1057,117 @@ section {
   }
 }
 
+/* The entry.
+
+   The bare domain painted the finished page in one frame, which left the most
+   considered screen on the site as the only one that arrived without being
+   composed. The suite boots, the reading view fades, and this did nothing.
+
+   The two halves arrive apart and close, and the seam draws on the joint as
+   they meet. One set of facts assembling into the two ways you can read it,
+   which is the argument the page is already making in words.
+
+   Transform only, for two separate reasons. It is the one property the
+   compositor moves without repainting, and that matters here because each half
+   holds either a large photo or a canvas already running its own animation
+   loop: a clip-path wipe in this spot repainted half a viewport every frame.
+   Opacity is also spoken for, since the halves carry their hover dim on
+   `transition: opacity`, and a filled animation on that property would win the
+   cascade for good and strand them both at full brightness the moment the
+   entry finished.
+
+   Filled backwards rather than both, so every animated property returns to the
+   cascade once it lands. Holding the end state would leave a transform on each
+   half for the life of the page, and a transform is a stacking context even at
+   translate zero, which quietly reorders the seam against the copy. */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Stacked on a phone, so the halves close top to bottom onto a horizontal
+     seam.
+
+     Offsets are a share of each half rather than a fixed length, so the gap
+     carries the same weight on a phone as on a display. The vertical figure is
+     the smaller of the two because the offset briefly extends the scroll area
+     along whichever axis it runs, and down is the axis this page can actually
+     scroll on.
+
+     easeOutExpo over most of a second. The curve spends roughly six tenths of
+     the distance in its first fifth, so the halves break apart fast and spend
+     the rest of the time arriving, and the extra travel is what keeps that long
+     tail reading as a settle rather than as a stall. */
+  .choose-join-1 {
+    animation: choose-join-down 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
+  }
+
+  .choose-join-2 {
+    animation: choose-join-up 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
+  }
+
+  /* On the joint, once the halves are nearly touching. */
+  .choose-seam {
+    /* `scale` rather than `transform`, which would throw away the Tailwind
+       translate that centres this on the seam. The line grows from its middle
+       outward, and the scale across a single pixel of thickness is invisible. */
+    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
+  }
+
+  /* Last, onto a page that has finished assembling itself. */
+  .choose-enter-header {
+    animation: choose-header-in 360ms cubic-bezier(0.32, 0.72, 0, 1) 420ms backwards;
+  }
+}
+
+/* Side by side from md, so the same two halves close left and right instead. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .choose-join-1 {
+    animation-name: choose-join-right;
+  }
+
+  .choose-join-2 {
+    animation-name: choose-join-left;
+  }
+}
+
+/* Named for the direction of travel. The first half closes rightward onto the
+   seam and the second closes leftward onto it, so both run inward. */
+@keyframes choose-join-right {
+  from {
+    transform: translateX(-12%);
+  }
+}
+
+@keyframes choose-join-left {
+  from {
+    transform: translateX(12%);
+  }
+}
+
+@keyframes choose-join-down {
+  from {
+    transform: translateY(-8%);
+  }
+}
+
+@keyframes choose-join-up {
+  from {
+    transform: translateY(8%);
+  }
+}
+
+@keyframes choose-seam-in {
+  from {
+    scale: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes choose-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .choose-half,
   .choose-half * {
