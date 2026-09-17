@@ -1091,29 +1091,35 @@ section {
      along whichever axis it runs, and down is the axis this page can actually
      scroll on.
 
-     easeOutExpo over most of a second. The curve spends roughly six tenths of
-     the distance in its first fifth, so the halves break apart fast and spend
-     the rest of the time arriving, and the extra travel is what keeps that long
-     tail reading as a settle rather than as a stall. */
+     easeOutQuart, arrived at between the two curves either side of it. Measured
+     off the page over this travel, easeOutExpo was 98% done by 440ms and spent
+     its remaining half second moving under two pixels, which is a tail nobody
+     can see and no duration can fix. easeOutCubic spread the distance evenly
+     enough to watch and read close to straight for it. This one breaks a third
+     of the gap in the first tenth of the time and holds the last four pixels
+     back across the final half second, which is the shape wanted here: gone
+     quickly, arriving slowly. */
   .choose-join-1 {
-    animation: choose-join-down 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
+    animation: choose-join-down 1200ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
   }
 
   .choose-join-2 {
-    animation: choose-join-up 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
+    animation: choose-join-up 1200ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
   }
 
-  /* On the joint, once the halves are nearly touching. */
+  /* On the joint, once the halves are nearly touching. Held this late on
+     purpose: drawn early it is a hairline hanging in the middle of a gap that
+     has not closed yet, which reads as a stray rule rather than as a join. */
   .choose-seam {
     /* `scale` rather than `transform`, which would throw away the Tailwind
        translate that centres this on the seam. The line grows from its middle
        outward, and the scale across a single pixel of thickness is invisible. */
-    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
+    animation: choose-seam-in 420ms cubic-bezier(0.16, 1, 0.3, 1) 500ms backwards;
   }
 
   /* Last, onto a page that has finished assembling itself. */
   .choose-enter-header {
-    animation: choose-header-in 360ms cubic-bezier(0.32, 0.72, 0, 1) 420ms backwards;
+    animation: choose-header-in 380ms cubic-bezier(0.32, 0.72, 0, 1) 640ms backwards;
   }
 }
 
