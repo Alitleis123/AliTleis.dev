@@ -31,6 +31,30 @@ export type Comp = {
 
 export const FPS = 24;
 
+/**
+ * What A1 is playing.
+ *
+ * The clip carries its own credit, so the music is something a visitor reads
+ * off the timeline before they press play rather than something that starts
+ * at them. Fill in the title and it replaces the filename everywhere.
+ *
+ * With no credit set this falls back to the source file, which is what an
+ * editor shows on a clip whose metadata carries no name. A lane labelled
+ * "Untitled" would be worse than one labelled honestly.
+ */
+export const AUDIO_TRACK = {
+  file: "reel.m4a",
+  title: "Eyes Without a Face (Instrumental)",
+  artist: "Billy Idol",
+};
+
+export const AUDIO_SRC = withBasePath(`/audio/${AUDIO_TRACK.file}`);
+
+/** The A1 name plate, and the project panel's music row. */
+export const AUDIO_LABEL = AUDIO_TRACK.title
+  ? [AUDIO_TRACK.title, AUDIO_TRACK.artist].filter(Boolean).join(" · ")
+  : AUDIO_TRACK.file;
+
 export const COMPS: Comp[] = [
   { id: "intro", name: "Intro", kind: "Title", duration: 6, href: "/#about", thumb: withBasePath("/studio/strip-intro.webp") },
   { id: "projects", name: "Projects", kind: "Sequence", duration: 22, href: "/#projects", thumb: withBasePath("/studio/strip-projects.webp") },

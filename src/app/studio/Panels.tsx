@@ -3,6 +3,7 @@
 import { LuVolume2, LuVolumeX } from "react-icons/lu";
 import ViewSwitch from "../components/ViewSwitch";
 import {
+  AUDIO_LABEL,
   COMPS,
   FPS,
   STARTS,
@@ -114,10 +115,19 @@ export function ProjectPanel({
           ["Duration", timecode(TOTAL)],
           ["Frame rate", `${FPS} fps`],
           ["Tracks", "V1 · A1"],
+          // What A1 is playing, spelled out here as well as on the clip. The
+          // panel is the one place a screen reader reaches it: the lane sits
+          // inside the timeline's slider, whose own label is what gets read.
+          ["Music", AUDIO_LABEL],
         ].map(([k, v]) => (
           <div key={k} className="flex items-baseline gap-2 py-[3px]">
-            <span className="st-label">{k}</span>
-            <span className="st-tc ml-auto text-[10px] text-[var(--st-dim)]">
+            <span className="st-label shrink-0">{k}</span>
+            {/* Wraps rather than clips. Every other row here is short enough
+                to stay on one line, but a title and an artist will not fit in
+                a 216px panel, and half a song name is no use to anyone. The
+                override is needed because st-tc sets nowrap from outside a
+                layer, which beats the utility. */}
+            <span className="st-tc ml-auto min-w-0 whitespace-normal! break-words text-right text-[10px] text-[var(--st-dim)]">
               {v}
             </span>
           </div>

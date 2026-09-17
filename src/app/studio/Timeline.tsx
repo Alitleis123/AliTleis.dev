@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import { COMPS, STARTS, TOTAL, compAt, timecode } from "./comps";
+import { AUDIO_LABEL, COMPS, STARTS, TOTAL, compAt, timecode } from "./comps";
 import { BARS } from "./waveform";
 
 /**
@@ -339,6 +339,16 @@ export default function Timeline({
                 style={{ left: pct(s) }}
               />
             ))}
+            {/* Name plate, the way V1's clips carry theirs, so the music is
+                something you read before you press play. Corner anchored and
+                faded out to the right rather than run full width: a scrim
+                across the whole lane would dull every bar in it, and only the
+                clip's head needs to be legible. */}
+            <span className="pointer-events-none absolute left-0 top-0 z-10 flex max-w-[60%] items-center bg-gradient-to-r from-black/85 via-black/60 to-transparent py-[3px] pl-2 pr-8">
+              <span className="st-tc min-w-0 truncate text-[10px] text-[var(--st-audio)]">
+                {AUDIO_LABEL}
+              </span>
+            </span>
           </div>
 
           <Playhead left={pct(time)} still={playing || scrubbing} />
