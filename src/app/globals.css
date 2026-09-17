@@ -1091,22 +1091,20 @@ section {
      along whichever axis it runs, and down is the axis this page can actually
      scroll on.
 
-     easeOutCubic, deliberately, rather than one of the sharper ease-outs used
-     for the small movements elsewhere here. Those spend their distance almost
-     entirely in the opening fifth, which is the right shape for a control
-     answering a press and the wrong one for the largest movement on the site:
-     measured off the page, easeOutExpo over this travel was 98% done by 440ms
-     and spent its remaining half a second moving under two pixels. Lengthening
-     that only lengthens a tail nobody can see. This curve is still an ease-out,
-     still quickest off the mark, but it spreads the deceleration across the
-     whole duration so the closing is something you watch rather than something
-     that has already happened. */
+     easeOutQuart, arrived at between the two curves either side of it. Measured
+     off the page over this travel, easeOutExpo was 98% done by 440ms and spent
+     its remaining half second moving under two pixels, which is a tail nobody
+     can see and no duration can fix. easeOutCubic spread the distance evenly
+     enough to watch and read close to straight for it. This one breaks a third
+     of the gap in the first tenth of the time and holds the last four pixels
+     back across the final half second, which is the shape wanted here: gone
+     quickly, arriving slowly. */
   .choose-join-1 {
-    animation: choose-join-down 1100ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    animation: choose-join-down 1200ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
   }
 
   .choose-join-2 {
-    animation: choose-join-up 1100ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+    animation: choose-join-up 1200ms cubic-bezier(0.25, 1, 0.5, 1) backwards;
   }
 
   /* On the joint, once the halves are nearly touching. Held this late on
@@ -1116,12 +1114,12 @@ section {
     /* `scale` rather than `transform`, which would throw away the Tailwind
        translate that centres this on the seam. The line grows from its middle
        outward, and the scale across a single pixel of thickness is invisible. */
-    animation: choose-seam-in 420ms cubic-bezier(0.16, 1, 0.3, 1) 560ms backwards;
+    animation: choose-seam-in 420ms cubic-bezier(0.16, 1, 0.3, 1) 500ms backwards;
   }
 
   /* Last, onto a page that has finished assembling itself. */
   .choose-enter-header {
-    animation: choose-header-in 380ms cubic-bezier(0.32, 0.72, 0, 1) 700ms backwards;
+    animation: choose-header-in 380ms cubic-bezier(0.32, 0.72, 0, 1) 640ms backwards;
   }
 }
 
