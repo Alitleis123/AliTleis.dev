@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { withBasePath } from "../data";
+import { AUDIO_SRC } from "./comps";
 
 /**
  * The sequence's audio, locked to the playhead.
@@ -148,7 +148,7 @@ export default function ReelAudio({
   return (
     <audio
       ref={elRef}
-      src={withBasePath("/audio/reel.m4a")}
+      src={AUDIO_SRC}
       // Cut to the length of the sequence, so there is nothing to loop to.
       //
       // Metadata rather than auto: seeking needs the duration and the seek
