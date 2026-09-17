@@ -139,6 +139,7 @@ export function TopBar({
   playing,
   muted,
   showMute,
+  entering,
   onPlayToggle,
   onStep,
   onMuteToggle,
@@ -147,6 +148,8 @@ export function TopBar({
   playing: boolean;
   muted: boolean;
   showMute: boolean;
+  /** Arrived from the reading view, so the differing parts animate in. */
+  entering: boolean;
   onPlayToggle: () => void;
   onStep: (dir: -1 | 1) => void;
   onMuteToggle: () => void;
@@ -169,12 +172,28 @@ export function TopBar({
       <span className="text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
         Ali&nbsp;Tleis
       </span>
-      <span className="st-tc hidden text-[var(--st-faint)] sm:block">
+      {/* Named on its own so it pops rather than cross-fading. It exists in
+          this bar only, so there is nothing on the other side to morph into. */}
+      <span
+        className={`st-tc hidden text-[var(--st-faint)] sm:block ${
+          entering ? "enter-swap enter-swap-1" : ""
+        }`}
+      >
         portfolio.aep
       </span>
 
-      {/* Transport. J K L is muscle memory for anyone who edits. */}
-      <div className="ml-auto flex items-center gap-1.5">
+      {/* Transport. J K L is muscle memory for anyone who edits.
+
+          Named apart from the reading view's section links rather than paired
+          with them. Sharing one name made the browser interpolate a 160px
+          transport into a 750px row of links, so the buttons stretched across
+          the bar on the way out. Each group now slides and fades at its own
+          size instead. */}
+      <div
+        className={`ml-auto flex items-center gap-1.5 ${
+          entering ? "enter-swap enter-swap-2" : ""
+        }`}
+      >
         <button
           type="button"
           onClick={() => onStep(-1)}

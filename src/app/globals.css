@@ -914,20 +914,26 @@ section {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* 1. Boot. Stage last, so the chrome is already framing it when it arrives. */
-  .st-root > header {
+  /* 1. Boot. Stage last, so the chrome is already framing it when it arrives.
+
+     Gated on .st-boots, which Studio withholds when the suite is entered
+     through the view switch. The header here is the same element that carries
+     the topbar transition name, so booting it during a morph meant the
+     transition snapshotted a bar that was still translated off the top and
+     part transparent. A cold open still boots. */
+  .st-boots > header {
     animation: st-boot-top 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .st-boot-panel {
+  .st-boots .st-boot-panel {
     animation: st-boot-left 460ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
   }
 
-  .st-boot-timeline {
+  .st-boots .st-boot-timeline {
     animation: st-boot-bottom 500ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
   }
 
-  .st-boot-stage {
+  .st-boots .st-boot-stage {
     animation: st-boot-stage 560ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
   }
 
@@ -1079,4 +1085,62 @@ section {
 
 @media (prefers-reduced-motion: reduce) {
   .ask-reading { animation: none; opacity: 0.7; }
+}
+
+/* =========================
+   Arriving from the other view
+   ========================= */
+
+/* A plain mount animation, not a view transition.
+
+   The morph this replaces snapshotted the whole document on every toggle, and
+   the reading view is nearly nine thousand pixels tall with a live canvas on
+   it, so each move captured and composited two full page images. These are
+   ordinary keyframes on a handful of elements, so nothing is captured and the
+   compositor has four boxes to move rather than two page-sized textures.
+
+   Only the parts that differ between the views animate. The wordmark and the
+   view switch sit within three pixels of the same place on both routes, so
+   moving them would invent a difference that is not there, and the switch in
+   particular should hold still under the cursor that just clicked it. */
+
+.enter-swap {
+  animation: enter-swap 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+/* A short stagger, so the bar fills in rather than appearing at once. */
+.enter-swap-1 {
+  animation-delay: 40ms;
+}
+
+.enter-swap-2 {
+  animation-delay: 80ms;
+}
+
+/* The page under the bar is wholly different, so it gets the longer fade and
+   no movement. Sliding a full page reads as jank at any speed. */
+.enter-page {
+  animation: enter-page 360ms ease-out both;
+}
+
+@keyframes enter-swap {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes enter-page {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter-swap,
+  .enter-swap-1,
+  .enter-swap-2,
+  .enter-page {
+    animation: none;
+  }
 }

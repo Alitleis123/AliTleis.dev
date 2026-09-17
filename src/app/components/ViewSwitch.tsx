@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LuAlignLeft, LuClapperboard } from "react-icons/lu";
 import { withBasePath } from "../data";
+import { markSwitchNavigation } from "../lib/switchArrival";
 
 /**
  * The switch between the two ways to read this site.
@@ -137,7 +138,7 @@ export default function ViewSwitch({
             <span
               key={v.href}
               aria-current="page"
-              className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] ${
+                className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] ${
                 tone === "studio"
                   ? "bg-[var(--st-sel)] text-[var(--st-text)]"
                   : "bg-white/10 text-white"
@@ -154,6 +155,7 @@ export default function ViewSwitch({
           <Link
             key={v.href}
             href={v.href}
+            onClick={() => markSwitchNavigation(v.href)}
             className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] transition-colors duration-150 ${
               tone === "studio"
                 ? "text-[var(--st-dim)] hover:bg-[var(--st-hover)] hover:text-[var(--st-text)]"
