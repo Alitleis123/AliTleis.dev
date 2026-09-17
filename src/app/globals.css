@@ -1063,100 +1063,84 @@ section {
    considered screen on the site as the only one that arrived without being
    composed. The suite boots, the reading view fades, and this did nothing.
 
-   So the seam draws, and the two halves open away from it. That is the page's
-   own argument put as a movement: one set of facts splitting into the two ways
-   you can read it. A wipe rather than a fade because a wipe is what the thing
-   behind the right half does for a living.
+   The two halves arrive apart and close, and the seam draws on the joint as
+   they meet. One set of facts assembling into the two ways you can read it,
+   which is the argument the page is already making in words.
 
-   The wipe is an opaque curtain slid off on `transform`, not a clip-path on the
-   halves themselves. Chrome does not run clip-path on the compositor, so
-   animating it repainted half a viewport on every frame, and each half holds
-   either a large photo or a canvas that is already running its own animation
-   loop. A transform on a flat panel is composited, so the art underneath it is
-   never repainted at all.
+   Transform only, for two separate reasons. It is the one property the
+   compositor moves without repainting, and that matters here because each half
+   holds either a large photo or a canvas already running its own animation
+   loop: a clip-path wipe in this spot repainted half a viewport every frame.
+   Opacity is also spoken for, since the halves carry their hover dim on
+   `transition: opacity`, and a filled animation on that property would win the
+   cascade for good and strand them both at full brightness the moment the
+   entry finished.
 
-   A curtain rather than an opacity fade on the halves, too, because they carry
-   their hover dim on `transition: opacity`, and a filled animation on that same
-   property wins the cascade for good, which would strand both halves at full
-   brightness the moment the entry finished. */
-
-.choose-curtain {
-  /* Hidden unless the animation that clears it is going to run. Should the
-     no-preference block below never apply, this must not be left sitting on top
-     of a half with no way to get off it. */
-  display: none;
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  background: var(--background);
-  pointer-events: none;
-}
+   Filled backwards rather than both, so every animated property returns to the
+   cascade once it lands. Holding the end state would leave a transform on each
+   half for the life of the page, and a transform is a stacking context even at
+   translate zero, which quietly reorders the seam against the copy. */
 
 @media (prefers-reduced-motion: no-preference) {
-  .choose-curtain {
-    display: block;
+  /* Stacked on a phone, so the halves close top to bottom onto a horizontal
+     seam. The offset is a share of each half rather than a fixed length, so the
+     gap reads at the same weight on a phone as on a display. */
+  .choose-join-1 {
+    animation: choose-join-down 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 
-  /* Stacked on a phone, so the curtains clear up and down off a horizontal
-     seam. Evenly paced rather than on one of the snappier curves used
-     elsewhere here: this travels half a viewport, and the fast-out curves make
-     that much distance land before the eye has followed it. */
-  .choose-curtain-1 {
-    animation: choose-curtain-up 560ms cubic-bezier(0.4, 0, 0.2, 1) 60ms both;
+  .choose-join-2 {
+    animation: choose-join-up 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 
-  .choose-curtain-2 {
-    animation: choose-curtain-down 560ms cubic-bezier(0.4, 0, 0.2, 1) 60ms both;
-  }
-
-  /* Held back until the curtains are moving, since they cover this pixel until
-     they do. */
+  /* On the joint, once the halves are nearly touching. */
   .choose-seam {
     /* `scale` rather than `transform`, which would throw away the Tailwind
        translate that centres this on the seam. The line grows from its middle
        outward, and the scale across a single pixel of thickness is invisible. */
-    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both;
+    animation: choose-seam-in 320ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
   }
 
-  /* Sits above the curtains, so the name is already in place as the page opens
-     underneath it. */
+  /* Last, onto a page that has finished assembling itself. */
   .choose-enter-header {
-    animation: choose-header-in 340ms cubic-bezier(0.32, 0.72, 0, 1) 200ms both;
+    animation: choose-header-in 320ms cubic-bezier(0.32, 0.72, 0, 1) 360ms backwards;
   }
 }
 
-/* Side by side from md, so the curtains clear left and right instead. */
+/* Side by side from md, so the same two halves close left and right instead. */
 @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-  .choose-curtain-1 {
-    animation-name: choose-curtain-left;
+  .choose-join-1 {
+    animation-name: choose-join-right;
   }
 
-  .choose-curtain-2 {
-    animation-name: choose-curtain-right;
-  }
-}
-
-@keyframes choose-curtain-left {
-  to {
-    transform: translateX(-100%);
+  .choose-join-2 {
+    animation-name: choose-join-left;
   }
 }
 
-@keyframes choose-curtain-right {
-  to {
-    transform: translateX(100%);
+/* Named for the direction of travel. The first half closes rightward onto the
+   seam and the second closes leftward onto it, so both run inward. */
+@keyframes choose-join-right {
+  from {
+    transform: translateX(-5%);
   }
 }
 
-@keyframes choose-curtain-up {
-  to {
-    transform: translateY(-100%);
+@keyframes choose-join-left {
+  from {
+    transform: translateX(5%);
   }
 }
 
-@keyframes choose-curtain-down {
-  to {
-    transform: translateY(100%);
+@keyframes choose-join-down {
+  from {
+    transform: translateY(-5%);
+  }
+}
+
+@keyframes choose-join-up {
+  from {
+    transform: translateY(5%);
   }
 }
 
