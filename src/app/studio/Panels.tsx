@@ -1,6 +1,7 @@
 "use client";
 
 import { LuVolume2, LuVolumeX } from "react-icons/lu";
+import BackToChooser from "../components/BackToChooser";
 import ViewSwitch from "../components/ViewSwitch";
 import {
   AUDIO_LABEL,
@@ -179,6 +180,7 @@ export function TopBar({
    */
   return (
     <header className="relative z-40 flex shrink-0 items-center gap-3 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2">
+      <BackToChooser />
       <span className="text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
         Ali&nbsp;Tleis
       </span>
