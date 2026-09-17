@@ -1058,7 +1058,7 @@ section {
 }
 
 /* The entry.
-   
+
    The bare domain painted the finished page in one frame, which left the most
    considered screen on the site as the only one that arrived without being
    composed. The suite boots, the reading view fades, and this did nothing.
@@ -1068,43 +1068,95 @@ section {
    you can read it. A wipe rather than a fade because a wipe is what the thing
    behind the right half does for a living.
 
-   Not an opacity fade on the halves, deliberately. They carry their hover dim
-   on `transition: opacity`, and a filled animation on that same property wins
-   the cascade for good, which would strand both halves at full brightness the
-   moment the entry finished. clip-path has no such quarrel and it composites
-   off the main thread. */
+   The wipe is an opaque curtain slid off on `transform`, not a clip-path on the
+   halves themselves. Chrome does not run clip-path on the compositor, so
+   animating it repainted half a viewport on every frame, and each half holds
+   either a large photo or a canvas that is already running its own animation
+   loop. A transform on a flat panel is composited, so the art underneath it is
+   never repainted at all.
+
+   A curtain rather than an opacity fade on the halves, too, because they carry
+   their hover dim on `transition: opacity`, and a filled animation on that same
+   property wins the cascade for good, which would strand both halves at full
+   brightness the moment the entry finished. */
+
+.choose-curtain {
+  /* Hidden unless the animation that clears it is going to run. Should the
+     no-preference block below never apply, this must not be left sitting on top
+     of a half with no way to get off it. */
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: var(--background);
+  pointer-events: none;
+}
 
 @media (prefers-reduced-motion: no-preference) {
+  .choose-curtain {
+    display: block;
+  }
+
+  /* Stacked on a phone, so the curtains clear up and down off a horizontal
+     seam. Evenly paced rather than on one of the snappier curves used
+     elsewhere here: this travels half a viewport, and the fast-out curves make
+     that much distance land before the eye has followed it. */
+  .choose-curtain-1 {
+    animation: choose-curtain-up 560ms cubic-bezier(0.4, 0, 0.2, 1) 60ms both;
+  }
+
+  .choose-curtain-2 {
+    animation: choose-curtain-down 560ms cubic-bezier(0.4, 0, 0.2, 1) 60ms both;
+  }
+
+  /* Held back until the curtains are moving, since they cover this pixel until
+     they do. */
   .choose-seam {
     /* `scale` rather than `transform`, which would throw away the Tailwind
        translate that centres this on the seam. The line grows from its middle
        outward, and the scale across a single pixel of thickness is invisible. */
-    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) 140ms both;
   }
 
-  /* Stacked on a phone, so the halves open up and down off a horizontal seam. */
-  .choose-open-1 {
-    animation: choose-open-up 460ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
-  }
-
-  .choose-open-2 {
-    animation: choose-open-down 460ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
-  }
-
-  /* Last, so the name lands on a page that has finished arranging itself. */
+  /* Sits above the curtains, so the name is already in place as the page opens
+     underneath it. */
   .choose-enter-header {
-    animation: choose-header-in 340ms cubic-bezier(0.32, 0.72, 0, 1) 240ms both;
+    animation: choose-header-in 340ms cubic-bezier(0.32, 0.72, 0, 1) 200ms both;
   }
 }
 
-/* Side by side from md, so the same two halves open left and right instead. */
+/* Side by side from md, so the curtains clear left and right instead. */
 @media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-  .choose-open-1 {
-    animation-name: choose-open-left;
+  .choose-curtain-1 {
+    animation-name: choose-curtain-left;
   }
 
-  .choose-open-2 {
-    animation-name: choose-open-right;
+  .choose-curtain-2 {
+    animation-name: choose-curtain-right;
+  }
+}
+
+@keyframes choose-curtain-left {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes choose-curtain-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes choose-curtain-up {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes choose-curtain-down {
+  to {
+    transform: translateY(100%);
   }
 }
 
@@ -1112,30 +1164,6 @@ section {
   from {
     scale: 0;
     opacity: 0;
-  }
-}
-
-@keyframes choose-open-up {
-  from {
-    clip-path: inset(100% 0 0 0);
-  }
-}
-
-@keyframes choose-open-down {
-  from {
-    clip-path: inset(0 0 100% 0);
-  }
-}
-
-@keyframes choose-open-left {
-  from {
-    clip-path: inset(0 0 0 100%);
-  }
-}
-
-@keyframes choose-open-right {
-  from {
-    clip-path: inset(0 100% 0 0);
   }
 }
 

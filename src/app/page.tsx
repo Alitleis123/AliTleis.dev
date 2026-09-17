@@ -54,7 +54,7 @@ export default function Choose() {
       {/* ── The portfolio ───────────────────────────────────────────── */}
       <Link
         href="/galaxy"
-        className="choose-half choose-open-1 group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
+        className="choose-half group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
       >
         {/* The galaxy route's own canvas, shooting stars and all.
             SpaceField sizes its canvas to the viewport rather than to its
@@ -86,12 +86,16 @@ export default function Choose() {
           blurb="Everything in order, straight down the page. Roles, projects, stack and the resume, where you expect them to be."
           cost="Scroll it like any other site"
         />
+
+        {/* The curtain this half opens out from. See globals.css for why it is
+            a panel on the move rather than a clip on the half. */}
+        <span aria-hidden className="choose-curtain choose-curtain-1" />
       </Link>
 
       {/* ── The editing suite ───────────────────────────────────────── */}
       <Link
         href="/studio"
-        className="choose-half choose-half-accent choose-open-2 group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
+        className="choose-half choose-half-accent group relative flex flex-1 flex-col justify-end overflow-hidden md:min-h-[100dvh]"
       >
         <span aria-hidden className="pointer-events-none absolute inset-0">
           {/* The same plate the end card sits on, so this half is a frame from
@@ -118,6 +122,8 @@ export default function Choose() {
           cost="Slower to read, more to look at"
           accent
         />
+
+        <span aria-hidden className="choose-curtain choose-curtain-2" />
       </Link>
 
       {/* The seam. Sits above both halves so neither one's scrim covers it. */}
