@@ -31,8 +31,22 @@ export function ProjectPanel({
 }) {
   const active = compAt(time);
 
+  /*
+   * From md rather than lg, and narrower until lg.
+   *
+   * The comp list is the only place the sections are named, sized and
+   * reachable in one go. Gated at lg it vanished for every laptop window
+   * narrower than 1024, which is most of them once a browser is not
+   * maximised, and the route it left behind had no list of its own: the
+   * clips carry names but the short ones truncate to a letter, and nothing
+   * else states a duration.
+   *
+   * 180px between md and lg. The full 216 takes a quarter of a 768px window,
+   * and the rows still read at 180 because the poster frame is fixed width
+   * and only the label column gives anything up.
+   */
   return (
-    <aside className="st-boot-panel hidden w-[216px] shrink-0 flex-col border-r border-[var(--st-line)] bg-[var(--st-panel)] lg:flex">
+    <aside className="st-boot-panel hidden w-[180px] shrink-0 flex-col border-r border-[var(--st-line)] bg-[var(--st-panel)] md:flex lg:w-[216px]">
       <div className="flex shrink-0 items-center gap-2 border-b border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2">
         <span className="st-label">Project</span>
         <span className="st-tc ml-auto text-[var(--st-faint)]">
@@ -116,23 +130,34 @@ export function ProjectPanel({
           ["Duration", timecode(TOTAL)],
           ["Frame rate", `${FPS} fps`],
           ["Tracks", "V1 · A1"],
-          // What A1 is playing, spelled out here as well as on the clip. The
-          // panel is the one place a screen reader reaches it: the lane sits
-          // inside the timeline's slider, whose own label is what gets read.
-          ["Music", AUDIO_LABEL],
         ].map(([k, v]) => (
           <div key={k} className="flex items-baseline gap-2 py-[3px]">
             <span className="st-label shrink-0">{k}</span>
-            {/* Wraps rather than clips. Every other row here is short enough
-                to stay on one line, but a title and an artist will not fit in
-                a 216px panel, and half a song name is no use to anyone. The
-                override is needed because st-tc sets nowrap from outside a
-                layer, which beats the utility. */}
-            <span className="st-tc ml-auto min-w-0 whitespace-normal! break-words text-right text-[10px] text-[var(--st-dim)]">
+            <span className="st-tc ml-auto text-[10px] text-[var(--st-dim)]">
               {v}
             </span>
           </div>
         ))}
+
+        {/* What A1 is playing, spelled out here as well as on the clip. The
+            panel is the one place a screen reader reaches it: the lane sits
+            inside the timeline's slider, whose own label is what gets read.
+
+            Stacked rather than set in a key and value row like the three
+            above. Those are all short and fixed. A title and an artist runs
+            to four lines against a 180px panel, and wrapping it right
+            aligned leaves a ragged left edge that reads as a broken row
+            rather than as one value. Given its own line it has the full
+            width and stays a single block of text.
+
+            The nowrap override is needed because st-tc sets it from outside
+            a layer, which beats the utility. */}
+        <div className="pt-[5px]">
+          <span className="st-label block">Music</span>
+          <span className="st-tc mt-1 block whitespace-normal! break-words text-[10px] leading-[1.5] text-[var(--st-dim)]">
+            {AUDIO_LABEL}
+          </span>
+        </div>
       </div>
     </aside>
   );
