@@ -11,7 +11,8 @@
     "optimize:images": "node scripts/optimize-images.mjs",
     "predeploy": "next build",
     "deploy": "gh-pages -d out --dotfiles",
-    "build:search": "node --experimental-strip-types scripts/build-search-index.mjs"
+    "build:search": "node --experimental-strip-types scripts/build-search-index.mjs",
+    "stats:tiktok": "node scripts/fetch-tiktok-stats.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.24.10",

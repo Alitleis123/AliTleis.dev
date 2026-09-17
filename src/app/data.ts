@@ -1,4 +1,39 @@
+import { tiktokStats } from "./tiktokStats.ts";
+
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+/**
+ * Live TikTok counts, refreshed by scripts/fetch-tiktok-stats.mjs.
+ *
+ * Every place the audience size appears reads from here. It used to be typed
+ * out in four: the stat tile, the image's alt text and two paragraphs, so a
+ * new number meant finding all four and one of them always got missed.
+ *
+ * Top post views stay hand written below. The profile payload carries follower
+ * and like totals but no per video play count, so that figure is only as fresh
+ * as the screenshot beside it.
+ */
+export const tiktokFetchedAt = tiktokStats.fetchedAt;
+
+/** 11800 to "11.8K", 1200000 to "1.2M", the way the app itself renders them. */
+export function formatCount(n: number): string {
+  if (n >= 1_000_000) {
+    const m = n / 1_000_000;
+    return `${m >= 10 ? Math.round(m) : m.toFixed(1).replace(/\.0$/, "")}M`;
+  }
+  if (n >= 1_000) {
+    const k = n / 1_000;
+    return `${k >= 10 ? k.toFixed(1).replace(/\.0$/, "") : k.toFixed(1)}K`;
+  }
+  return String(n);
+}
+
+export const followerLabel = formatCount(tiktokStats.followerCount);
+export const likeLabel = formatCount(tiktokStats.heartCount);
+
+/** Hand written, since the profile payload has no per video play count. */
+const TOP_POST = "2.8M";
+
 export const withBasePath = (path: string) => `${basePath}${path}`;
 
 /** Canonical origin, matches public/CNAME. Used for metadata, sitemap, robots. */
@@ -269,7 +304,7 @@ export const featuredProjects: Project[] = [
     range: "Jan 2026 – Present",
     desc: "DaVinci Resolve plugin for hand-drawn animation. It finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
     bullets: [
-      "This one came out of my own edits. I create anime edits for an audience of 11.8k, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.",
+      `This one came out of my own edits. I create anime edits for an audience of ${followerLabel}, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.`,
       "Anime is drawn on 2s or 3s. Twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing. There is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
       "Frame-difference scoring finds the duplicates and infers whether a clip is on 1s, 2s or 3s, so the hold pattern is read off the footage rather than typed in. If a clip has no duplicated frames the plugin says so and stops, instead of inventing motion that was never drawn.",
       "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree, which is exactly where flow normally tears, it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
@@ -452,13 +487,13 @@ export const offClockProfile = {
     return v ? `${base}?v=${v}` : base;
   })(),
   src: withBasePath("/offclock/anime-editing-full.webp"),
-  alt: "TikTok profile for @.justlightt showing 11.8K followers, 1.2M likes, and a post grid with 2.8M, 1.6M and 767.4K views",
+  alt: `TikTok profile for @.justlightt showing ${followerLabel} followers, ${likeLabel} likes, and a post grid led by ${TOP_POST} views`,
   href: "https://www.tiktok.com/@.justlightt",
   handle: "@.justlightt",
   stats: [
-    { value: "11.8K", label: "Followers" },
-    { value: "1.2M", label: "Likes" },
-    { value: "2.8M", label: "Top post" },
+    { value: followerLabel, label: "Followers" },
+    { value: likeLabel, label: "Likes" },
+    { value: TOP_POST, label: "Top post" },
   ],
 };
 
@@ -499,7 +534,7 @@ export const offClockExtras = [
  * the evidence for how you would know.
  */
 export const offClockNote =
-  "I create edits from anime, shows and movies for an audience of 11.8k, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.";
+  `I create edits from anime, shows and movies for an audience of ${followerLabel}, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.`;
 
 // ───────────────────────────────────────────────────────────────────
 // About
