@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Plate from "./Plate";
 import { LuExternalLink } from "react-icons/lu";
 import { offClockProfile, offClockFrames, offClockNote } from "../../data";
 
@@ -13,8 +14,10 @@ import { offClockProfile, offClockFrames, offClockNote } from "../../data";
  */
 export default function Reel() {
   return (
-    <div className="st-seq flex h-full min-h-full flex-col justify-center gap-4 px-[4%] py-[2%] xl:flex-row xl:gap-10 xl:items-center">
-      <div className="min-w-0 flex-1">
+    <div className="st-seq relative flex h-full min-h-full flex-col justify-center gap-4 px-[4%] py-[2%] xl:flex-row xl:gap-10 xl:items-center">
+      <Plate />
+
+      <div className="relative min-w-0 flex-1">
         <span className="st-eyebrow">Footage</span>
         <p className="st-body mt-2.5 max-w-[58ch]">
           {offClockNote}
@@ -49,7 +52,7 @@ export default function Reel() {
           comp the only thing you had to scroll to find. Phone and figures are
           side by side now, and the handle is a button rather than a 10px
           uppercase label. */}
-      <div className="flex shrink-0 items-center gap-5 xl:w-[350px]">
+      <div className="relative flex shrink-0 items-center gap-5 xl:w-[350px]">
         <div className="relative w-[128px] shrink-0 sm:w-[150px]">
           <Image
             src={offClockProfile.device}
