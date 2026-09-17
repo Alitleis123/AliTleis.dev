@@ -1083,14 +1083,24 @@ section {
 
 @media (prefers-reduced-motion: no-preference) {
   /* Stacked on a phone, so the halves close top to bottom onto a horizontal
-     seam. The offset is a share of each half rather than a fixed length, so the
-     gap reads at the same weight on a phone as on a display. */
+     seam.
+
+     Offsets are a share of each half rather than a fixed length, so the gap
+     carries the same weight on a phone as on a display. The vertical figure is
+     the smaller of the two because the offset briefly extends the scroll area
+     along whichever axis it runs, and down is the axis this page can actually
+     scroll on.
+
+     easeOutExpo over most of a second. The curve spends roughly six tenths of
+     the distance in its first fifth, so the halves break apart fast and spend
+     the rest of the time arriving, and the extra travel is what keeps that long
+     tail reading as a settle rather than as a stall. */
   .choose-join-1 {
-    animation: choose-join-down 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation: choose-join-down 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
   }
 
   .choose-join-2 {
-    animation: choose-join-up 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation: choose-join-up 880ms cubic-bezier(0.19, 1, 0.22, 1) backwards;
   }
 
   /* On the joint, once the halves are nearly touching. */
@@ -1098,12 +1108,12 @@ section {
     /* `scale` rather than `transform`, which would throw away the Tailwind
        translate that centres this on the seam. The line grows from its middle
        outward, and the scale across a single pixel of thickness is invisible. */
-    animation: choose-seam-in 320ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
+    animation: choose-seam-in 380ms cubic-bezier(0.16, 1, 0.3, 1) 300ms backwards;
   }
 
   /* Last, onto a page that has finished assembling itself. */
   .choose-enter-header {
-    animation: choose-header-in 320ms cubic-bezier(0.32, 0.72, 0, 1) 360ms backwards;
+    animation: choose-header-in 360ms cubic-bezier(0.32, 0.72, 0, 1) 420ms backwards;
   }
 }
 
@@ -1122,25 +1132,25 @@ section {
    seam and the second closes leftward onto it, so both run inward. */
 @keyframes choose-join-right {
   from {
-    transform: translateX(-5%);
+    transform: translateX(-12%);
   }
 }
 
 @keyframes choose-join-left {
   from {
-    transform: translateX(5%);
+    transform: translateX(12%);
   }
 }
 
 @keyframes choose-join-down {
   from {
-    transform: translateY(-5%);
+    transform: translateY(-8%);
   }
 }
 
 @keyframes choose-join-up {
   from {
-    transform: translateY(5%);
+    transform: translateY(8%);
   }
 }
 
