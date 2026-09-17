@@ -139,6 +139,7 @@ export function TopBar({
   playing,
   muted,
   showMute,
+  entering,
   onPlayToggle,
   onStep,
   onMuteToggle,
@@ -147,6 +148,8 @@ export function TopBar({
   playing: boolean;
   muted: boolean;
   showMute: boolean;
+  /** Arrived from the reading view, so the differing parts animate in. */
+  entering: boolean;
   onPlayToggle: () => void;
   onStep: (dir: -1 | 1) => void;
   onMuteToggle: () => void;
@@ -165,23 +168,32 @@ export function TopBar({
    * else in this route goes above z-20, so 40 clears all of it.
    */
   return (
-    <header className="vt-topbar relative z-40 flex shrink-0 items-center gap-3 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2">
-      <span className="vt-wordmark text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
+    <header className="relative z-40 flex shrink-0 items-center gap-3 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2">
+      <span className="text-[13px] font-medium tracking-[-0.02em] text-[var(--st-text)]">
         Ali&nbsp;Tleis
       </span>
       {/* Named on its own so it pops rather than cross-fading. It exists in
           this bar only, so there is nothing on the other side to morph into. */}
-      <span className="vt-filename st-tc hidden text-[var(--st-faint)] sm:block">
+      <span
+        className={`st-tc hidden text-[var(--st-faint)] sm:block ${
+          entering ? "enter-swap enter-swap-1" : ""
+        }`}
+      >
         portfolio.aep
       </span>
 
       {/* Transport. J K L is muscle memory for anyone who edits.
 
-          Shares a transition name with the reading view's section links, so
-          toggling slides one group into the other. The wordmark only grows
-          13px to 15px, which is too small to read as a morph on its own; this
-          is the pair that actually carries the movement. */}
-      <div className="vt-barcontrols ml-auto flex items-center gap-1.5">
+          Named apart from the reading view's section links rather than paired
+          with them. Sharing one name made the browser interpolate a 160px
+          transport into a 750px row of links, so the buttons stretched across
+          the bar on the way out. Each group now slides and fades at its own
+          size instead. */}
+      <div
+        className={`ml-auto flex items-center gap-1.5 ${
+          entering ? "enter-swap enter-swap-2" : ""
+        }`}
+      >
         <button
           type="button"
           onClick={() => onStep(-1)}

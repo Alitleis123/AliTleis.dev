@@ -13,6 +13,7 @@ import Viewer from "./Viewer";
 import { ProjectPanel, TopBar } from "./Panels";
 import { PresentationProvider } from "./presentation";
 import ReelAudio, { useReelAudioPref } from "./ReelAudio";
+import { isSwitchArrival } from "../lib/switchArrival";
 
 import TitleCard from "./comps/TitleCard";
 import Bin from "./comps/Bin";
@@ -63,6 +64,16 @@ const useReducedMotion = () =>
 export default function Studio() {
   const reduced = useReducedMotion();
   const { muted, toggle: toggleMuted } = useReelAudioPref();
+
+  /**
+   * Boot the chrome on a cold open, hold still on a morph.
+   *
+   * Read once on mount rather than every render, and read during render
+   * rather than in an effect, so the very first paint already carries the
+   * right class. Setting it from an effect would boot for one frame and then
+   * stop, which is the flicker the boot exists to avoid.
+   */
+  const [boots] = useState(() => !isSwitchArrival("/studio"));
 
   /**
    * Hides the mute control when there is no bed to mute.
@@ -245,9 +256,7 @@ export default function Studio() {
   // A fresh comp starts at its top, the way opening one in an editor does.
   // Each layer scrolls itself, so this reaches for the one coming in.
   useEffect(() => {
-    const layer = scrollRef.current?.querySelector(
-      `[data-comp="${activeId}"]`,
-    );
+    const layer = scrollRef.current?.querySelector(`[data-comp="${activeId}"]`);
     if (layer instanceof HTMLElement) layer.scrollTop = 0;
   }, [activeId]);
 
@@ -278,12 +287,17 @@ export default function Studio() {
   }, []);
 
   return (
-    <div className="st-root flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)]">
+    <div
+      className={`st-root ${
+        boots ? "st-boots" : "enter-page"
+      } flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)]`}
+    >
       <TopBar
         time={time}
         playing={playing && !reduced}
         muted={muted}
         showMute={hasAudio}
+        entering={!boots}
         onPlayToggle={togglePlay}
         onStep={step}
         onMuteToggle={toggleMuted}
@@ -317,9 +331,14 @@ export default function Studio() {
           className="st-boot-stage flex min-w-0 flex-1 flex-col"
           onPointerDownCapture={takeOver}
         >
-          <Viewer time={time} scrubbing={scrubbing} zoom={100} scrollRef={scrollRef}>
+          <Viewer
+            time={time}
+            scrubbing={scrubbing}
+            zoom={100}
+            scrollRef={scrollRef}
+          >
             <PresentationProvider value={{ presenting, progress }}>
-            {/*
+              {/*
               Every comp is mounted, and only the active one is shown.
               Rendering just the active component kept six of the seven
               sections out of the exported HTML, which on a statically hosted
@@ -328,32 +347,32 @@ export default function Studio() {
               the document, and `inert` keeps the hidden ones out of the tab
               order.
             */}
-            {COMPS.map((c) => {
-              const Comp = RENDER[c.id];
-              if (!Comp) return null;
-              const on = c.id === layers.cur;
-              const leaving = c.id === layers.out;
-              return (
-                <section
-                  key={c.id}
-                  id={c.id}
-                  data-comp={c.id}
-                  aria-label={c.name}
-                  className={`st-layer ${
-                    on
-                      ? "st-layer-in"
-                      : leaving
-                        ? "st-layer-out"
-                        : "st-layer-off"
-                  }`}
-                  inert={!on}
-                >
-                  <div className="st-comp">
-                    <Comp />
-                  </div>
-                </section>
-              );
-            })}
+              {COMPS.map((c) => {
+                const Comp = RENDER[c.id];
+                if (!Comp) return null;
+                const on = c.id === layers.cur;
+                const leaving = c.id === layers.out;
+                return (
+                  <section
+                    key={c.id}
+                    id={c.id}
+                    data-comp={c.id}
+                    aria-label={c.name}
+                    className={`st-layer ${
+                      on
+                        ? "st-layer-in"
+                        : leaving
+                          ? "st-layer-out"
+                          : "st-layer-off"
+                    }`}
+                    inert={!on}
+                  >
+                    <div className="st-comp">
+                      <Comp />
+                    </div>
+                  </section>
+                );
+              })}
             </PresentationProvider>
           </Viewer>
         </div>

@@ -914,20 +914,26 @@ section {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* 1. Boot. Stage last, so the chrome is already framing it when it arrives. */
-  .st-root > header {
+  /* 1. Boot. Stage last, so the chrome is already framing it when it arrives.
+
+     Gated on .st-boots, which Studio withholds when the suite is entered
+     through the view switch. The header here is the same element that carries
+     the topbar transition name, so booting it during a morph meant the
+     transition snapshotted a bar that was still translated off the top and
+     part transparent. A cold open still boots. */
+  .st-boots > header {
     animation: st-boot-top 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  .st-boot-panel {
+  .st-boots .st-boot-panel {
     animation: st-boot-left 460ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
   }
 
-  .st-boot-timeline {
+  .st-boots .st-boot-timeline {
     animation: st-boot-bottom 500ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
   }
 
-  .st-boot-stage {
+  .st-boots .st-boot-stage {
     animation: st-boot-stage 560ms cubic-bezier(0.22, 1, 0.36, 1) 200ms both;
   }
 
@@ -1081,158 +1087,60 @@ section {
   .ask-reading { animation: none; opacity: 0.7; }
 }
 
-
 /* =========================
-   View transitions
+   Arriving from the other view
    ========================= */
 
-/* Morphing the two top bars into each other.
+/* A plain mount animation, not a view transition.
 
-   The bars are 50px and 49px tall, both put the wordmark at x=12, and both
-   put the view switch at y=8 within four pixels of the same x. At face value
-   they are the same bar holding different content, so cutting between them
-   threw away the one thing the layout had already established. Naming the
-   shared parts lets the browser interpolate them instead: the wordmark grows
-   from 13px to 15px and cross-fades its glyphs, the bar's background and
-   border slide between palettes, and the switch holds still under the cursor
-   that just clicked it.
+   The morph this replaces snapshotted the whole document on every toggle, and
+   the reading view is nearly nine thousand pixels tall with a live canvas on
+   it, so each move captured and composited two full page images. These are
+   ordinary keyframes on a handful of elements, so nothing is captured and the
+   compositor has four boxes to move rather than two page-sized textures.
 
-   Only the shared chrome is named. Everything else in the bar, the transport
-   on one side and seven section links on the other, is genuinely different
-   content and cross-fades with the bar it sits in. */
+   Only the parts that differ between the views animate. The wordmark and the
+   view switch sit within three pixels of the same place on both routes, so
+   moving them would invent a difference that is not there, and the switch in
+   particular should hold still under the cursor that just clicked it. */
 
-.vt-topbar {
-  view-transition-name: topbar;
+.enter-swap {
+  animation: enter-swap 300ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
-.vt-wordmark {
-  view-transition-name: wordmark;
+/* A short stagger, so the bar fills in rather than appearing at once. */
+.enter-swap-1 {
+  animation-delay: 40ms;
 }
 
-.vt-switch {
-  view-transition-name: viewswitch;
+.enter-swap-2 {
+  animation-delay: 80ms;
 }
 
-.vt-filename {
-  view-transition-name: filename;
+/* The page under the bar is wholly different, so it gets the longer fade and
+   no movement. Sliding a full page reads as jank at any speed. */
+.enter-page {
+  animation: enter-page 360ms ease-out both;
 }
 
-/* The transport on one side, the section links on the other. Paired so the
-   group travels rather than dissolving in place. */
-.vt-barcontrols {
-  view-transition-name: barcontrols;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* One curve for everything that morphs, so the bar does not arrive before
-     the text inside it. */
-  ::view-transition-group(topbar),
-  ::view-transition-group(wordmark),
-  ::view-transition-group(viewswitch),
-  ::view-transition-group(barcontrols) {
-    animation-duration: 560ms;
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  /* Long enough to watch the group travel, and the contents cross-fade over
-     most of it rather than snapping at either end. */
-  ::view-transition-old(barcontrols),
-  ::view-transition-new(barcontrols) {
-    animation-duration: 560ms;
-    animation-timing-function: ease-in-out;
-  }
-
-  /* A 13px to 15px wordmark is a two pixel change, so the cross-fade alone
-     reads as nothing happening. A short lift underneath it makes the swap
-     legible as a swap. */
-  ::view-transition-old(wordmark) {
-    animation: vt-mark-out 300ms ease-in both;
-  }
-
-  ::view-transition-new(wordmark) {
-    animation: vt-mark-in 420ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
-  }
-
-  /* The switch is the thing that was clicked, so it should look like it never
-     moved. No cross-fade, only the box interpolating. */
-  ::view-transition-old(viewswitch),
-  ::view-transition-new(viewswitch) {
-    animation: none;
-    mix-blend-mode: normal;
-  }
-
-  /* portfolio.aep belongs to the suite alone, so it has nothing to morph into.
-     It arrives after the bar has settled, which reads as the file opening
-     rather than as a label fading in. */
-  ::view-transition-new(filename) {
-    animation: vt-filename-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 140ms both;
-  }
-
-  ::view-transition-old(filename) {
-    animation: vt-filename-out 200ms ease-in both;
-  }
-
-  /* The page under the bar is different content on each side, so it fades
-     rather than pretending to be the same thing moved. */
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 380ms;
-  }
-}
-
-@keyframes vt-filename-in {
+@keyframes enter-swap {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.86);
-    filter: blur(3px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: blur(0);
+    transform: translateY(-7px);
   }
 }
 
-@keyframes vt-filename-out {
+@keyframes enter-page {
   from {
-    opacity: 1;
-    transform: none;
-  }
-  to {
     opacity: 0;
-    transform: translateY(-3px) scale(0.9);
   }
 }
 
-/* Nothing moves for anyone who asked for less motion. The navigation still
-   happens, it just cuts. */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-}
-
-
-@keyframes vt-mark-out {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes vt-mark-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .enter-swap,
+  .enter-swap-1,
+  .enter-swap-2,
+  .enter-page {
+    animation: none;
   }
 }

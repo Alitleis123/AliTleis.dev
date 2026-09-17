@@ -40,21 +40,6 @@ const nowLabel = buildDate.toLocaleDateString("en-US", {
 });
 
 const nextConfig: NextConfig = {
-  /**
-   * Wraps router navigations in document.startViewTransition, which is what
-   * lets the two views' top bars morph into one another instead of cutting.
-   * The bars are the same height and put the wordmark and the view switch in
-   * the same place, so the only honest way to move between them is to
-   * interpolate: the wordmark grows from 13px to 15px, the switch holds still,
-   * and portfolio.aep pops in because it exists on one side only.
-   *
-   * Everything is named and animated in globals.css under "View transitions".
-   * Browsers without the API navigate as before, with no transition.
-   */
-  experimental: {
-    viewTransition: true,
-  },
-
   // Next's dev badge anchors bottom-left, on top of the ambient-audio button.
   // Development only, but it makes that control unclickable while working.
   devIndicators: false,
