@@ -30,7 +30,7 @@ import { LOCATION, RESUME_HREF, socials, withBasePath } from "../../data";
 export function DocPanel() {
   return (
     <div className="st-seq relative flex h-full min-h-full flex-col px-[4%] py-[3%]">
-      <Plate />
+      <Plate src="plate-resume.webp" scrim={0.6} />
 
       <span className="st-eyebrow relative shrink-0">Render queue</span>
 
