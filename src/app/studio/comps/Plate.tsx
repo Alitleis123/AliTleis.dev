@@ -17,13 +17,18 @@ import { withBasePath } from "../../data";
  *
  * With no `src` the plate lights itself instead. Two comps have no plate art of
  * their own and were rendering onto flat stage black, which no amount of scrim
- * could have helped: there was nothing behind the wash to let through. A pair
- * of very dim pools in the one accent reads as a lit stage rather than as an
- * unfinished one, and stays in the same family as the photographic plates,
- * which at these scrims are most of the way to being luminance fields anyway.
+ * could have helped: there was nothing behind the wash to let through.
  *
- * The flat wash is skipped in that case. Laying 70% of the stage colour over a
- * gradient this faint would erase it.
+ * Four layers rather than a wash, because one smooth pool over black is what
+ * reads as a plain background even once it is bright enough to see. A key high
+ * on the right, a dimmer fill low on the left, a cool pocket between them so
+ * the whole thing is not one temperature, and a slow diagonal sweep to break
+ * the symmetry the pools would otherwise have. That is roughly how the
+ * photographic plates behave once their scrim is on, so the two kinds of comp
+ * sit together.
+ *
+ * The flat wash is skipped in this case. Laying 70% of the stage colour over
+ * gradients this faint would erase them.
  */
 export default function Plate({
   src,
@@ -54,8 +59,16 @@ export default function Plate({
         <span
           className="absolute inset-0"
           style={{
-            background:
-              "radial-gradient(85% 65% at 78% 16%, rgba(var(--signal-rgb),0.07), transparent 60%), radial-gradient(75% 60% at 12% 90%, rgba(var(--signal-rgb),0.035), transparent 58%)",
+            background: [
+              // Key, high right.
+              "radial-gradient(68% 55% at 76% 10%, rgba(var(--signal-rgb),0.17), transparent 63%)",
+              // Fill, low left.
+              "radial-gradient(62% 52% at 8% 94%, rgba(var(--signal-rgb),0.085), transparent 60%)",
+              // A cooler pocket, so the stage is not lit in one temperature.
+              "radial-gradient(52% 46% at 34% 34%, rgba(126,156,214,0.055), transparent 66%)",
+              // Sweep, to break the symmetry of two opposed pools.
+              "linear-gradient(118deg, transparent 36%, rgba(var(--signal-rgb),0.05) 52%, transparent 68%)",
+            ].join(", "),
           }}
         />
       )}
