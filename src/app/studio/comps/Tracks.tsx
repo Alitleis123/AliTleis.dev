@@ -74,7 +74,7 @@ export default function Tracks() {
 
   return (
     <div className="st-seq relative flex h-full min-h-full flex-col px-[4%] py-[3%]">
-      <Plate src="plate-experience.webp" scrim={0.74} />
+      <Plate src="plate-experience.webp" />
       <div className="relative flex shrink-0 items-baseline gap-3">
         <span className="st-eyebrow">Layers</span>
         <span className="st-label">{timeline.length} in sequence</span>

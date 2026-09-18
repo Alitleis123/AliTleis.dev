@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Plate from "./Plate";
 import { useState } from "react";
 import {
   LuArrowUpRight,
@@ -28,10 +29,15 @@ import { LOCATION, RESUME_HREF, socials, withBasePath } from "../../data";
  */
 export function DocPanel() {
   return (
-    <div className="st-seq flex h-full min-h-full flex-col px-[4%] py-[3%]">
-      <span className="st-eyebrow shrink-0">Render queue</span>
+    <div className="st-seq relative flex h-full min-h-full flex-col px-[4%] py-[3%]">
+      {/* Less scrim than the others carry. The rendered page is a large white
+          rectangle, and next to it a plate at 0.6 reads as flat black however
+          much is actually behind the wash. */}
+      <Plate src="plate-resume.webp" />
 
-      <div className="mt-4 grid min-h-0 flex-1 gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-center">
+      <span className="st-eyebrow relative shrink-0">Render queue</span>
+
+      <div className="relative mt-4 grid min-h-0 flex-1 gap-x-10 gap-y-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)] lg:items-center">
         {/* The rendered page. A white plate in a dark application is exactly
             what an output frame looks like, so it is framed rather than
             tinted to blend in. */}
