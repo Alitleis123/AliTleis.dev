@@ -15,7 +15,7 @@ import { offClockProfile, offClockFrames, offClockNote } from "../../data";
 export default function Reel() {
   return (
     <div className="st-seq relative flex h-full min-h-full flex-col justify-center gap-4 px-[4%] py-[2%] xl:flex-row xl:gap-10 xl:items-center">
-      <Plate src="plate-offclock.webp" scrim={0.6} />
+      <Plate src="plate-offclock.webp" />
 
       <div className="relative min-w-0 flex-1">
         <span className="st-eyebrow">Footage</span>

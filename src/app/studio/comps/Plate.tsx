@@ -12,8 +12,12 @@ import { withBasePath } from "../../data";
  * so the edges fall away from the content.
  *
  * `scrim` is the opacity of the flat wash between the image and the content.
- * Comps carrying long body copy want it high. A comp that is mostly headline
- * can afford less and let more of the image through.
+ * Every comp takes the default, and the default is the whole calibration: what
+ * a visitor actually sees is roughly the plate's mean brightness times the
+ * light this lets past. The plates are graded to one target mean for exactly
+ * that reason, so setting it here once holds all five comps at the same
+ * weight. Per-comp values drifted them apart and are why some read as flat
+ * black while others did not.
  *
  * Resume and Off-clock had no art of their own, and a CSS wash in place of one
  * still read as an empty panel, because a gradient carries no detail for the
@@ -23,7 +27,7 @@ import { withBasePath } from "../../data";
  */
 export default function Plate({
   src,
-  scrim = 0.82,
+  scrim = 0.55,
 }: {
   /** File name inside public/studio, without the directory. */
   src: string;
