@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { LuChevronDown, LuExternalLink, LuGithub } from "react-icons/lu";
+import { LuChevronDown, LuChrome, LuExternalLink, LuGithub } from "react-icons/lu";
 import { featuredProjects, otherWork, type Project } from "../../data";
 import { COVER_MAP } from "../../lib/projectCovers";
 import {
@@ -237,6 +237,17 @@ export default function Bin() {
                 >
                   <LuExternalLink aria-hidden className="text-[12px]" />
                   Live
+                </a>
+              ) : null}
+              {p.store ? (
+                <a
+                  href={p.store}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="st-btn gap-1.5 px-3"
+                >
+                  <LuChrome aria-hidden className="text-[12px]" />
+                  Web Store
                 </a>
               ) : null}
               {p.repo ? (
