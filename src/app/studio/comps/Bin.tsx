@@ -71,7 +71,7 @@ export default function Bin() {
 
   return (
     <div className="st-seq relative flex h-full min-h-full flex-col lg:flex-row">
-      <Plate src="plate-projects.webp" scrim={0.72} />
+      <Plate src="plate-projects.webp" />
 
       <div className="relative shrink-0 border-b border-[var(--st-line)] bg-[var(--st-panel)]/85 backdrop-blur-sm lg:flex lg:w-[248px] lg:flex-col lg:border-b-0 lg:border-r">
         <div className="flex items-center gap-2 border-b border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2">
