@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useState, type ComponentType } from "react";
 import {
+  FaChrome,
   FaGithub,
   FaArrowUpRightFromSquare,
   FaMagnifyingGlassPlus,
@@ -380,7 +381,7 @@ function ProjectCard({
 
         {/* Footer: tech + links */}
         <div className="mt-auto flex flex-col gap-5 pt-1">
-          {!isComing && (project.demo || project.repo) ? (
+          {!isComing && (project.demo || project.store || project.repo) ? (
             <div className="flex flex-wrap gap-2">
               {project.demo ? (
                 <a
@@ -391,6 +392,20 @@ function ProjectCard({
                 >
                   <FaArrowUpRightFromSquare className="text-[10px]" />
                   Live Demo
+                </a>
+              ) : null}
+              {/* Where to install it, which is a different errand from the
+                  demo: one shows you the thing, the other puts it in your
+                  browser. */}
+              {project.store ? (
+                <a
+                  href={project.store}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-soft)] px-4 py-2 text-[12px] font-medium text-white/85 transition-colors duration-200 hover:border-white/30 hover:bg-white/[0.05] hover:text-white"
+                >
+                  <FaChrome className="text-[12px]" />
+                  Chrome Web Store
                 </a>
               ) : null}
               {project.repo ? (

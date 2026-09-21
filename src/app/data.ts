@@ -287,6 +287,8 @@ export type Project = {
   iconAlt?: string;
   iconText?: string;
   demo?: string;
+  /** Public listing, for something you install rather than visit. */
+  store?: string;
   repo?: string;
   comingSoon?: boolean;
   iconKey?: string;
@@ -378,6 +380,7 @@ export const featuredProjects: Project[] = [
       "Chrome DevTools Protocol",
     ],
     demo: "https://alitleis123.github.io/Eternal-Summary/",
+    store: "https://chromewebstore.google.com/detail/eternal-summary/cpdeianknlpdhlbfdgckdcgfglbhkjbf",
     repo: "https://github.com/Alitleis123/Eternal-Summary",
     coverKey: "eternalSummary",
     gallery: [
