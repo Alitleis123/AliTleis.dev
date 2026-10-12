@@ -281,8 +281,8 @@ export type Project = {
   desc: string;
   bullets: string[];
   tech?: string[];
-  /** Headline outcomes, shown on the card without expanding it. */
-  metrics?: { value: string; label: string }[];
+  /** Headline outcomes, shown beside the subtitle without expanding the card. */
+  metrics?: { value: string; label: string; icon?: "users" | "star" }[];
   icon?: string;
   iconAlt?: string;
   iconText?: string;
@@ -326,30 +326,34 @@ export const featuredProjects: Project[] = [
     ],
   },
   {
-    id: "tcr-platform",
-    title: "Top Choice Realty Platform",
-    range: "Jun – Sep 2025",
-    desc: "Full-stack real estate platform with session auth, role-based access control, and a scalable component architecture.",
-    bullets: [
-      "Role-based access control is enforced in API middleware rather than in the UI, so the frontend cannot grant itself a permission it was not issued. Auth is session-based, with bcrypt-hashed credentials, sessions persisted to MongoDB through connect-mongo so a restart does not sign everyone out, and secure cookies.",
-      "Every request body is parsed through a shared Zod schema at the route boundary, with sanitizing string, email and phone types underneath it and an error handler that turns a schema failure into a field-level 400. That is what keeps unvalidated writes off the collections, which is the failure mode that had produced the duplicate client records in the first place.",
-      "A reusable component architecture carries listing views, agent dashboards, and client intake flows, so new screens compose rather than duplicate.",
-      "Laid out as a pnpm workspace holding a React and Vite web app, an Express and Mongoose API, and shared infrastructure, with typecheck, lint and format running across both apps from the root.",
-      "Inquiries submitted from the public site notify the listing agent over SMTP, with helmet and per-IP rate limiting in front of the public endpoints.",
-      "Solo across the entire stack, meaning schema, API, auth, frontend architecture, deployment, and ongoing maintenance.",
+    id: "eternal-monitor",
+    title: "EternalMonitor",
+    subtitle: "eternalmonitor.dev",
+    range: "Apr 2026 – Present",
+    desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways.",
+    metrics: [
+      { value: "500+", label: "users", icon: "users" },
+      { value: "100+", label: "GitHub stars", icon: "star" },
     ],
-    icon: withBasePath("/projects/Top%20choice%20image%201.webp"),
-    iconAlt: "Top Choice Realty thumbnail",
-    tech: ["React", "TypeScript", "Node.js", "Express", "MongoDB", "Zod", "REST APIs"],
-    demo: "https://topchoicerealtyny.com/",
-    repo: "https://github.com/alitleis123/topchoicerealty",
-    coverKey: "topChoiceRealty",
+    bullets: [
+      "The Windows host is Rust. It captures the desktop with DXGI and encodes on the graphics card through FFmpeg, with NVENC, AMF or Quick Sync, H.264 by default or HEVC, at 30 to 120 fps. The iPad app is native Swift. It decodes in hardware with VideoToolbox and draws NV12 frames with Metal.",
+      "Each frame travels as numbered UDP fragments, and when one goes missing the iPad asks for that fragment again as soon as a later one shows the gap. The host keeps the last 96 frames, up to 12 MiB, to answer from, and the iPad waits an RTT-aware 8 to 25 ms before giving up and asking for a keyframe. One dropped packet rarely costs a frame, and the bitrate adapts between 4 and 50 Mbps from the iPad's loss and jitter reports.",
+      "Over USB the same messages run through a length-framed tunnel that the host opens with Apple's device service. Plugging in a cable takes over a running Wi-Fi session, and unplugging falls back to the remembered Wi-Fi host without a manual reconnect.",
+      "Extend mode adds a virtual display that exists only while the iPad is connected, so Windows never keeps a phantom monitor around. Touch maps to clicks, drags and two-finger scrolls. Apple Pencil arrives as Windows Ink pressure and tilt, and drawing mode ignores the palm resting on the canvas.",
+      "PC audio is captured with WASAPI loopback and sent as 20 ms Opus packets. The iPad plays it through a jitter buffer that starts at 60 ms, grows to 120 ms after repeated underruns and shrinks again once playback is clean.",
+      "First contact over Wi-Fi needs a six-digit code or a QR scan, which rotates after use and locks out a source after five failed tries in a minute. Later connections use a 128-bit token kept in the iPad's Keychain. The README says plainly that the stream itself is not encrypted, so it is meant for a network you trust.",
+      "Rust and Swift check the wire protocol against shared golden vectors, and CI runs the Rust suites on Linux, macOS and Windows, the iPad tests, and a streaming system test on every pull request. On macOS the host streams a synthetic test pattern, so the whole pipeline is testable without a Windows machine. The v0.3.0 release held about 58 fps through 30-minute runs at 3440×1440 over Wi-Fi and 2732×2048 over USB on a physical iPad Pro.",
+    ],
+    icon: withBasePath("/projects/em-icon.webp"),
+    iconAlt: "EternalMonitor icon",
+    tech: ["Rust", "Swift", "FFmpeg", "VideoToolbox", "Metal", "DXGI", "UDP", "Opus"],
+    demo: "https://eternalmonitor.dev/",
+    repo: "https://github.com/sidebandstudio/EternalMonitor",
+    coverKey: "eternalMonitor",
     gallery: [
-      { src: withBasePath("/projects/Top%20choice%20image%201.webp"), alt: "Top Choice Realty, main listings page" },
-      { src: withBasePath("/projects/Top%20choice%20image%202.webp"), alt: "Top Choice Realty, agent dashboard" },
-      { src: withBasePath("/projects/Top%20choice%20image%203.webp"), alt: "Top Choice Realty, listing detail" },
-      { src: withBasePath("/projects/Top%20choice%20image%204.webp"), alt: "Top Choice Realty, admin view" },
-      { src: withBasePath("/projects/Top%20choice%20image%205.webp"), alt: "Top Choice Realty, client intake" },
+      { src: withBasePath("/projects/em-site.webp"), alt: "EternalMonitor, the project site, with the Windows app streaming to an iPad" },
+      { src: withBasePath("/projects/em-host.webp"), alt: "EternalMonitor, the Windows app streaming to an iPad Pro over USB at 60 fps, with latency, bitrate and repair stats" },
+      { src: withBasePath("/projects/em-ipad.webp"), alt: "EternalMonitor, the iPad app's connect screen, with Connect, Scan QR code, Find PCs and recent PCs" },
     ],
   },
   {
@@ -398,7 +402,7 @@ export const featuredProjects: Project[] = [
     range: "2025 – Present",
     desc: "Independent Boston software studio, four founders, shipping six products across desktop, browser, and web on a shared Next.js surface.",
     bullets: [
-      "Six products with four of them live. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor, an iPad as a low-latency Windows display in Rust and Swift, and Exerly Fitness are both in development.",
+      "Six products with four of them live. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor, an iPad as a low-latency Windows display in Rust and Swift, is in public beta, and Exerly Fitness is in development.",
       "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page, built on Next.js 14 with the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
       "I also author the Python and Lua pipeline that ships as Eternal2x, driving DaVinci Resolve's scripting environment from an embedded Lua panel.",
       "The site carries an engineer roster rather than a single about page, a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
@@ -419,6 +423,16 @@ export const featuredProjects: Project[] = [
 ];
 
 export const otherWork: Project[] = [
+  {
+    id: "tcr-platform",
+    title: "Top Choice Realty Platform",
+    range: "Jun – Sep 2025",
+    desc: "Full-stack real estate platform with session auth, role-based access enforced in API middleware, and Zod validation at every route boundary.",
+    bullets: [],
+    tech: ["React", "TypeScript", "Express", "MongoDB", "Zod"],
+    demo: "https://topchoicerealtyny.com/",
+    iconKey: "home",
+  },
   {
     id: "calorie-calculator",
     title: "CalorieCalculator",

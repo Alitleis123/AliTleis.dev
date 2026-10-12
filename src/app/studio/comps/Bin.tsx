@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import { LuChevronDown, LuChrome, LuExternalLink, LuGithub } from "react-icons/lu";
+import { LuChevronDown, LuChrome, LuExternalLink, LuGithub, LuStar, LuUsers } from "react-icons/lu";
 import { featuredProjects, otherWork, type Project } from "../../data";
 import { COVER_MAP } from "../../lib/projectCovers";
 import {
@@ -205,6 +205,24 @@ export default function Bin() {
               <p className="st-tc mt-1.5 text-[var(--st-accent)]">
                 {p.subtitle}
               </p>
+            ) : null}
+
+            {p.metrics?.length ? (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {p.metrics.map((m) => {
+                  const Icon = m.icon === "users" ? LuUsers : m.icon === "star" ? LuStar : null;
+                  return (
+                    <span
+                      key={m.label}
+                      className="inline-flex items-center gap-1.5 rounded-[3px] border border-[var(--st-line-strong)] bg-[var(--st-panel)] px-2 py-1 text-[11.5px] tracking-[-0.01em]"
+                    >
+                      {Icon ? <Icon aria-hidden className="text-[12px] text-[var(--st-accent)]" /> : null}
+                      <span className="text-white">{m.value}</span>
+                      <span className="text-[var(--st-dim)]">{m.label}</span>
+                    </span>
+                  );
+                })}
+              </div>
             ) : null}
 
             <p className="st-lede mt-4 max-w-[44ch]">{p.desc}</p>
