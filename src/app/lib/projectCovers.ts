@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import SidebandCover from "../components/projectCovers/SidebandCover";
 import Eternal2xCover from "../components/projectCovers/Eternal2xCover";
-import TopChoiceRealtyCover from "../components/projectCovers/TopChoiceRealtyCover";
+import EternalMonitorCover from "../components/projectCovers/EternalMonitorCover";
 import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover";
 
 /**
@@ -14,6 +14,6 @@ import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover
 export const COVER_MAP: Record<string, ComponentType> = {
   sideband: SidebandCover,
   eternal2x: Eternal2xCover,
-  topChoiceRealty: TopChoiceRealtyCover,
+  eternalMonitor: EternalMonitorCover,
   eternalSummary: EternalSummaryCover,
 };

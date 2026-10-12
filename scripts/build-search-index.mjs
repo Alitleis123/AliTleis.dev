@@ -77,7 +77,14 @@ for (const p of [...featuredProjects, ...otherWork]) {
     subtitle: p.subtitle ?? p.desc.slice(0, 80),
     meta: p.range,
     href: "#projects",
-    text: [p.title, p.subtitle, p.desc, ...(p.bullets ?? []), ...(p.tech ?? [])]
+    text: [
+      p.title,
+      p.subtitle,
+      p.desc,
+      ...(p.metrics ?? []).map((m) => `${m.value} ${m.label}`),
+      ...(p.bullets ?? []),
+      ...(p.tech ?? []),
+    ]
       .filter(Boolean).join(". "),
   });
 }

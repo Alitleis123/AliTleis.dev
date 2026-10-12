@@ -8,8 +8,10 @@ import {
   FaArrowUpRightFromSquare,
   FaMagnifyingGlassPlus,
   FaChevronDown,
+  FaStar,
+  FaUsers,
 } from "react-icons/fa6";
-import { TbCalculator, TbCalendarEvent, TbPuzzle } from "react-icons/tb";
+import { TbCalculator, TbCalendarEvent, TbHome, TbPuzzle } from "react-icons/tb";
 import { SiCplusplus } from "react-icons/si";
 import { COVER_MAP } from "../../lib/projectCovers";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
@@ -18,10 +20,16 @@ import Lightbox, { type LightboxState } from "../Lightbox";
 
 type IconCmp = ComponentType<{ className?: string }>;
 
+const METRIC_ICON: Record<string, IconCmp> = {
+  users: FaUsers,
+  star: FaStar,
+};
+
 const OTHER_ICON: Record<string, IconCmp> = {
   calculator: TbCalculator,
   calendar: TbCalendarEvent,
   cplusplus: SiCplusplus,
+  home: TbHome,
   puzzle: TbPuzzle,
 };
 
@@ -99,7 +107,7 @@ export default function Projects() {
             return (
               <a
                 key={p.id}
-                href={p.repo}
+                href={p.repo ?? p.demo}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="surface-lift group flex items-center gap-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
@@ -112,7 +120,11 @@ export default function Projects() {
                     <span className="text-[15px] font-medium tracking-tight text-white">
                       {p.title}
                     </span>
-                    <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                    {p.repo ? (
+                      <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                    ) : (
+                      <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                    )}
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-[var(--text-dim)]">
                     <span>{p.range.toUpperCase()}</span>
@@ -275,9 +287,31 @@ function ProjectCard({
           <h3 className="text-[19px] font-medium leading-tight tracking-tight text-white md:text-[21px]">
             {project.title}
           </h3>
-          {project.subtitle ? (
-            <div className="mt-1 text-[13px] text-[var(--text-muted)]">
-              {project.subtitle}
+          {/* Metrics share the subtitle's line, so a card that has them
+              stays the height of the one beside it. In the narrow two-column
+              range the words would wrap that line, so only the icon and the
+              number show there, and the label moves to the tooltip. */}
+          {project.subtitle || project.metrics?.length ? (
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              {project.subtitle ? (
+                <span className="text-[13px] text-[var(--text-muted)]">
+                  {project.subtitle}
+                </span>
+              ) : null}
+              {project.metrics?.map((m) => {
+                const Icon = m.icon ? METRIC_ICON[m.icon] : null;
+                return (
+                  <span
+                    key={m.label}
+                    title={`${m.value} ${m.label}`}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(var(--signal-rgb),0.28)] bg-[rgba(var(--signal-rgb),0.07)] px-2.5 py-0.5 text-[12px]"
+                  >
+                    {Icon ? <Icon aria-hidden className="text-[11px] text-[var(--signal)]" /> : null}
+                    <span className="tabular-figures font-medium text-white">{m.value}</span>
+                    <span className="text-[var(--text-muted)] md:max-xl:sr-only">{m.label}</span>
+                  </span>
+                );
+              })}
             </div>
           ) : null}
         </div>
