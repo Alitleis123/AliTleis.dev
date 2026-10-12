@@ -115,14 +115,14 @@ add({
   id: "offclock",
   kind: "Off-clock",
   title: "Editing",
-  subtitle: `${offClockProfile.handle} · 11.8K followers`,
+  subtitle: `${offClockProfile.handle} · ${offClockProfile.stats[0].value} followers`,
   meta: "Off-clock",
   href: "#offclock",
   text: [
     offClockNote,
     "TikTok, anime, shows, movies, video editing, After Effects, motion graphics, compositing,",
     "3D space, camera moves, effects, sound design, easing, nulls, keyframes,",
-    "11.8K followers, 1.2M likes, 2.8M views, audience, creator,",
+    `${offClockProfile.stats.map((s) => `${s.value} ${s.label.toLowerCase()}`).join(", ")} views, audience, creator,`,
     ...offClockFrames.map((f) => f.label),
   ].join(" "),
 });

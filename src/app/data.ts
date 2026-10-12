@@ -32,7 +32,7 @@ export const followerLabel = formatCount(tiktokStats.followerCount);
 export const likeLabel = formatCount(tiktokStats.heartCount);
 
 /** Hand written, since the profile payload has no per video play count. */
-const TOP_POST = "2.8M";
+const TOP_POST = "2.9M";
 
 export const withBasePath = (path: string) => `${basePath}${path}`;
 
@@ -503,7 +503,7 @@ export const offClockProfile = {
     const v = process.env.NEXT_PUBLIC_PHONE_V;
     return v ? `${base}?v=${v}` : base;
   })(),
-  src: withBasePath("/offclock/anime-editing-full.webp"),
+  src: withBasePath("/offclock/tiktok-profile.webp"),
   alt: `TikTok profile for @.justlightt showing ${followerLabel} followers, ${likeLabel} likes, and a post grid led by ${TOP_POST} views`,
   href: "https://www.tiktok.com/@.justlightt",
   handle: "@.justlightt",
