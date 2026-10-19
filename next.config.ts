@@ -47,6 +47,34 @@ function pdfDate(relPath: string): string {
 }
 
 /**
+ * The resume preview is a picture drawn from the PDF, so it goes stale the
+ * moment a new PDF lands without a redraw, and the site then shows an old
+ * resume beside a download of the new one. scripts/render-resume-preview.py
+ * records which PDF it drew. The Pages workflow redraws before building, so
+ * a mismatch there means that step was lost, and the build stops. Anywhere
+ * else it only warns, since a local build is not what visitors see.
+ */
+function checkResumePreview() {
+  try {
+    const pdf = createHash("sha256")
+      .update(readFileSync(path.join(process.cwd(), "public/resume/resume.pdf")))
+      .digest("hex");
+    const drawn = readFileSync(
+      path.join(process.cwd(), "scripts/resume-preview.sha256"),
+      "utf8",
+    ).trim();
+    if (pdf === drawn) return;
+  } catch {
+    // A missing PDF or record falls through to the same message.
+  }
+  const message =
+    "public/studio/resume-page.webp was not drawn from the current resume.pdf. Run: python scripts/render-resume-preview.py";
+  if (process.env.CI) throw new Error(message);
+  console.warn(`warning: ${message}`);
+}
+checkResumePreview();
+
+/**
  * The timeline's "Now" marker is resolved here rather than in the component so
  * the value is baked into both the server HTML and the client bundle at build
  * time. Calling `new Date()` inside the client component instead would drift

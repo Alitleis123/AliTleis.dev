@@ -7,10 +7,15 @@ old resume next to a download button for the new one, which is what happened
 when this was a hand-made screenshot. The Pages workflow runs this before every
 build, so the deployed image always matches the deployed PDF.
 
+It also records which PDF it drew, in scripts/resume-preview.sha256, and
+next.config.ts checks that record, so a build that would pair a new PDF with an
+old picture fails in CI and warns everywhere else.
+
     pip install pymupdf pillow
     python scripts/render-resume-preview.py
 """
 
+import hashlib
 from pathlib import Path
 
 import pymupdf
@@ -19,6 +24,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "public/resume/resume.pdf"
 OUTPUT = ROOT / "public/studio/resume-page.webp"
+RECORD = ROOT / "scripts/resume-preview.sha256"
 # The <Image> width and height in the previews are 900x1165, US Letter at 900
 # pixels wide. Change them together.
 WIDTH = 900
@@ -33,4 +39,5 @@ with pymupdf.open(SOURCE) as pdf:
 image = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 height = round(image.height * WIDTH / image.width)
 image.resize((WIDTH, height), Image.LANCZOS).save(OUTPUT, "WEBP", quality=88)
+RECORD.write_text(hashlib.sha256(SOURCE.read_bytes()).hexdigest() + "\n")
 print(f"{OUTPUT.relative_to(ROOT)}: {WIDTH}x{height} from {SOURCE.relative_to(ROOT)}")
