@@ -51,10 +51,9 @@ export default function Intro() {
             variants={heroItem}
             className="mt-8 max-w-[36rem] text-[15px] leading-[1.7] text-[var(--text-muted)]"
           >
-            CS student at Northeastern, currently on a seven-month co-op at
-            MIT Lincoln Laboratory. I build production software end-to-end.
-            Full-stack platforms, automation pipelines, and tooling people
-            actually use.
+            CS and Sociology student at Northeastern. I&apos;m on a seven-month
+            co-op at MIT Lincoln Laboratory, where I own the internal AI search
+            that 4,500+ engineers use.
           </motion.p>
 
           <motion.div
@@ -113,10 +112,10 @@ export default function Intro() {
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
           <p className="max-w-[54ch] text-[18px] leading-[1.7] text-[var(--text-muted)]">
-            The work I gravitate toward is the kind that ships. Full systems
-            with database schemas underneath them, Python and Lua pipelines
-            handling the parts no one wants to do by hand, and a clean front
-            end on top. Fast, considered, and quietly opinionated.
+            Outside work I build tools for problems I hit myself. Eternal2x
+            exists because every interpolator I tried smeared the held frames
+            in my anime edits. On EternalMonitor, the iPad second-screen app, I
+            own AMD GPU support, from the AMF encoder to the software fallback.
           </p>
         </motion.div>
 
