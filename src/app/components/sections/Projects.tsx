@@ -11,7 +11,8 @@ import {
   FaStar,
   FaUsers,
 } from "react-icons/fa6";
-import { TbCalendarEvent, TbPuzzle } from "react-icons/tb";
+import { TbCalculator, TbCalendarEvent, TbHome, TbPuzzle } from "react-icons/tb";
+import { SiCplusplus } from "react-icons/si";
 import { COVER_MAP } from "../../lib/projectCovers";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
 import { featuredProjects, otherWork, type Project } from "../../data";
@@ -25,7 +26,10 @@ const METRIC_ICON: Record<string, IconCmp> = {
 };
 
 const OTHER_ICON: Record<string, IconCmp> = {
+  calculator: TbCalculator,
   calendar: TbCalendarEvent,
+  cplusplus: SiCplusplus,
+  home: TbHome,
   puzzle: TbPuzzle,
 };
 
