@@ -589,7 +589,7 @@ export const socials = {
  */
 export const LOCATION = "Greater Boston";
 
-export const aboutClearance = "DoD investigation in progress";
+export const aboutClearance = "DoD clearance investigation in progress";
 
 export const aboutLanguages = [
   { name: "Arabic", level: "Native" },
