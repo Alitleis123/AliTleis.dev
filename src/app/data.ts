@@ -434,36 +434,6 @@ export const featuredProjects: Project[] = [
 
 export const otherWork: Project[] = [
   {
-    id: "tcr-platform",
-    title: "Top Choice Realty Platform",
-    range: "Jun – Sep 2025",
-    desc: "Full-stack real estate platform with session auth, role-based access enforced in API middleware, and Zod validation at every route boundary.",
-    bullets: [],
-    tech: ["React", "TypeScript", "Express", "MongoDB", "Zod"],
-    demo: "https://topchoicerealtyny.com/",
-    iconKey: "home",
-  },
-  {
-    id: "calorie-calculator",
-    title: "CalorieCalculator",
-    range: "2024",
-    desc: "Calorie target calculator. Mifflin-St Jeor for BMR, an activity multiplier for TDEE, then a goal adjustment.",
-    bullets: [],
-    tech: ["React", "Vite"],
-    repo: "https://github.com/Alitleis123/CalorieCalculator",
-    iconKey: "calculator",
-  },
-  {
-    id: "cs3520",
-    title: "CS3520 Coursework",
-    range: "Summer 1 · 2025",
-    desc: "C++ coursework from Summer 1 semester at Northeastern.",
-    bullets: [],
-    tech: ["C++"],
-    repo: "https://github.com/Alitleis123/CS3520-Summer-2025",
-    iconKey: "cplusplus",
-  },
-  {
     id: "neu-calendar-ics",
     title: "NEU Academic Calendar → ICS",
     range: "2026 – Present",
