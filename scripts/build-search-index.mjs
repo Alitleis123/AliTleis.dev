@@ -80,8 +80,15 @@ for (const p of [...featuredProjects, ...otherWork]) {
     text: [
       p.title,
       p.subtitle,
+      // One sentence, not one each, and ahead of the description so it lands
+      // in the heading chunk. "500+ users." is under the chunker's
+      // 12-character floor on its own, so EternalMonitor's user count was
+      // dropped, and a question naming a project matches that project's
+      // heading chunk best, so that is where its numbers need to be.
+      (p.metrics ?? []).length
+        ? `${p.title} has ${p.metrics.map((m) => `${m.value} ${m.label}`).join(" and ")}.`
+        : null,
       p.desc,
-      ...(p.metrics ?? []).map((m) => `${m.value} ${m.label}`),
       ...(p.bullets ?? []),
       ...(p.tech ?? []),
     ]
@@ -179,7 +186,14 @@ const embed = await pipeline(
  * keeps each vector about one idea.
  */
 const chunksOf = (d) => {
-  const sentences = d.text.split(/(?<=\.)\s+/).filter((x) => x.trim().length > 12);
+  // The title and subtitle open most records' text and the heading line adds
+  // them anyway, so left in they filled its third slot with the title a second
+  // time ("EternalMonitor. eternalmonitor.dev. EternalMonitor.").
+  const bare = (x) => x.trim().replace(/\.$/, "").toLowerCase();
+  const heading = new Set([d.title, d.subtitle].filter(Boolean).map(bare));
+  const sentences = d.text
+    .split(/(?<=\.)\s+/)
+    .filter((x) => x.trim().length > 12 && !heading.has(bare(x)));
   const head = `${d.title}. ${d.subtitle ?? ""}. ${sentences[0] ?? ""}`;
   const rest = [];
   for (let i = 1; i < sentences.length; i += 2) {

@@ -75,6 +75,24 @@ const CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
  */
 const READER = "Xenova/distilbert-base-cased-distilled-squad";
 
+/**
+ * The reader's span as the passage spells it.
+ *
+ * The model returns its answer decoded from tokens rather than cut from the
+ * text, which puts spaces where the tokenizer split, so "12.5K" came back as
+ * "12. 5K". Matching it against the passage with whitespace optional recovers
+ * the original.
+ */
+function inContext(answer: string, passage: string): string {
+  if (!answer || passage.includes(answer)) return answer;
+  const pattern = answer
+    .replace(/\s+/g, "")
+    .split("")
+    .map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("\\s*");
+  return new RegExp(pattern, "i").exec(passage)?.[0] ?? answer;
+}
+
 /** Below this the span is noise, so the passages answer instead. */
 const ANSWER_FLOOR = 0.22;
 
@@ -114,7 +132,7 @@ export default function CommandPalette() {
   const threadRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<Set<number>>(new Set());
   const encoderRef = useRef<((t: string) => Promise<Float32Array>) | null>(null);
-  const loadingRef = useRef(false);
+  const encoderLoadRef = useRef<Promise<void> | null>(null);
 
   // ── open / close ──────────────────────────────────────────────
   useEffect(() => {
@@ -134,8 +152,8 @@ export default function CommandPalette() {
     };
   }, []);
 
-  // Index and encoder are fetched on first open, never on page load, because the
-  // palette costs nothing to a visitor who never presses the key.
+  // The index is fetched on first open, never on page load, because the palette
+  // costs nothing to a visitor who never presses the key.
   useEffect(() => {
     if (!open || index) return;
     fetch(withBasePath("/search-index.json"))
@@ -144,30 +162,6 @@ export default function CommandPalette() {
       .catch(() => {});
   }, [open, index]);
 
-  useEffect(() => {
-    if (!open || encoderRef.current || loadingRef.current) return;
-    loadingRef.current = true;
-    setMode("loading");
-    (async () => {
-      try {
-        const t = await import(/* webpackIgnore: true */ CDN);
-        t.env.allowLocalModels = false;
-        const pipe = await t.pipeline(
-          "feature-extraction",
-          "Xenova/all-MiniLM-L6-v2",
-          { quantized: true },
-        );
-        encoderRef.current = async (text: string) => {
-          const out = await pipe(text, { pooling: "mean", normalize: true });
-          return out.data as Float32Array;
-        };
-        setMode("semantic");
-      } catch {
-        // Offline or CDN blocked, so keyword ranking stays in charge.
-        setMode("lexical");
-      }
-    })();
-  }, [open]);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 40);
@@ -301,6 +295,42 @@ export default function CommandPalette() {
     [index, lex, words, STOP],
   );
 
+  /**
+   * Downloads the encoder once, on the first question.
+   *
+   * It used to start the moment the panel opened, so somebody who opened it
+   * to look around paid for 23MB of model and 10MB of WASM they never used.
+   * Only a question needs it, and the first one waits for it rather than
+   * falling back to keyword ranking, so the first answer is as good as the
+   * rest.
+   */
+  const loadEncoder = useCallback(async () => {
+    if (encoderRef.current) return;
+    if (!encoderLoadRef.current) {
+      setMode("loading");
+      encoderLoadRef.current = (async () => {
+        try {
+          const t = await import(/* webpackIgnore: true */ CDN);
+          t.env.allowLocalModels = false;
+          const pipe = await t.pipeline(
+            "feature-extraction",
+            "Xenova/all-MiniLM-L6-v2",
+            { quantized: true },
+          );
+          encoderRef.current = async (text: string) => {
+            const out = await pipe(text, { pooling: "mean", normalize: true });
+            return out.data as Float32Array;
+          };
+          setMode("semantic");
+        } catch {
+          // Offline or CDN blocked, so keyword ranking stays in charge.
+          setMode("lexical");
+        }
+      })();
+    }
+    await encoderLoadRef.current;
+  }, []);
+
   /** Downloads the reader once, and hands back the same function after. */
   const loadReader = useCallback(async () => {
     if (readerRef.current) return;
@@ -328,6 +358,7 @@ export default function CommandPalette() {
       setThinking(true);
       let vec: Float32Array | null = null;
       try {
+        await loadEncoder();
         vec = (await encoderRef.current?.(q)) ?? null;
       } catch {
         vec = null;
@@ -370,13 +401,23 @@ export default function CommandPalette() {
          * lower-ranked passage can still win, but only by being much more
          * certain rather than slightly.
          */
-        const topScore = hits[0].score || 1;
+        /*
+         * A question that names a project is about that project, so only its
+         * passages are read. Otherwise "How many users does EternalMonitor
+         * have?" was answered with the follower count from the editing
+         * section, which happened to be the most confident number on offer.
+         */
+        const ql = q.toLowerCase();
+        const named = hits.filter((h) => ql.includes(h.doc.title.toLowerCase()));
+        const pool = named.length ? named : hits;
+        const topScore = pool[0].score || 1;
         let best: (Answer & { weighted: number }) | null = null;
-        for (let i = 0; i < hits.length; i++) {
-          const r = await read(q, hits[i].snippet);
-          const text = r.answer?.trim();
+        for (const h of pool) {
+          const i = hits.indexOf(h);
+          const r = await read(q, h.snippet);
+          const text = r.answer ? inContext(r.answer.trim(), h.snippet) : "";
           if (!text) continue;
-          const weighted = r.score * (hits[i].score / topScore);
+          const weighted = r.score * (h.score / topScore);
           if (!best || weighted > best.weighted) {
             best = { text, score: r.score, from: i, weighted };
           }
@@ -388,7 +429,7 @@ export default function CommandPalette() {
         settle(null);
       }
     },
-    [rank, thinking, loadReader],
+    [rank, thinking, loadEncoder, loadReader],
   );
 
   const go = useCallback((d: Doc) => {
