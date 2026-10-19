@@ -96,11 +96,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Base document styles */
-html {
-  scroll-behavior: smooth;
-}
-
+/* Base document styles. Smooth scrolling only for visitors who have not asked
+   for less motion. An unconditional copy of this rule used to sit beside it,
+   which made the media query do nothing. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;

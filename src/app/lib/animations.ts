@@ -1,5 +1,14 @@
 import type { Variants } from "framer-motion";
 
+/**
+ * "smooth", unless the visitor has asked for less motion. The stylesheet only
+ * covers anchor jumps, so a scroll started from script has to ask itself.
+ */
+export const scrollBehavior = (): ScrollBehavior =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+
 export const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
   visible: {

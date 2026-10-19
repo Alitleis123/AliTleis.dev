@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { withBasePath } from "../data";
+import { scrollBehavior } from "../lib/animations";
 
 type Doc = {
   id: string;
@@ -435,7 +436,7 @@ export default function CommandPalette() {
   const go = useCallback((d: Doc) => {
     setOpen(false);
     const el = document.querySelector(d.href);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (el) el.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     else window.location.hash = d.href;
   }, []);
 
