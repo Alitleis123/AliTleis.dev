@@ -25,6 +25,28 @@ function contentHash(relPath: string): string {
 }
 
 /**
+ * The day a PDF was made, as "Oct 19, 2026", read from its /CreationDate.
+ *
+ * The Resume repo pins pdfTeX's clock to the commit that last touched
+ * resume.tex, so for the resume this is the day its content last changed, not
+ * the day the site happened to be rebuilt.
+ */
+function pdfDate(relPath: string): string {
+  try {
+    const m = /\/CreationDate\s*\(D:(\d{4})(\d{2})(\d{2})/.exec(
+      readFileSync(path.join(process.cwd(), relPath), "latin1"),
+    );
+    if (!m) return "";
+    return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).toLocaleDateString(
+      "en-US",
+      { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" },
+    );
+  } catch {
+    return "";
+  }
+}
+
+/**
  * The timeline's "Now" marker is resolved here rather than in the component so
  * the value is baked into both the server HTML and the client bundle at build
  * time. Calling `new Date()` inside the client component instead would drift
@@ -54,6 +76,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_NOW_LABEL: nowLabel,
     NEXT_PUBLIC_BUILD_YEAR: String(buildDate.getFullYear()),
     NEXT_PUBLIC_RESUME_V: contentHash("public/resume/resume.pdf"),
+    NEXT_PUBLIC_RESUME_DATE: pdfDate("public/resume/resume.pdf"),
+    NEXT_PUBLIC_RESUME_PREVIEW_V: contentHash("public/studio/resume-page.webp"),
     NEXT_PUBLIC_PHONE_V: contentHash("public/offclock/phone.webp"),
   },
 };

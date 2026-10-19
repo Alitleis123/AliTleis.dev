@@ -1,45 +1,11 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { fadeUp } from "../../lib/animations";
-import { RESUME_HREF } from "../../data";
-
-/**
- * Mounts the PDF iframe only once the section is near the viewport. Embedding a
- * PDF spins up Chromium's PDFium viewer in its own process and makes it a
- * participant in page compositing and scroll hit-testing, so keeping it mounted
- * from first paint made scrolling the whole page choppy.
- */
-function useNearViewport<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [near, setNear] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || near) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setNear(true);
-          observer.disconnect();
-        }
-      },
-      // Start loading a screen early so it's ready by the time it's reached.
-      { rootMargin: "600px 0px" },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [near]);
-
-  return { ref, near };
-}
+import { RESUME_HREF, RESUME_PREVIEW_SRC } from "../../data";
 
 export default function Resume() {
-  const { ref: frameRef, near: showFrame } = useNearViewport<HTMLDivElement>();
-
   return (
     <motion.section
       id="resume"
@@ -79,27 +45,26 @@ export default function Resume() {
         </div>
       </div>
 
-      <div
-        ref={frameRef}
-        className="mx-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-black/30"
+      {/* A picture of page one rather than the PDF itself. An iframe of a PDF
+          shows nothing at all on Android Chrome, and on desktop it brought a
+          whole PDF viewer process into the page's scrolling. The page is the
+          link, so the PDF is one click away either way. */}
+      <a
+        href={RESUME_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open the resume PDF in a new tab"
+        className="mx-auto block w-full max-w-3xl overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-white transition-[border-color,box-shadow] duration-200 hover:border-[var(--border-soft)] hover:shadow-[0_18px_50px_-20px_rgba(255,255,255,0.18)]"
       >
-        <div className="relative w-full" style={{ paddingTop: "129.4%" }}>
-          {showFrame ? (
-            <iframe
-              src={`${RESUME_HREF}#view=FitH&toolbar=0&navpanes=0`}
-              className="absolute inset-0 h-full w-full"
-              title="Ali Tleis Resume"
-              loading="lazy"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
-                Loading preview…
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+        <Image
+          src={RESUME_PREVIEW_SRC}
+          alt="Page one of Ali Tleis's resume"
+          width={900}
+          height={1165}
+          sizes="(min-width: 800px) 768px, 100vw"
+          className="h-auto w-full"
+        />
+      </a>
     </motion.section>
   );
 }

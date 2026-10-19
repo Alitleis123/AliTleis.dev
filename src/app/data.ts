@@ -50,6 +50,17 @@ export const RESUME_HREF = (() => {
   return v ? `${base}?v=${v}` : base;
 })();
 
+/**
+ * Page one of the resume as an image, for the previews. Drawn from the PDF by
+ * scripts/render-resume-preview.py and cache-busted the same way, since it is
+ * replaced in place whenever the resume changes.
+ */
+export const RESUME_PREVIEW_SRC = (() => {
+  const base = withBasePath("/studio/resume-page.webp");
+  const v = process.env.NEXT_PUBLIC_RESUME_PREVIEW_V;
+  return v ? `${base}?v=${v}` : base;
+})();
+
 export type TimelineEntry = {
   id: string;
   /** Start month, "YYYY-MM". Also drives descending timeline order. */

@@ -12,7 +12,13 @@ import {
   LuMail,
   LuMapPin,
 } from "react-icons/lu";
-import { LOCATION, RESUME_HREF, socials, withBasePath } from "../../data";
+import {
+  LOCATION,
+  RESUME_HREF,
+  RESUME_PREVIEW_SRC,
+  socials,
+  withBasePath,
+} from "../../data";
 
 /**
  * Resume as the render queue. One output, one format, one action.
@@ -22,10 +28,9 @@ import { LOCATION, RESUME_HREF, socials, withBasePath } from "../../data";
  * blank and asked a recruiter to take the file on trust, when the page itself
  * is the single most useful thing this comp can show.
  *
- * resume-page.webp is a render of page one of the PDF. Regenerate it whenever
- * the resume changes:
- *   qlmanage -t -s 1600 -o /tmp public/resume/resume.pdf
- * then resize to 900px wide and save as public/studio/resume-page.webp.
+ * resume-page.webp is a render of page one of the PDF, drawn by
+ * scripts/render-resume-preview.py. The Pages workflow redraws it before every
+ * build, so it cannot fall behind the PDF the way the hand-made one did.
  */
 export function DocPanel() {
   return (
@@ -48,7 +53,7 @@ export function DocPanel() {
           className="group relative mx-auto block h-full max-h-full w-auto overflow-hidden rounded-[3px] border border-[var(--st-line-strong)] bg-white shadow-[0_28px_70px_-24px_rgba(0,0,0,0.92)] transition-colors duration-200 hover:border-[var(--st-sel-line)]"
         >
           <Image
-            src={withBasePath("/studio/resume-page.webp")}
+            src={RESUME_PREVIEW_SRC}
             alt="Page one of Ali Tleis's resume"
             width={900}
             height={1165}
@@ -76,18 +81,21 @@ export function DocPanel() {
               ["File", "resume.pdf"],
               ["Format", "PDF, single page"],
               ["Includes", "Experience, education, stack, clearance"],
-              ["Updated", "Cache busted by content hash"],
-            ].map(([k, v]) => (
-              <div
-                key={k}
-                className="flex items-baseline gap-4 border-b border-[var(--st-line)] px-3 py-2.5 last:border-b-0"
-              >
-                <span className="st-label w-[92px] shrink-0">{k}</span>
-                <span className="text-[13.5px] tracking-[-0.01em] text-[rgba(244,244,241,0.9)]">
-                  {v}
-                </span>
-              </div>
-            ))}
+              // The day the resume last changed, read from the PDF at build.
+              ["Updated", process.env.NEXT_PUBLIC_RESUME_DATE ?? ""],
+            ]
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div
+                  key={k}
+                  className="flex items-baseline gap-4 border-b border-[var(--st-line)] px-3 py-2.5 last:border-b-0"
+                >
+                  <span className="st-label w-[92px] shrink-0">{k}</span>
+                  <span className="text-[13.5px] tracking-[-0.01em] text-[rgba(244,244,241,0.9)]">
+                    {v}
+                  </span>
+                </div>
+              ))}
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-2.5">

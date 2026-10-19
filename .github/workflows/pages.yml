@@ -35,6 +35,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The Resume repo syncs only the PDF, so the image of page one the
+      # previews show is redrawn here, from the PDF this build ships.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Render resume preview
+        run: |
+          python -m pip install --quiet pymupdf==2.0 pillow==13.0.0
+          python scripts/render-resume-preview.py
+
       - name: Build static site
         run: npm run build
 
