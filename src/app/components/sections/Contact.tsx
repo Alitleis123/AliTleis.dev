@@ -29,8 +29,7 @@ export default function Contact() {
           Get in touch<span className="text-[var(--accent-electric)]">.</span>
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-[15px] leading-[1.7] text-[var(--text-muted)]">
-          I&apos;m always open to interesting conversations, collaborations, and
-          opportunities. Reach out, I reply to everything.
+          Email reaches me fastest.
         </p>
 
         <div className="mt-10 flex justify-center">
