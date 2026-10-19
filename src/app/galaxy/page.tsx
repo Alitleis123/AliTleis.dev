@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Contact from "../components/sections/Contact";
 import Intro from "../components/sections/Intro";
 import OffClock from "../components/sections/OffClock";
@@ -5,6 +6,12 @@ import Projects from "../components/sections/Projects";
 import Resume from "../components/sections/Resume";
 import Stack from "../components/sections/Stack";
 import Timeline from "../components/sections/Timeline";
+
+// Its own canonical. Inheriting the layout's "/" told search engines this page
+// was a copy of the chooser, when it is the page a result should land on.
+export const metadata: Metadata = {
+  alternates: { canonical: "/galaxy/" },
+};
 
 /**
  * The reading view.
