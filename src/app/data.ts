@@ -422,7 +422,7 @@ export const featuredProjects: Project[] = [
     iconText: "SB",
     tech: ["TypeScript", "Next.js", "React", "Node.js", "Tailwind CSS", "Framer Motion", "Python", "Lua", "Playwright"],
     demo: "https://sideband.studio",
-    repo: "https://github.com/whoisaldo/sideband.studio",
+    repo: "https://github.com/sidebandstudio/sideband.studio",
     coverKey: "sideband",
     gallery: [
       { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband, the studio home page, with the product marks and the interactive terminal" },
