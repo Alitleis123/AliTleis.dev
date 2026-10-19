@@ -333,7 +333,7 @@ export const featuredProjects: Project[] = [
     desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways.",
     metrics: [
       { value: "500+", label: "users", icon: "users" },
-      { value: "100+", label: "GitHub stars", icon: "star" },
+      { value: "175+", label: "GitHub stars", icon: "star" },
     ],
     bullets: [
       "The Windows host is Rust. It captures the desktop with DXGI and encodes on the graphics card through FFmpeg, with NVENC, AMF or Quick Sync, H.264 by default or HEVC, at 30 to 120 fps. The iPad app is native Swift. It decodes in hardware with VideoToolbox and draws NV12 frames with Metal.",
