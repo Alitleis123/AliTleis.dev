@@ -332,12 +332,13 @@ export const featuredProjects: Project[] = [
     title: "EternalMonitor",
     subtitle: "eternalmonitor.dev",
     range: "Apr 2026 – Present",
-    desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways.",
+    desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways. I'm an open-source contributor and own its AMD GPU support.",
     metrics: [
       { value: "500+", label: "users", icon: "users" },
       { value: "175+", label: "GitHub stars", icon: "star" },
     ],
     bullets: [
+      "My part is AMD support, end to end. I wrote the Rust and FFmpeg AMF encoding path for H.264 and HEVC, keyframe recovery, and a software fallback, then validated AMD streaming on physical Windows and iPad hardware through DXGI capture, GPU encoding, Wi-Fi and USB transport, VideoToolbox decoding and Metal rendering.",
       "The Windows host is Rust. It captures the desktop with DXGI and encodes on the graphics card through FFmpeg, with NVENC, AMF or Quick Sync, H.264 by default or HEVC, at 30 to 120 fps. The iPad app is native Swift. It decodes in hardware with VideoToolbox and draws NV12 frames with Metal.",
       "Each frame travels as numbered UDP fragments, and when one goes missing the iPad asks for that fragment again as soon as a later one shows the gap. The host keeps the last 96 frames, up to 12 MiB, to answer from, and the iPad waits an RTT-aware 8 to 25 ms before giving up and asking for a keyframe. One dropped packet rarely costs a frame, and the bitrate adapts between 4 and 50 Mbps from the iPad's loss and jitter reports.",
       "Over USB the same messages run through a length-framed tunnel that the host opens with Apple's device service. Plugging in a cable takes over a running Wi-Fi session, and unplugging falls back to the remembered Wi-Fi host without a manual reconnect.",
