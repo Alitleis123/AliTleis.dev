@@ -54,6 +54,7 @@ export default function Timeline({
   muted,
   showMute,
   onSeek,
+  onKeySeek,
   onScrubStart,
   onScrubEnd,
   onPlayToggle,
@@ -68,6 +69,8 @@ export default function Timeline({
   muted: boolean;
   showMute: boolean;
   onSeek: (t: number) => void;
+  /** A seek from the slider's keys, which stops playback the way a scrub does. */
+  onKeySeek: (t: number) => void;
   onScrubStart: () => void;
   onScrubEnd: () => void;
   onPlayToggle: () => void;
@@ -160,7 +163,7 @@ export default function Timeline({
     if (to === null) return;
     e.preventDefault();
     e.stopPropagation();
-    onSeek(to);
+    onKeySeek(to);
   };
 
   /** A clip, filmstrip and all. Shared by the full and compact tracks. */

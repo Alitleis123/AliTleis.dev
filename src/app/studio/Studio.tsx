@@ -392,6 +392,10 @@ export default function Studio() {
           muted={muted}
           showMute={hasAudio}
           onSeek={seek}
+          onKeySeek={(t) => {
+            scrubTo();
+            seek(t);
+          }}
           onScrubStart={() => {
             scrubTo();
             setScrubbing(true);
