@@ -195,7 +195,6 @@ export const timeline: TimelineEntry[] = [
         { label: "Degree", value: "CS & Sociology" },
         { label: "Expected", value: "Aug 2028" },
         { label: "Program", value: "Co-op" },
-        { label: "GPA", value: "3.5+" },
       ],
       coursework: [
         "Algorithms & Data Structures",

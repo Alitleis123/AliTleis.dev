@@ -324,7 +324,7 @@ function Entry({ entry }: { entry: TEntry }) {
                 {isEducation && entry.education ? (
                   <RevealBlock index={1}>
                     <SectionLabel>At a Glance</SectionLabel>
-                    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                       {entry.education.stats.map((s) => (
                         <div
                           key={s.label}
