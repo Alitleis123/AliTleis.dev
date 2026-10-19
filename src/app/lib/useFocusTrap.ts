@@ -12,13 +12,21 @@ const FOCUSABLE =
  * Both overlays here cover the page, and without this Tab walked out of them
  * into the controls behind: from the Ask box straight to the nav, and from an
  * open gallery to the project card's More button underneath it.
+ *
+ * Only the most recently opened trap acts. The palette can open over a
+ * gallery, and with both listening each one pulled focus back into itself, so
+ * Tab stuck on the palette's first button.
  */
+const traps: object[] = [];
+
 export function useFocusTrap(
   ref: RefObject<HTMLElement | null>,
   active: boolean,
 ) {
   useEffect(() => {
     if (!active) return;
+    const self = {};
+    traps.push(self);
     const opener =
       document.activeElement instanceof HTMLElement
         ? document.activeElement
@@ -35,7 +43,7 @@ export function useFocusTrap(
     }
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || !ref.current) return;
+      if (e.key !== "Tab" || !ref.current || traps.at(-1) !== self) return;
       const items = inside();
       if (!items.length) return;
       const first = items[0];
@@ -54,6 +62,7 @@ export function useFocusTrap(
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      traps.splice(traps.indexOf(self), 1);
       // Without scrolling, since closing the palette by picking a result has
       // just scrolled the page to it.
       opener?.focus({ preventScroll: true });
