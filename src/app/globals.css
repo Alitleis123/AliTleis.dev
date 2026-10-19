@@ -1230,10 +1230,6 @@ section {
   animation-delay: 40ms;
 }
 
-.enter-swap-2 {
-  animation-delay: 80ms;
-}
-
 /* The page under the bar is wholly different, so it gets the longer fade and
    no movement. Sliding a full page reads as jank at any speed. */
 .enter-page {
@@ -1256,7 +1252,6 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .enter-swap,
   .enter-swap-1,
-  .enter-swap-2,
   .enter-page {
     animation: none;
   }

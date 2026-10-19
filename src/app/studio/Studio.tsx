@@ -292,16 +292,7 @@ export default function Studio() {
         boots ? "st-boots" : "enter-page"
       } flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)]`}
     >
-      <TopBar
-        time={time}
-        playing={playing && !reduced}
-        muted={muted}
-        showMute={hasAudio}
-        entering={!boots}
-        onPlayToggle={togglePlay}
-        onStep={step}
-        onMuteToggle={toggleMuted}
-      />
+      <TopBar entering={!boots} />
 
       {/* The A1 track. Follows the playhead rather than free-running, so a
           position in the reel is a position in the song. */}
@@ -384,12 +375,17 @@ export default function Studio() {
           playing={playing && !reduced}
           scrubbing={scrubbing}
           hint={!touched}
+          muted={muted}
+          showMute={hasAudio}
           onSeek={seek}
           onScrubStart={() => {
             scrubTo();
             setScrubbing(true);
           }}
           onScrubEnd={() => setScrubbing(false)}
+          onPlayToggle={togglePlay}
+          onStep={step}
+          onMuteToggle={toggleMuted}
         />
       </div>
     </div>

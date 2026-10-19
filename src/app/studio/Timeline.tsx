@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { LuVolume2, LuVolumeX } from "react-icons/lu";
 import { AUDIO_LABEL, COMPS, STARTS, TOTAL, compAt, timecode } from "./comps";
 import { BARS } from "./waveform";
 
@@ -50,18 +51,28 @@ export default function Timeline({
   playing,
   scrubbing,
   hint,
+  muted,
+  showMute,
   onSeek,
   onScrubStart,
   onScrubEnd,
+  onPlayToggle,
+  onStep,
+  onMuteToggle,
 }: {
   time: number;
   playing: boolean;
   scrubbing: boolean;
   /** Shown until the visitor takes control, then it retires. */
   hint: boolean;
+  muted: boolean;
+  showMute: boolean;
   onSeek: (t: number) => void;
   onScrubStart: () => void;
   onScrubEnd: () => void;
+  onPlayToggle: () => void;
+  onStep: (dir: -1 | 1) => void;
+  onMuteToggle: () => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const compactRef = useRef<HTMLDivElement>(null);
@@ -195,12 +206,77 @@ export default function Timeline({
 
   return (
     <div className="flex min-h-0 flex-col border-t border-[var(--st-line)] bg-[var(--st-panel)]">
-      {/* Panel header */}
-      <div className="flex shrink-0 items-center gap-4 border-b border-[var(--st-line)] px-3 py-1.5">
-        <span className="st-label">Timeline</span>
-        <span className="st-tc text-[var(--st-dim)]">{timecode(time)}</span>
+      {/* Panel header, and the transport.
+
+          The transport used to sit in the far corner of the top bar, as far
+          from the clips it moves through as the page allows. Between the
+          viewer and the track is where an editor keeps it, so it is here,
+          centred on the wider layouts. On a phone the label gives way so the
+          timecode and the buttons share one row. */}
+      <div className="flex shrink-0 items-center gap-4 border-b border-[var(--st-line)] px-3 py-1.5 sm:grid sm:grid-cols-[1fr_auto_1fr]">
+        <div className="flex items-center gap-4">
+          <span className="st-label hidden sm:block">Timeline</span>
+          <span className="st-tc text-[var(--st-dim)]">{timecode(time)}</span>
+          <span className="st-label hidden sm:block">
+            {String(active + 1).padStart(2, "0")}/
+            {String(COMPS.length).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* J K L is muscle memory for anyone who edits.
+
+            The reel starts paused, which makes play the one thing a
+            first-time visitor has to be able to find. It gets the accent and
+            twice the width of the shuttle keys rather than sitting in a row of
+            three identical grey buttons. */}
+        <div className="ml-auto flex items-center gap-1.5 sm:ml-0">
+          <button
+            type="button"
+            onClick={() => onStep(-1)}
+            aria-label="Previous composition"
+            className="st-btn"
+          >
+            <span aria-hidden>&#9664;&#9664;</span>
+          </button>
+          <button
+            type="button"
+            onClick={onPlayToggle}
+            aria-label={playing ? "Pause" : "Play"}
+            className="st-btn-play"
+          >
+            <span aria-hidden>{playing ? "‖" : "▶"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onStep(1)}
+            aria-label="Next composition"
+            className="st-btn"
+          >
+            <span aria-hidden>&#9654;&#9654;</span>
+          </button>
+
+          {/* Mute, next to play. That is where a player keeps it, so there is
+              nothing to learn, and it is the only control the audio needs.
+              Absent entirely when there is no bed to mute. */}
+          {showMute ? (
+            <button
+              type="button"
+              onClick={onMuteToggle}
+              aria-pressed={muted}
+              aria-label={muted ? "Unmute the reel" : "Mute the reel"}
+              className="st-btn"
+            >
+              {muted ? (
+                <LuVolumeX aria-hidden className="text-[13px]" />
+              ) : (
+                <LuVolume2 aria-hidden className="text-[13px]" />
+              )}
+            </button>
+          ) : null}
+        </div>
+
         {hint ? (
-          <span className="st-label ml-auto hidden text-[var(--st-accent)] md:block">
+          <span className="st-label ml-auto hidden text-[var(--st-accent)] lg:block">
             Drag to scrub · space to play · J K L to shuttle
           </span>
         ) : (
