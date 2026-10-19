@@ -93,38 +93,7 @@ export default function Bin() {
 
         {/* Other work. Compact by design: no preview, no detail pane, no
             expander, because there is nothing behind them worth opening. */}
-        <div className="hidden lg:block">
-          <div className="flex items-center gap-2 border-y border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2">
-            <span className="st-label">Other work</span>
-            <span className="st-tc ml-auto text-[var(--st-faint)]">
-              {otherWork.length}
-            </span>
-          </div>
-          {otherWork.map((item) => (
-            <a
-              key={item.id}
-              href={item.repo ?? item.demo ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 border-b border-[var(--st-line)] px-3 py-2 transition-colors duration-150 hover:bg-[var(--st-hover)]"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[12px] tracking-[-0.01em] text-[var(--st-dim)]">
-                  {item.title}
-                </span>
-                <span className="st-tc block truncate text-[9.5px] text-[var(--st-faint)]">
-                  {[item.range, item.tech?.[0]].filter(Boolean).join(" · ")}
-                </span>
-              </span>
-              {item.repo ? (
-                <LuGithub
-                  aria-hidden
-                  className="shrink-0 text-[13px] text-[var(--st-faint)]"
-                />
-              ) : null}
-            </a>
-          ))}
-        </div>
+        <OtherWorkList className="hidden lg:block" />
       </div>
 
       <div className="relative flex min-w-0 flex-1 flex-col justify-center px-[4%] py-[3%]">
@@ -324,6 +293,49 @@ export default function Bin() {
           </div>
         ) : null}
       </div>
+
+      {/* Below lg there is no side panel to hold the other work, and leaving
+          it out dropped five projects from the phone layout entirely. Here it
+          closes the comp instead. */}
+      <OtherWorkList className="relative bg-[var(--st-panel)]/85 backdrop-blur-sm lg:hidden" />
+    </div>
+  );
+}
+
+/** The compact list of everything that is not featured. */
+function OtherWorkList({ className }: { className: string }) {
+  return (
+    <div className={className}>
+      <div className="flex items-center gap-2 border-y border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2">
+        <span className="st-label">Other work</span>
+        <span className="st-tc ml-auto text-[var(--st-faint)]">
+          {otherWork.length}
+        </span>
+      </div>
+      {otherWork.map((item) => (
+        <a
+          key={item.id}
+          href={item.repo ?? item.demo ?? "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 border-b border-[var(--st-line)] px-3 py-2 transition-colors duration-150 hover:bg-[var(--st-hover)]"
+        >
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[12px] tracking-[-0.01em] text-[var(--st-dim)]">
+              {item.title}
+            </span>
+            <span className="st-tc block truncate text-[9.5px] text-[var(--st-faint)]">
+              {[item.range, item.tech?.[0]].filter(Boolean).join(" · ")}
+            </span>
+          </span>
+          {item.repo ? (
+            <LuGithub
+              aria-hidden
+              className="shrink-0 text-[13px] text-[var(--st-faint)]"
+            />
+          ) : null}
+        </a>
+      ))}
     </div>
   );
 }
