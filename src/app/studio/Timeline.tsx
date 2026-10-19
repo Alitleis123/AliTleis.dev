@@ -209,11 +209,12 @@ export default function Timeline({
       {/* Panel header, and the transport.
 
           The transport used to sit in the far corner of the top bar, as far
-          from the clips it moves through as the page allows. Between the
-          viewer and the track is where an editor keeps it, so it is here,
-          centred on the wider layouts. On a phone the label gives way so the
-          timecode and the buttons share one row. */}
-      <div className="flex shrink-0 items-center gap-4 border-b border-[var(--st-line)] px-3 py-1.5 sm:grid sm:grid-cols-[1fr_auto_1fr]">
+          from the clips it moves through as the page allows. It sits right
+          after the timecode now, so the button and the number it moves are
+          read together. Centred, it landed half a screen from that number on
+          a wide display. On a phone the label gives way and the buttons go
+          to the right edge, so the timecode and the buttons share one row. */}
+      <div className="flex shrink-0 items-center gap-4 border-b border-[var(--st-line)] px-3 py-1.5">
         <div className="flex items-center gap-4">
           <span className="st-label hidden sm:block">Timeline</span>
           <span className="st-tc text-[var(--st-dim)]">{timecode(time)}</span>
@@ -229,7 +230,7 @@ export default function Timeline({
             first-time visitor has to be able to find. It gets the accent and
             twice the width of the shuttle keys rather than sitting in a row of
             three identical grey buttons. */}
-        <div className="ml-auto flex items-center gap-1.5 sm:ml-0">
+        <div className="ml-auto flex items-center gap-1.5 sm:ml-2">
           <button
             type="button"
             onClick={() => onStep(-1)}
