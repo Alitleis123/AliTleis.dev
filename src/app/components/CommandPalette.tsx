@@ -90,9 +90,31 @@ function inContext(answer: string, passage: string): string {
   const pattern = answer
     .replace(/\s+/g, "")
     .split("")
-    .map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .map(escapeRe)
     .join("\\s*");
   return new RegExp(pattern, "i").exec(passage)?.[0] ?? answer;
+}
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * The project a question names, if any, as the hits that belong to it.
+ *
+ * Projects only, and whole names only. Matching any title as a substring let
+ * the Stack group "Languages" claim "What languages do you speak?" from the
+ * profile that actually answers it. Where two names match, the longer one is
+ * the more specific, so it wins.
+ */
+function namedProject(q: string, hits: Hit[]): Hit[] {
+  const named = hits.filter(
+    (h) =>
+      h.doc.kind === "Project" &&
+      new RegExp(`(^|\\W)${escapeRe(h.doc.title)}(\\W|$)`, "i").test(q),
+  );
+  const longest = Math.max(0, ...named.map((h) => h.doc.title.length));
+  return named.filter((h) => h.doc.title.length === longest);
 }
 
 /** Below this the span is noise, so the passages answer instead. */
@@ -411,8 +433,7 @@ export default function CommandPalette() {
          * have?" was answered with the follower count from the editing
          * section, which happened to be the most confident number on offer.
          */
-        const ql = q.toLowerCase();
-        const named = hits.filter((h) => ql.includes(h.doc.title.toLowerCase()));
+        const named = namedProject(q, hits);
         const pool = named.length ? named : hits;
         const topScore = pool[0].score || 1;
         let best: (Answer & { weighted: number }) | null = null;
