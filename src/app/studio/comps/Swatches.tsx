@@ -47,7 +47,7 @@ export default function Swatches() {
         </span>
       </div>
 
-      <div className="relative mt-4 flex min-h-0 flex-1 flex-col justify-center gap-2.5 sm:gap-5">
+      <div className="relative mt-4 flex min-h-0 flex-1 flex-col justify-center-safe gap-2.5 sm:gap-5">
         {stackGroups.map((g) => (
           <section
             key={g.title}
