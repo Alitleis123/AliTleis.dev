@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { withBasePath } from "../data";
 import { scrollBehavior } from "../lib/animations";
+import { useFocusTrap } from "../lib/useFocusTrap";
 
 type Doc = {
   id: string;
@@ -130,6 +131,8 @@ export default function CommandPalette() {
   const [thinking, setThinking] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, open);
   const threadRef = useRef<HTMLDivElement>(null);
   const typedRef = useRef<Set<number>>(new Set());
   const encoderRef = useRef<((t: string) => Promise<Float32Array>) | null>(null);
@@ -451,6 +454,7 @@ export default function CommandPalette() {
     <AnimatePresence>
       {open ? (
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
