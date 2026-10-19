@@ -592,7 +592,9 @@ export const socials = {
   github: "https://github.com/Alitleis123",
   githubLabel: "github.com/Alitleis123",
   linkedin: "https://www.linkedin.com/in/ali-tleis-091800247/",
-  linkedinLabel: "linkedin.com/in/ali-tleis",
+  // The full handle, matching the URL above. The studio's copy button puts
+  // this label on the clipboard, and the short form is not this profile.
+  linkedinLabel: "linkedin.com/in/ali-tleis-091800247",
   tiktok: "https://www.tiktok.com/@.justlightt",
   tiktokLabel: "@.justlightt",
 } as const;
