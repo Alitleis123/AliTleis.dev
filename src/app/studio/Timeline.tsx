@@ -140,6 +140,29 @@ export default function Timeline({
     onSeek(timeFromEl(e.currentTarget, e.clientX));
   };
 
+  /**
+   * The slider's own keys, one second per arrow and the ends on Home and End.
+   * Kept from the window's shortcuts, where the same arrows step a whole comp.
+   * The compact track had no key handling at all, so a phone keyboard or a
+   * switch control could focus it and not move it.
+   */
+  const onSliderKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const to =
+      e.key === "ArrowLeft"
+        ? Math.max(0, time - 1)
+        : e.key === "ArrowRight"
+          ? Math.min(TOTAL, time + 1)
+          : e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? TOTAL
+              : null;
+    if (to === null) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onSeek(to);
+  };
+
   /** A clip, filmstrip and all. Shared by the full and compact tracks. */
   const Clip = ({ i, compact }: { i: number; compact?: boolean }) => {
     const c = COMPS[i];
@@ -300,6 +323,7 @@ export default function Timeline({
         aria-valuenow={Math.round(time)}
         aria-valuetext={COMPS[active].name}
         tabIndex={0}
+        onKeyDown={onSliderKey}
       >
         {COMPS.map((c, i) => (
           <Clip key={c.id} i={i} compact />
@@ -344,10 +368,7 @@ export default function Timeline({
           aria-valuenow={Math.round(time)}
           aria-valuetext={COMPS[active].name}
           tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") onSeek(Math.max(0, time - 1));
-            if (e.key === "ArrowRight") onSeek(Math.min(TOTAL, time + 1));
-          }}
+          onKeyDown={onSliderKey}
         >
           {/* Ruler */}
           <div className="relative h-6 border-b border-[var(--st-line)]">

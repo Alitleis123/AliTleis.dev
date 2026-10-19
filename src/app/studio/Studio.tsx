@@ -215,10 +215,24 @@ export default function Studio() {
   // in their hands already.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const typing =
-        e.target instanceof HTMLElement &&
-        ["INPUT", "TEXTAREA"].includes(e.target.tagName);
-      if (typing) return;
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      if (target?.closest("input, textarea, select, [contenteditable]")) return;
+      // A focused control keeps the keys it already means something by. Space
+      // and Enter press a button, and the arrows, Home and End move a slider.
+      // Taking them here made Space on "Next composition" start playback, and
+      // ArrowRight on the timeline jump a whole comp instead of one second.
+      if (
+        (e.key === " " || e.key === "Enter") &&
+        target?.closest("button, a")
+      ) {
+        return;
+      }
+      if (
+        ["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key) &&
+        target?.closest("[role=slider]")
+      ) {
+        return;
+      }
 
       const k = e.key.toLowerCase();
       if (e.key === " ") {
