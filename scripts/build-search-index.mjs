@@ -135,7 +135,7 @@ add({
   meta: "About",
   href: "#about",
   text:
-    `Security clearance: ${aboutClearance}. Cleared work. Spoken languages: ` +
+    `Security clearance: ${aboutClearance}. Spoken languages: ` +
     `${aboutLanguages.map((l) => `${l.name} (${l.level})`).join(", ")}. ` +
     `Based in Boston, Massachusetts. Northeastern University co-op. ` +
     `Off-clock: ${aboutHobbies.map((h) => h.name).join(", ")}.`,
