@@ -6,8 +6,8 @@
  */
 
 export const tiktokStats = {
-  followerCount: 12400,
+  followerCount: 12500,
   heartCount: 1300000,
-  videoCount: 57,
-  fetchedAt: "2026-10-12",
+  videoCount: 58,
+  fetchedAt: "2026-10-19",
 };
