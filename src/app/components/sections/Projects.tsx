@@ -425,7 +425,9 @@ function ProjectCard({
                   className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[12px] font-medium text-black transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(255,255,255,0.18)]"
                 >
                   <FaArrowUpRightFromSquare className="text-[10px]" />
-                  Live Demo
+                  {/* Every one of these is the project's own site, not a
+                      sandbox, so "demo" promised something it was not. */}
+                  Website
                 </a>
               ) : null}
               {/* Where to install it, which is a different errand from the
