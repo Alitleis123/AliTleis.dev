@@ -118,7 +118,7 @@ export const timeline: TimelineEntry[] = [
       { value: "70%", label: "Lower query latency" },
       { value: "40%", label: "Fewer tokens per request" },
     ],
-    note: "Security clearance under DoD investigation, in progress.",
+    note: "DoD clearance investigation in progress.",
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
@@ -349,7 +349,7 @@ export const featuredProjects: Project[] = [
     title: "EternalMonitor",
     subtitle: "eternalmonitor.dev",
     range: "Apr 2026 – Present",
-    desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways. I'm an open-source contributor and own its AMD GPU support.",
+    desc: "I'm an open-source contributor and own its AMD GPU support. It turns an iPad into a second screen for Windows, extending or mirroring the desktop over Wi-Fi or USB with touch, keyboard and Apple Pencil input, and plays the PC's audio on the iPad.",
     metrics: [
       { value: "500+", label: "users", icon: "users" },
       { value: "175+", label: "GitHub stars", icon: "star" },
@@ -422,7 +422,7 @@ export const featuredProjects: Project[] = [
     range: "2025 – Present",
     desc: "Independent Boston software studio, four founders, shipping six products across desktop, browser, and web on a shared Next.js surface.",
     bullets: [
-      "Six products with four of them live. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor, an iPad as a low-latency Windows display in Rust and Swift, is in public beta, and Exerly Fitness is in development.",
+      "Six products. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), Signature Cuts 413 (barbershop booking) and EternalMonitor (an iPad as a low-latency Windows display, in Rust and Swift) are out, and Exerly Fitness is in development.",
       "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page, built on Next.js 14 with the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
       "I also author the Python and Lua pipeline that ships as Eternal2x, driving DaVinci Resolve's scripting environment from an embedded Lua panel.",
       "The site carries an engineer roster rather than a single about page, a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
@@ -477,7 +477,7 @@ export const otherWork: Project[] = [
     id: "neu-calendar-ics",
     title: "NEU Academic Calendar → ICS",
     range: "2026 – Present",
-    desc: "Northeastern publishes its academic calendar only as a PDF. This scrapes it weekly and republishes a subscribable .ics feed filtered to Boston-campus undergraduates, with no dependencies and standard library only.",
+    desc: "Northeastern posts its academic calendar as PDFs. This checks the registrar every Monday and republishes the calendar as subscribable .ics feeds, split by audience and category.",
     bullets: [],
     tech: ["Python", "GitHub Actions", "iCalendar"],
     repo: "https://github.com/Alitleis123/neu-academic-calendar-ics",
@@ -614,7 +614,6 @@ export const aboutLanguages = [
 ];
 
 export const aboutHobbies = [
-  { name: "Coding", glyph: "{ }" },
   { name: "Weight Lifting", glyph: "△" },
   { name: "Video Editing", glyph: "▶" },
 ];

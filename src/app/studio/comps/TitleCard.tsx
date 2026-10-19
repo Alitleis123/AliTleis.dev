@@ -95,8 +95,9 @@ export default function TitleCard() {
           </h1>
 
           <p className="st-lede mt-6 max-w-[42ch]">
-            CS and Sociology at Northeastern, on a seven-month co-op building
-            LLM-backed search at Lincoln Laboratory.
+            CS and Sociology at Northeastern, on a seven-month co-op at
+            Lincoln Laboratory, where I own the internal AI search 4,500+
+            engineers use.
           </p>
 
           <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
