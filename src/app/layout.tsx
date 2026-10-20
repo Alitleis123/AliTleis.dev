@@ -5,8 +5,10 @@ import { SITE_URL } from "./data";
 import "./globals.css";
 import SiteShell from "./components/SiteShell";
 
+// What a search result and a link preview show, so it carries the same facts
+// as the intro rather than lines that could sit on anyone's site.
 const DESCRIPTION =
-  "Personal portfolio of Ali Tleis. CS student at Northeastern, Web Application Developer (AI Integration) at MIT Lincoln Laboratory. Full-stack platforms, automation pipelines, and tooling that ships.";
+  "I'm a CS and Sociology student at Northeastern, on co-op at MIT Lincoln Laboratory, where I own the internal AI search 4,500+ engineers use. I also build Eternal2x and EternalMonitor's AMD GPU support.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

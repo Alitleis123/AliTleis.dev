@@ -1,6 +1,5 @@
 "use client";
 
-import { LuVolume2, LuVolumeX } from "react-icons/lu";
 import BackToChooser from "../components/BackToChooser";
 import ViewSwitch from "../components/ViewSwitch";
 import {
@@ -164,34 +163,18 @@ export function ProjectPanel({
 }
 
 /**
- * Transport and file identity, the strip across the top of the application.
+ * File identity and the view switch, the strip across the top of the
+ * application.
  *
- * The reel starts paused, which makes play the one thing a first-time visitor
- * has to be able to find. It gets the accent and twice the width of the
- * shuttle keys rather than sitting in a row of three identical grey buttons.
+ * The transport used to sit here too, in the far corner from the timeline it
+ * drives. It lives in the timeline's header now. See Timeline.
  */
 export function TopBar({
-  time,
-  playing,
-  muted,
-  showMute,
   entering,
-  onPlayToggle,
-  onStep,
-  onMuteToggle,
 }: {
-  time: number;
-  playing: boolean;
-  muted: boolean;
-  showMute: boolean;
   /** Arrived from the reading view, so the differing parts animate in. */
   entering: boolean;
-  onPlayToggle: () => void;
-  onStep: (dir: -1 | 1) => void;
-  onMuteToggle: () => void;
 }) {
-  const active = compAt(time);
-
   /*
    * Positioned with a z-index of its own, so the view switch's preview can
    * hang below the bar.
@@ -210,8 +193,7 @@ export function TopBar({
         Ali&nbsp;Tleis
       </span>
       {/* The file name belongs to the suite alone, so arriving from the
-          reading view it is new rather than changed, and it leads the
-          stagger. */}
+          reading view it is new rather than changed. */}
       <span
         className={`st-tc hidden text-[var(--st-faint)] sm:block ${
           entering ? "enter-swap enter-swap-1" : ""
@@ -220,74 +202,11 @@ export function TopBar({
         portfolio.aep
       </span>
 
-      {/* Transport. J K L is muscle memory for anyone who edits.
-
-          Named apart from the reading view's section links rather than paired
-          with them. Sharing one name made the browser interpolate a 160px
-          transport into a 750px row of links, so the buttons stretched across
-          the bar on the way out. Each group now slides and fades at its own
-          size instead. */}
-      <div
-        className={`ml-auto flex items-center gap-1.5 ${
-          entering ? "enter-swap enter-swap-2" : ""
-        }`}
-      >
-        <button
-          type="button"
-          onClick={() => onStep(-1)}
-          aria-label="Previous composition"
-          className="st-btn"
-        >
-          <span aria-hidden>&#9664;&#9664;</span>
-        </button>
-        <button
-          type="button"
-          onClick={onPlayToggle}
-          aria-label={playing ? "Pause" : "Play"}
-          className="st-btn-play"
-        >
-          <span aria-hidden>{playing ? "‖" : "▶"}</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => onStep(1)}
-          aria-label="Next composition"
-          className="st-btn"
-        >
-          <span aria-hidden>&#9654;&#9654;</span>
-        </button>
-
-        {/* Mute, next to play. That is where a player keeps it, so there is
-            nothing to learn, and it is the only control the audio needs.
-            Absent entirely when there is no bed to mute. */}
-        {showMute ? (
-          <button
-            type="button"
-            onClick={onMuteToggle}
-            aria-pressed={muted}
-            aria-label={muted ? "Unmute the reel" : "Mute the reel"}
-            className="st-btn"
-          >
-            {muted ? (
-              <LuVolumeX aria-hidden className="text-[13px]" />
-            ) : (
-              <LuVolume2 aria-hidden className="text-[13px]" />
-            )}
-          </button>
-        ) : null}
-      </div>
-
-      <span className="st-tc ml-1 hidden text-[var(--st-accent)] sm:block">
-        {timecode(time)}
-      </span>
-      <span className="st-label hidden md:block">
-        {String(active + 1).padStart(2, "0")}/
-        {String(COMPS.length).padStart(2, "0")}
-      </span>
-
       {/* Both destinations, current one marked. See ViewSwitch for why this
           is not a single button. */}
-      <ViewSwitch />
+      <div className="ml-auto">
+        <ViewSwitch />
+      </div>
     </header>
   );
 }

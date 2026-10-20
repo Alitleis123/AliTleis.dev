@@ -38,7 +38,14 @@ export default function Reel() {
                   {String(i + 1).padStart(2, "0")}
                 </span>
               </div>
-              <span className="st-label mt-2 block leading-[1.5]">
+              {/* Wraps. st-label is nowrap everywhere else, and at 390px the
+                  three columns are 114px wide, so the captions ran into each
+                  other and off the edge. Inline, because st-label sits outside
+                  Tailwind's layers and beats a whitespace utility. */}
+              <span
+                className="st-label mt-2 block leading-[1.5]"
+                style={{ whiteSpace: "normal" }}
+              >
                 {f.label}
               </span>
             </div>

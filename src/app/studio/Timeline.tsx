@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { LuVolume2, LuVolumeX } from "react-icons/lu";
 import { AUDIO_LABEL, COMPS, STARTS, TOTAL, compAt, timecode } from "./comps";
 import { BARS } from "./waveform";
 
@@ -50,18 +51,31 @@ export default function Timeline({
   playing,
   scrubbing,
   hint,
+  muted,
+  showMute,
   onSeek,
+  onKeySeek,
   onScrubStart,
   onScrubEnd,
+  onPlayToggle,
+  onStep,
+  onMuteToggle,
 }: {
   time: number;
   playing: boolean;
   scrubbing: boolean;
   /** Shown until the visitor takes control, then it retires. */
   hint: boolean;
+  muted: boolean;
+  showMute: boolean;
   onSeek: (t: number) => void;
+  /** A seek from the slider's keys, which stops playback the way a scrub does. */
+  onKeySeek: (t: number) => void;
   onScrubStart: () => void;
   onScrubEnd: () => void;
+  onPlayToggle: () => void;
+  onStep: (dir: -1 | 1) => void;
+  onMuteToggle: () => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const compactRef = useRef<HTMLDivElement>(null);
@@ -127,6 +141,29 @@ export default function Timeline({
     draggingRef.current = true;
     onScrubStart();
     onSeek(timeFromEl(e.currentTarget, e.clientX));
+  };
+
+  /**
+   * The slider's own keys, one second per arrow and the ends on Home and End.
+   * Kept from the window's shortcuts, where the same arrows step a whole comp.
+   * The compact track had no key handling at all, so a phone keyboard or a
+   * switch control could focus it and not move it.
+   */
+  const onSliderKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const to =
+      e.key === "ArrowLeft"
+        ? Math.max(0, time - 1)
+        : e.key === "ArrowRight"
+          ? Math.min(TOTAL, time + 1)
+          : e.key === "Home"
+            ? 0
+            : e.key === "End"
+              ? TOTAL
+              : null;
+    if (to === null) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onKeySeek(to);
   };
 
   /** A clip, filmstrip and all. Shared by the full and compact tracks. */
@@ -195,12 +232,78 @@ export default function Timeline({
 
   return (
     <div className="flex min-h-0 flex-col border-t border-[var(--st-line)] bg-[var(--st-panel)]">
-      {/* Panel header */}
+      {/* Panel header, and the transport.
+
+          The transport used to sit in the far corner of the top bar, as far
+          from the clips it moves through as the page allows. It sits right
+          after the timecode now, so the button and the number it moves are
+          read together. Centred, it landed half a screen from that number on
+          a wide display. On a phone the label gives way and the buttons go
+          to the right edge, so the timecode and the buttons share one row. */}
       <div className="flex shrink-0 items-center gap-4 border-b border-[var(--st-line)] px-3 py-1.5">
-        <span className="st-label">Timeline</span>
-        <span className="st-tc text-[var(--st-dim)]">{timecode(time)}</span>
+        <div className="flex items-center gap-4">
+          <span className="st-label hidden sm:block">Timeline</span>
+          <span className="st-tc text-[var(--st-dim)]">{timecode(time)}</span>
+          <span className="st-label hidden sm:block">
+            {String(active + 1).padStart(2, "0")}/
+            {String(COMPS.length).padStart(2, "0")}
+          </span>
+        </div>
+
+        {/* J K L is muscle memory for anyone who edits.
+
+            The reel starts paused, which makes play the one thing a
+            first-time visitor has to be able to find. It gets the accent and
+            twice the width of the shuttle keys rather than sitting in a row of
+            three identical grey buttons. */}
+        <div className="ml-auto flex items-center gap-1.5 sm:ml-2">
+          <button
+            type="button"
+            onClick={() => onStep(-1)}
+            aria-label="Previous composition"
+            className="st-btn"
+          >
+            <span aria-hidden>&#9664;&#9664;</span>
+          </button>
+          <button
+            type="button"
+            onClick={onPlayToggle}
+            aria-label={playing ? "Pause" : "Play"}
+            className="st-btn-play"
+          >
+            <span aria-hidden>{playing ? "‖" : "▶"}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onStep(1)}
+            aria-label="Next composition"
+            className="st-btn"
+          >
+            <span aria-hidden>&#9654;&#9654;</span>
+          </button>
+
+          {/* Mute, next to play. That is where a player keeps it, so there is
+              nothing to learn, and it is the only control the audio needs.
+              Absent entirely when there is no bed to mute. */}
+          {showMute ? (
+            <button
+              type="button"
+              onClick={onMuteToggle}
+              aria-pressed={muted}
+              aria-label={muted ? "Unmute the reel" : "Mute the reel"}
+              className="st-btn"
+            >
+              {muted ? (
+                <LuVolumeX aria-hidden className="text-[13px]" />
+              ) : (
+                <LuVolume2 aria-hidden className="text-[13px]" />
+              )}
+            </button>
+          ) : null}
+        </div>
+
         {hint ? (
-          <span className="st-label ml-auto hidden text-[var(--st-accent)] md:block">
+          <span className="st-label ml-auto hidden text-[var(--st-accent)] lg:block">
             Drag to scrub · space to play · J K L to shuttle
           </span>
         ) : (
@@ -223,6 +326,7 @@ export default function Timeline({
         aria-valuenow={Math.round(time)}
         aria-valuetext={COMPS[active].name}
         tabIndex={0}
+        onKeyDown={onSliderKey}
       >
         {COMPS.map((c, i) => (
           <Clip key={c.id} i={i} compact />
@@ -267,10 +371,7 @@ export default function Timeline({
           aria-valuenow={Math.round(time)}
           aria-valuetext={COMPS[active].name}
           tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowLeft") onSeek(Math.max(0, time - 1));
-            if (e.key === "ArrowRight") onSeek(Math.min(TOTAL, time + 1));
-          }}
+          onKeyDown={onSliderKey}
         >
           {/* Ruler */}
           <div className="relative h-6 border-b border-[var(--st-line)]">

@@ -25,6 +25,56 @@ function contentHash(relPath: string): string {
 }
 
 /**
+ * The day a PDF was made, as "Oct 19, 2026", read from its /CreationDate.
+ *
+ * The Resume repo pins pdfTeX's clock to the commit that last touched
+ * resume.tex, so for the resume this is the day its content last changed, not
+ * the day the site happened to be rebuilt.
+ */
+function pdfDate(relPath: string): string {
+  try {
+    const m = /\/CreationDate\s*\(D:(\d{4})(\d{2})(\d{2})/.exec(
+      readFileSync(path.join(process.cwd(), relPath), "latin1"),
+    );
+    if (!m) return "";
+    return new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).toLocaleDateString(
+      "en-US",
+      { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" },
+    );
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * The resume preview is a picture drawn from the PDF, so it goes stale the
+ * moment a new PDF lands without a redraw, and the site then shows an old
+ * resume beside a download of the new one. scripts/render-resume-preview.py
+ * records which PDF it drew. The Pages workflow redraws before building, so
+ * a mismatch there means that step was lost, and the build stops. Anywhere
+ * else it only warns, since a local build is not what visitors see.
+ */
+function checkResumePreview() {
+  try {
+    const pdf = createHash("sha256")
+      .update(readFileSync(path.join(process.cwd(), "public/resume/resume.pdf")))
+      .digest("hex");
+    const drawn = readFileSync(
+      path.join(process.cwd(), "scripts/resume-preview.sha256"),
+      "utf8",
+    ).trim();
+    if (pdf === drawn) return;
+  } catch {
+    // A missing PDF or record falls through to the same message.
+  }
+  const message =
+    "public/studio/resume-page.webp was not drawn from the current resume.pdf. Run: python scripts/render-resume-preview.py";
+  if (process.env.CI) throw new Error(message);
+  console.warn(`warning: ${message}`);
+}
+checkResumePreview();
+
+/**
  * The timeline's "Now" marker is resolved here rather than in the component so
  * the value is baked into both the server HTML and the client bundle at build
  * time. Calling `new Date()` inside the client component instead would drift
@@ -54,6 +104,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_NOW_LABEL: nowLabel,
     NEXT_PUBLIC_BUILD_YEAR: String(buildDate.getFullYear()),
     NEXT_PUBLIC_RESUME_V: contentHash("public/resume/resume.pdf"),
+    NEXT_PUBLIC_RESUME_DATE: pdfDate("public/resume/resume.pdf"),
+    NEXT_PUBLIC_RESUME_PREVIEW_V: contentHash("public/studio/resume-page.webp"),
     NEXT_PUBLIC_PHONE_V: contentHash("public/offclock/phone.webp"),
   },
 };

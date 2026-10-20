@@ -128,14 +128,14 @@ export default function ViewSwitch({
             <span
               key={v.href}
               aria-current="page"
-              className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] ${
+              className={`group relative flex items-center justify-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] pointer-coarse:min-h-8 pointer-coarse:min-w-8 ${
                 tone === "studio"
                   ? "bg-[var(--st-sel)] text-[var(--st-text)]"
                   : "bg-white/10 text-white"
               }`}
             >
               {body}
-              <span className="sr-only">(current view)</span>
+              <span className="sr-only">{v.label} (current view)</span>
               {preview}
             </span>
           );
@@ -146,7 +146,10 @@ export default function ViewSwitch({
             key={v.href}
             href={v.href}
             onClick={() => markSwitchNavigation(v.href)}
-            className={`group relative flex items-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] transition-colors duration-150 ${
+            // Named outright. Below md the label is hidden and the glyph is
+            // aria-hidden, which left a screen reader a link with no name.
+            aria-label={v.label}
+            className={`group relative flex items-center justify-center gap-1.5 rounded-full px-2.5 py-[5px] text-[11.5px] tracking-[-0.01em] transition-colors duration-150 pointer-coarse:min-h-8 pointer-coarse:min-w-8 ${
               tone === "studio"
                 ? "text-[var(--st-dim)] hover:bg-[var(--st-hover)] hover:text-[var(--st-text)]"
                 : "text-white/70 hover:bg-white/[0.07] hover:text-white"

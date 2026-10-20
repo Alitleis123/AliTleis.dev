@@ -50,6 +50,17 @@ export const RESUME_HREF = (() => {
   return v ? `${base}?v=${v}` : base;
 })();
 
+/**
+ * Page one of the resume as an image, for the previews. Drawn from the PDF by
+ * scripts/render-resume-preview.py and cache-busted the same way, since it is
+ * replaced in place whenever the resume changes.
+ */
+export const RESUME_PREVIEW_SRC = (() => {
+  const base = withBasePath("/studio/resume-page.webp");
+  const v = process.env.NEXT_PUBLIC_RESUME_PREVIEW_V;
+  return v ? `${base}?v=${v}` : base;
+})();
+
 export type TimelineEntry = {
   id: string;
   /** Start month, "YYYY-MM". Also drives descending timeline order. */
@@ -93,36 +104,38 @@ export const timeline: TimelineEntry[] = [
     subtitle: "Web Application Developer (AI Integration)",
     range: "Jun 2026 – Jan 2027",
     meta: "Lexington, MA",
-    desc: "Seven-month co-op building an LLM-backed search layer over the Laboratory's Apache Solr index.",
+    desc: "Seven-month co-op. I own the Laboratory's internal AI search, used by 4,500+ engineers, from the technical proposal to the production release.",
     bullets: [
-      "Owning design and implementation of an LLM-backed search layer over the Laboratory's Apache Solr index, authoring the technical proposal and driving it through engineering review ahead of schedule.",
-      "Built the ingestion layer on Norconex, handling authenticated access, JavaScript-rendered pages, and mixed document formats to normalize content from multiple Laboratory web properties and SharePoint into the Solr index.",
-      "Engineered retrieval logic in Java that ranks and narrows candidate documents before model invocation, cutting query response time 70% and token consumption per request 40%.",
-      "Delivered a working end-to-end prototype and demoed it to the group, unifying content from SharePoint, internal documentation, and the public Laboratory site behind a single search interface.",
-      "Working across both frontier model APIs and self-hosted open-weight models, choosing per workload rather than defaulting to one provider, and keeping the retrieval layer independent of any single model.",
-      "Designing and building AI-integrated internal web applications used daily by researchers, scientists, and engineers across classified and unclassified divisions of MIT Lincoln Laboratory.",
-      "Building inside an established enterprise environment of ServiceNow, SharePoint, Jira, and Confluence, so new tooling has to fit systems already in daily use across the lab rather than sit beside them.",
-      "Operating inside a federally funded R&D center on a competitive Northeastern co-op placement, selected for the Web Application Developer (AI Integration) role specifically.",
+      "Wrote the technical proposal, then built and shipped the service to production, with Java and Spring Boot APIs and Python and FastAPI services.",
+      "Retrieval combines Solr keyword and vector search, then reranks the candidates with Sentence Transformers before the model sees them. That cut query latency 70% and model tokens per request 40%.",
+      "Search results and generated answers keep the source documents' access controls. Retrieval is permission-aware and tied to the lab's existing identity services.",
+      "Norconex ingests content incrementally from SharePoint, internal documentation and the Laboratory's web properties, including pages behind authentication and pages rendered with JavaScript.",
+      "Answers come from Llama, hosted internally on vLLM, with streamed responses, prompts grounded in the retrieved passages, and Redis caching for repeated queries.",
+      "Runs as Docker containers on the lab's existing Kubernetes infrastructure, deployed with Helm and GitLab CI/CD. Automated integration tests and Prometheus and Grafana dashboards back the rollout and help diagnose failures.",
     ],
     metrics: [
-      { value: "70%", label: "Faster query response" },
+      { value: "4,500+", label: "Engineers using it" },
+      { value: "70%", label: "Lower query latency" },
       { value: "40%", label: "Fewer tokens per request" },
     ],
-    note: "Security clearance under DoD investigation, in progress.",
+    note: "DoD clearance investigation in progress.",
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
     tech: [
-      "React",
-      "TypeScript",
-      "Next.js",
-      "Node.js",
       "Java",
-      "LLM Integration",
+      "Spring Boot",
+      "Python",
+      "FastAPI",
       "Apache Solr",
+      "Sentence Transformers",
       "Norconex",
-      "SharePoint",
-      "Boomi",
+      "vLLM",
+      "Redis",
+      "Docker",
+      "Kubernetes",
+      "Helm",
+      "GitLab CI/CD",
     ],
   },
   {
@@ -134,22 +147,31 @@ export const timeline: TimelineEntry[] = [
     subtitle: "Frontend Developer Intern",
     range: "Jun – Sep 2025",
     meta: "Staten Island, NY",
-    desc: "Full-stack work across UI patterns, schema integrity, and automation pipelines.",
+    desc: "Frontend internship that also covered the Express APIs, the MongoDB schema and the sync jobs behind them.",
     bullets: [
-      "Embedded as a Frontend Developer Intern but operated well beyond that scope, touching backend integrations, database architecture, and automation infrastructure in addition to UI work throughout the engagement.",
-      "Conducted a full audit of existing listing and client-management workflows from end to end, identified structural inefficiencies in both the UI layer and the underlying data pipeline, and proposed architectural improvements that were reviewed, approved, and adopted by the engineering team.",
-      "Designed and implemented a comprehensive reusable component system in React and TypeScript to standardize dashboard layouts and client intake forms across the platform, eliminating UI inconsistency and significantly reducing the time required to ship new features.",
-      "Diagnosed deep data integrity failures in the existing MongoDB schema caused by unvalidated writes and inconsistent field naming. Refactored the schema design to enforce strict consistency across all client and agent records, eliminating duplicate entries that were cascading into downstream query failures and incorrect data displays.",
-      "Architected and deployed Python and C# automation pipelines to synchronize MongoDB records across multiple distributed virtualized environments that were previously managed manually, reducing reconciliation time by 30% and eliminating an entire category of manual error.",
-      "Operated as a trusted contributor despite being an intern, proposing, designing, and shipping solutions that went into production and are still in use.",
+      "Built the client-intake and agent-dashboard workflows in Next.js from shared React and TypeScript components, so forms and layouts behave the same across the platform, and folded agent feedback into each production release.",
+      "Added role-based access and document uploads to the Express APIs. Records live in MongoDB Atlas and uploaded files in Azure Blob Storage.",
+      "Automated MongoDB synchronization with Python and C# Azure Functions, which cut manual reconciliation time 30%.",
+      "Refactored the client and agent schemas to stop duplicate records. Unvalidated writes and inconsistent field names had been creating them, and the duplicates broke downstream queries.",
+      "Added GitHub Actions workflows for builds, API tests and deployment checks.",
     ],
     metrics: [
       { value: "30%", label: "Less reconciliation time" },
-      { value: "0", label: "Duplicate records after refactor" },
     ],
     icon: withBasePath("/Timeline/Top%20Choice%20Realty.webp"),
     iconAlt: "Top Choice Realty logo",
-    tech: ["React", "TypeScript", "MongoDB", "Python", "C#", "Azure DevOps"],
+    tech: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Express",
+      "MongoDB Atlas",
+      "Python",
+      "C#",
+      "Azure Functions",
+      "Azure Blob Storage",
+      "GitHub Actions",
+    ],
     images: [
       {
         src: withBasePath("/projects/Top%20choice%20image%201.webp"),
@@ -184,7 +206,6 @@ export const timeline: TimelineEntry[] = [
         { label: "Degree", value: "CS & Sociology" },
         { label: "Expected", value: "Aug 2028" },
         { label: "Program", value: "Co-op" },
-        { label: "GPA", value: "3.5+" },
       ],
       coursework: [
         "Algorithms & Data Structures",
@@ -205,20 +226,18 @@ export const timeline: TimelineEntry[] = [
     subtitle: "Computer Technician Intern",
     range: "Jun – Sep 2023",
     meta: "Staten Island, NY",
-    desc: "Workstation provisioning, automation scripting, and deployment standardization across 20+ systems.",
+    desc: "Workstation provisioning and inventory tooling for an office of 20+ machines.",
     bullets: [
-      "Owned complete end-to-end workstation provisioning responsibility for 20+ employee systems across the office, with sole ownership of the deployment pipeline rather than an assistive role.",
-      "Performed OS imaging using WinPE to build and deploy standardized Windows and Linux configurations from scratch across every machine, ensuring a consistent and reliable baseline across the entire office environment.",
-      "Identified that the existing software deployment process was entirely manual and error-prone. Wrote a suite of PowerShell automation scripts to handle configuration, software installation, and environment setup tasks programmatically, improving consistency and cutting per-machine setup time significantly.",
-      "Managed virtual machine configuration and setup for internal use cases, coordinated version control through Azure DevOps, and supported CI workflow setup and maintenance.",
-      "First technical internship, building foundational fluency in systems administration, enterprise scripting, and deployment workflows that directly informed the architecture and automation decisions made in every subsequent role.",
+      "Automated provisioning for 20+ workstations with PowerShell, covering software installs, account setup, and Windows and Linux configuration, so every machine came up the same way.",
+      "Wrote a Python inventory utility that flags missing software, outdated systems and configuration differences between machines.",
+      "Supported Microsoft Intune enrollment and Active Directory account administration.",
     ],
     metrics: [
       { value: "20+", label: "Workstations provisioned" },
     ],
     icon: withBasePath("/Timeline/RobertDe%20Falco.webp"),
     iconAlt: "Robert DeFalco Realty logo",
-    tech: ["PowerShell", "Windows", "Linux", "Azure DevOps", "WinPE"],
+    tech: ["PowerShell", "Python", "Windows", "Linux", "Microsoft Intune", "Active Directory"],
   },
 ];
 
@@ -330,12 +349,13 @@ export const featuredProjects: Project[] = [
     title: "EternalMonitor",
     subtitle: "eternalmonitor.dev",
     range: "Apr 2026 – Present",
-    desc: "Turns an iPad into a second screen for Windows. Extend or mirror the desktop over Wi-Fi or USB, with touch, keyboard, Apple Pencil and PC audio sent both ways.",
+    desc: "I'm an open-source contributor and own its AMD GPU support. It turns an iPad into a second screen for Windows, extending or mirroring the desktop over Wi-Fi or USB with touch, keyboard and Apple Pencil input, and plays the PC's audio on the iPad.",
     metrics: [
       { value: "500+", label: "users", icon: "users" },
       { value: "175+", label: "GitHub stars", icon: "star" },
     ],
     bullets: [
+      "My part is AMD support, end to end. I wrote the Rust and FFmpeg AMF encoding path for H.264 and HEVC, keyframe recovery, and a software fallback, then validated AMD streaming on physical Windows and iPad hardware through DXGI capture, GPU encoding, Wi-Fi and USB transport, VideoToolbox decoding and Metal rendering.",
       "The Windows host is Rust. It captures the desktop with DXGI and encodes on the graphics card through FFmpeg, with NVENC, AMF or Quick Sync, H.264 by default or HEVC, at 30 to 120 fps. The iPad app is native Swift. It decodes in hardware with VideoToolbox and draws NV12 frames with Metal.",
       "Each frame travels as numbered UDP fragments, and when one goes missing the iPad asks for that fragment again as soon as a later one shows the gap. The host keeps the last 96 frames, up to 12 MiB, to answer from, and the iPad waits an RTT-aware 8 to 25 ms before giving up and asking for a keyframe. One dropped packet rarely costs a frame, and the bitrate adapts between 4 and 50 Mbps from the iPad's loss and jitter reports.",
       "Over USB the same messages run through a length-framed tunnel that the host opens with Apple's device service. Plugging in a cable takes over a running Wi-Fi session, and unplugging falls back to the remembered Wi-Fi host without a manual reconnect.",
@@ -402,7 +422,7 @@ export const featuredProjects: Project[] = [
     range: "2025 – Present",
     desc: "Independent Boston software studio, four founders, shipping six products across desktop, browser, and web on a shared Next.js surface.",
     bullets: [
-      "Six products with four of them live. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), and Signature Cuts 413 (barbershop booking). EternalMonitor, an iPad as a low-latency Windows display in Rust and Swift, is in public beta, and Exerly Fitness is in development.",
+      "Six products. Eternal2x (Resolve plugin), Eternal Summary (Chrome extension), EternalRichPresence (Discord rich presence for Apple Music and Spotify), Signature Cuts 413 (barbershop booking) and EternalMonitor (an iPad as a low-latency Windows display, in Rust and Swift) are out, and Exerly Fitness is in development.",
       "Co-founder and full-stack engineer. I own the web surface across the studio site and every product page, built on Next.js 14 with the App Router, TypeScript in strict mode, Tailwind, and Framer Motion.",
       "I also author the Python and Lua pipeline that ships as Eternal2x, driving DaVinci Resolve's scripting environment from an embedded Lua panel.",
       "The site carries an engineer roster rather than a single about page, a dossier per founder, generated from structured data, with products cross-linked to the people who built them.",
@@ -412,7 +432,7 @@ export const featuredProjects: Project[] = [
     iconText: "SB",
     tech: ["TypeScript", "Next.js", "React", "Node.js", "Tailwind CSS", "Framer Motion", "Python", "Lua", "Playwright"],
     demo: "https://sideband.studio",
-    repo: "https://github.com/whoisaldo/sideband.studio",
+    repo: "https://github.com/sidebandstudio/sideband.studio",
     coverKey: "sideband",
     gallery: [
       { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband, the studio home page, with the product marks and the interactive terminal" },
@@ -427,9 +447,9 @@ export const otherWork: Project[] = [
     id: "tcr-platform",
     title: "Top Choice Realty Platform",
     range: "Jun – Sep 2025",
-    desc: "Full-stack real estate platform with session auth, role-based access enforced in API middleware, and Zod validation at every route boundary.",
+    desc: "Real estate platform for Top Choice Realty. Next.js client intake and agent dashboards on Express APIs, with role-based access, MongoDB Atlas, and document uploads stored in Azure Blob Storage.",
     bullets: [],
-    tech: ["React", "TypeScript", "Express", "MongoDB", "Zod"],
+    tech: ["Next.js", "React", "TypeScript", "Express", "MongoDB Atlas", "Azure Blob Storage"],
     demo: "https://topchoicerealtyny.com/",
     iconKey: "home",
   },
@@ -457,7 +477,7 @@ export const otherWork: Project[] = [
     id: "neu-calendar-ics",
     title: "NEU Academic Calendar → ICS",
     range: "2026 – Present",
-    desc: "Northeastern publishes its academic calendar only as a PDF. This scrapes it weekly and republishes a subscribable .ics feed filtered to Boston-campus undergraduates, with no dependencies and standard library only.",
+    desc: "Northeastern posts its academic calendar as PDFs. This checks the registrar every Monday and republishes the calendar as subscribable .ics feeds, split by audience and category.",
     bullets: [],
     tech: ["Python", "GitHub Actions", "iCalendar"],
     repo: "https://github.com/Alitleis123/neu-academic-calendar-ics",
@@ -572,7 +592,9 @@ export const socials = {
   github: "https://github.com/Alitleis123",
   githubLabel: "github.com/Alitleis123",
   linkedin: "https://www.linkedin.com/in/ali-tleis-091800247/",
-  linkedinLabel: "linkedin.com/in/ali-tleis",
+  // The full handle, matching the URL above. The studio's copy button puts
+  // this label on the clipboard, and the short form is not this profile.
+  linkedinLabel: "linkedin.com/in/ali-tleis-091800247",
   tiktok: "https://www.tiktok.com/@.justlightt",
   tiktokLabel: "@.justlightt",
 } as const;
@@ -586,7 +608,7 @@ export const socials = {
  */
 export const LOCATION = "Greater Boston";
 
-export const aboutClearance = "DoD investigation in progress";
+export const aboutClearance = "DoD clearance investigation in progress";
 
 export const aboutLanguages = [
   { name: "Arabic", level: "Native" },
@@ -594,7 +616,6 @@ export const aboutLanguages = [
 ];
 
 export const aboutHobbies = [
-  { name: "Coding", glyph: "{ }" },
   { name: "Weight Lifting", glyph: "△" },
   { name: "Video Editing", glyph: "▶" },
 ];
@@ -614,14 +635,14 @@ export type StackGroup = {
 };
 
 export const coreStack: StackItem[] = [
-  { name: "React", iconKey: "SiReact" },
+  { name: "Java", iconKey: "FaJava" },
+  { name: "Python", iconKey: "SiPython" },
+  { name: "Rust", iconKey: "SiRust" },
   { name: "TypeScript", iconKey: "SiTypescript" },
+  { name: "React", iconKey: "SiReact" },
   { name: "Next.js", iconKey: "SiNextdotjs" },
   { name: "Node.js", iconKey: "SiNodedotjs" },
-  { name: "Python", iconKey: "SiPython" },
   { name: "MongoDB", iconKey: "SiMongodb" },
-  { name: "Tailwind CSS", iconKey: "SiTailwindcss" },
-  { name: "Git", iconKey: "SiGit" },
 ];
 
 export const stackGroups: StackGroup[] = [
@@ -632,10 +653,10 @@ export const stackGroups: StackGroup[] = [
       { name: "JavaScript", iconKey: "SiJavascript" },
       { name: "Python", iconKey: "SiPython" },
       { name: "Java", iconKey: "FaJava" },
+      { name: "Rust", iconKey: "SiRust" },
       { name: "C++", iconKey: "SiCplusplus" },
       { name: "C#", iconKey: "SiSharp" },
       { name: "Lua", iconKey: "SiLua" },
-      { name: "Kotlin", iconKey: "SiKotlin" },
       { name: "SQL", iconKey: "TbDatabase" },
     ],
   },
@@ -644,6 +665,8 @@ export const stackGroups: StackGroup[] = [
     items: [
       { name: "React", iconKey: "SiReact" },
       { name: "Next.js", iconKey: "SiNextdotjs" },
+      { name: "Spring Boot", iconKey: "SiSpringboot" },
+      { name: "FastAPI", iconKey: "SiFastapi" },
       { name: "Tailwind CSS", iconKey: "SiTailwindcss" },
       { name: "Framer Motion", iconKey: "SiFramer" },
       { name: "Vite", iconKey: "SiVite" },
@@ -655,20 +678,23 @@ export const stackGroups: StackGroup[] = [
     items: [
       { name: "Node.js / Express", iconKey: "SiNodedotjs" },
       { name: "REST APIs", iconKey: "TbApi" },
-      { name: "Boomi", iconKey: "TbPlugConnected" },
       { name: "JWT Auth", iconKey: "SiJsonwebtokens" },
       { name: "Git / GitHub", iconKey: "SiGithub" },
       { name: "Docker", iconKey: "SiDocker" },
+      { name: "Kubernetes", iconKey: "SiKubernetes" },
+      { name: "Helm", iconKey: "SiHelm" },
+      { name: "GitLab CI/CD", iconKey: "SiGitlab" },
+      { name: "GitHub Actions", iconKey: "SiGithubactions" },
+      { name: "Prometheus", iconKey: "SiPrometheus" },
+      { name: "Grafana", iconKey: "SiGrafana" },
       { name: "Linux", iconKey: "SiLinux" },
       { name: "OpenCV", iconKey: "SiOpencv" },
       { name: "FFmpeg", iconKey: "SiFfmpeg" },
       { name: "PowerShell", iconKey: "VscTerminalPowershell" },
-      { name: "Azure DevOps", iconKey: "VscAzureDevops" },
+      { name: "Azure Functions", iconKey: "VscAzure" },
       { name: "Jest", iconKey: "SiJest" },
       { name: "JUnit", iconKey: "SiJunit5" },
       { name: "Fly.io", iconKey: "SiFlydotio" },
-      { name: "Heroku", iconKey: "SiHeroku" },
-      { name: "Arduino", iconKey: "SiArduino" },
     ],
   },
   {
@@ -677,6 +703,7 @@ export const stackGroups: StackGroup[] = [
       { name: "MongoDB", iconKey: "SiMongodb" },
       { name: "PostgreSQL", iconKey: "SiPostgresql" },
       { name: "MySQL", iconKey: "SiMysql" },
+      { name: "Redis", iconKey: "SiRedis" },
       { name: "Apache Solr", iconKey: "SiApachesolr" },
       { name: "Norconex", iconKey: "TbSpider" },
     ],
@@ -685,8 +712,10 @@ export const stackGroups: StackGroup[] = [
     title: "AI & ML",
     items: [
       { name: "LLM Integration", iconKey: "LuBrainCircuit" },
+      { name: "Llama", iconKey: "SiMeta" },
+      { name: "vLLM", iconKey: "TbServer" },
+      { name: "Sentence Transformers", iconKey: "SiHuggingface" },
       { name: "Gemini API", iconKey: "SiGooglegemini" },
-      { name: "DeepSeek", iconKey: "TbBrain" },
       { name: "Open-Weight LLMs", iconKey: "SiHuggingface" },
     ],
   },

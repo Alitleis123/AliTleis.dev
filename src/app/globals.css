@@ -96,11 +96,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Base document styles */
-html {
-  scroll-behavior: smooth;
-}
-
+/* Base document styles. Smooth scrolling only for visitors who have not asked
+   for less motion. An unconditional copy of this rule used to sit beside it,
+   which made the media query do nothing. */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -1230,10 +1228,6 @@ section {
   animation-delay: 40ms;
 }
 
-.enter-swap-2 {
-  animation-delay: 80ms;
-}
-
 /* The page under the bar is wholly different, so it gets the longer fade and
    no movement. Sliding a full page reads as jank at any speed. */
 .enter-page {
@@ -1256,7 +1250,6 @@ section {
 @media (prefers-reduced-motion: reduce) {
   .enter-swap,
   .enter-swap-1,
-  .enter-swap-2,
   .enter-page {
     animation: none;
   }

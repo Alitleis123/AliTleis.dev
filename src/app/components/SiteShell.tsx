@@ -1,5 +1,6 @@
 "use client";
 
+import { MotionConfig } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { clearSwitchArrival, isSwitchArrival } from "../lib/switchArrival";
@@ -62,8 +63,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
 
   if (bare) return <>{children}</>;
 
+  // reducedMotion="user" drops the reading view's slide-ins to a plain fade
+  // for visitors who ask for less motion. Every section rises in on scroll
+  // through Framer Motion, and none of it checked the preference before.
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <BackgroundRings />
       <NavBar entering={entering} />
 
@@ -91,6 +95,6 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       <ScrollToTop />
       <AmbientAudio />
       <CommandPalette />
-    </>
+    </MotionConfig>
   );
 }

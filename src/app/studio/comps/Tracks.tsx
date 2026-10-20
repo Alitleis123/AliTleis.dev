@@ -154,6 +154,12 @@ export default function Tracks() {
                       {e.subtitle}
                     </span>
                   ) : null}
+                  {/* The dates column is gone below sm, and with it the only
+                      place a phone showed when each role was. */}
+                  <span className="st-tc mt-1 block text-[10px] text-[var(--st-faint)] sm:hidden">
+                    {e.range}
+                    {dur ? ` · ${dur}` : ""}
+                  </span>
                 </span>
 
                 {/* The headline number, on the row rather than hidden behind
@@ -164,7 +170,7 @@ export default function Tracks() {
                     <span className="st-tc text-[15px] text-[var(--st-accent)]">
                       {e.metrics[0].value}
                     </span>
-                    <span className="st-label max-w-[10rem] truncate">
+                    <span className="st-label max-w-[13rem] truncate">
                       {e.metrics[0].label}
                     </span>
                   </span>

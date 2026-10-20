@@ -13,7 +13,7 @@ const PRODUCTS: Product[] = [
   { name: "Eternal Summary", status: "LIVE" },
   { name: "EternalRichPresence", status: "LIVE" },
   { name: "Signature Cuts 413", status: "LIVE" },
-  { name: "EternalMonitor", status: "DEV" },
+  { name: "EternalMonitor", status: "LIVE" },
   { name: "Exerly Fitness", status: "DEV" },
 ];
 
@@ -79,7 +79,7 @@ export default function SidebandCover() {
           we wished existed<tspan fill={ACCENT}>.</tspan>
         </text>
         <text x="400" y="206" fontSize="12" fill="rgba(255,255,255,0.55)" letterSpacing="0.2">
-          Four friends, six products, four of them live.
+          Four friends, six products, five of them live.
         </text>
       </g>
 

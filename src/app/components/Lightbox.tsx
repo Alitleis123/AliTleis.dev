@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { FaChevronLeft, FaChevronRight, FaXmark } from "react-icons/fa6";
+import { useFocusTrap } from "../lib/useFocusTrap";
 
 /** One open gallery: the images, which one is showing, and whose gallery it is. */
 export type LightboxState = {
@@ -22,6 +23,8 @@ export default function Lightbox({
 }) {
   const open = !!state;
   const total = state?.images.length ?? 0;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, open);
 
   const prev = useCallback(() => {
     if (!state) return;
@@ -53,12 +56,16 @@ export default function Lightbox({
     <AnimatePresence>
       {open && state ? (
         <motion.div
+          ref={dialogRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 backdrop-blur-md"
           onClick={onClose}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${state.title} screenshots`}
         >
           {/* Top bar */}
           <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-4 px-5 py-4">
