@@ -118,7 +118,7 @@ export const timeline: TimelineEntry[] = [
       { value: "70%", label: "Lower query latency" },
       { value: "40%", label: "Fewer tokens per request" },
     ],
-    note: "DoD clearance investigation in progress.",
+    note: "Security Clearance: DoD Investigation in Progress",
     icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
@@ -608,7 +608,7 @@ export const socials = {
  */
 export const LOCATION = "Greater Boston";
 
-export const aboutClearance = "DoD clearance investigation in progress";
+export const aboutClearance = "DoD Investigation in Progress";
 
 export const aboutLanguages = [
   { name: "Arabic", level: "Native" },
