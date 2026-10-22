@@ -47,7 +47,7 @@ export default function Choose() {
         </h1>
         <p className="mx-auto mt-2.5 max-w-[56ch] text-[14px] leading-[1.6] sm:text-[15px] text-white/72 [text-shadow:0_1px_14px_rgba(0,0,0,0.9)]">
           Web Application Developer at MIT Lincoln Laboratory, CS and Sociology
-          at Northeastern. {aboutClearance}. {LOCATION}.
+          at Northeastern. Security Clearance: {aboutClearance}. {LOCATION}.
         </p>
       </header>
 

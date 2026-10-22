@@ -101,7 +101,10 @@ export default function TitleCard() {
           </p>
 
           <div className="mt-7 flex flex-wrap items-center gap-x-7 gap-y-3">
-            <Fact icon={<LuShieldCheck aria-hidden />} value={aboutClearance} />
+            <Fact
+              icon={<LuShieldCheck aria-hidden />}
+              value={`Security Clearance: ${aboutClearance}`}
+            />
             <Fact
               icon={<LuLanguages aria-hidden />}
               value={aboutLanguages.map((l) => l.name).join(", ")}

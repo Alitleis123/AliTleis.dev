@@ -123,7 +123,7 @@ export default function Intro() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
               <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
-                Clearance
+                Security Clearance
               </span>
               <span className="inline-flex items-center gap-2 text-[13px] tracking-tight text-white/85">
                 <span
