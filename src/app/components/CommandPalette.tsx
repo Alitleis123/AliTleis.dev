@@ -33,14 +33,48 @@ type Mode = "lexical" | "loading" | "semantic";
 type Hit = { doc: Doc; score: number; snippet: string };
 
 /**
- * A span pulled out of a retrieved passage by the reader model.
+ * What the panel shows above the passages.
  *
- * `score` is the model's own confidence, which is what decides whether this
- * is shown as an answer or withheld in favour of the passages. Extractive
- * models are confident on a question their context actually covers and
- * visibly unsure otherwise, so the number is worth trusting.
+ * `from` is the hit a quoted span came from, or null when the writer composed
+ * the answer from the whole site instead.
  */
-type Answer = { text: string; score: number; from: number };
+type Answer = { text: string; from: number | null };
+
+/**
+ * The writer, a Vercel function that answers from the whole site with Gemini.
+ * Source and setup are in ask/. The override exists for local previews.
+ */
+const ASK_API =
+  process.env.NEXT_PUBLIC_ASK_API || "https://alitleis-ask.vercel.app/api/ask";
+
+/** The function rejects longer questions, so the input stops there too. */
+const MAX_QUESTION = 500;
+
+/**
+ * Asks the writer, with earlier answers so a follow-up like "what did you build
+ * there?" has something to point at.
+ *
+ * Returns null instead of throwing. Any failure, whether a timeout, a 502 or
+ * a spent quota, means the reader answers instead.
+ */
+async function write(
+  question: string,
+  history: { q: string; a: string }[],
+): Promise<string | null> {
+  try {
+    const res = await fetch(ASK_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, history }),
+      signal: AbortSignal.timeout(25_000),
+    });
+    if (!res.ok) return null;
+    const { answer } = await res.json();
+    return typeof answer === "string" && answer.trim() ? answer.trim() : null;
+  } catch {
+    return null;
+  }
+}
 
 /** One question and what came back for it. */
 type Turn = {
@@ -74,6 +108,9 @@ const CDN = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2";
  *
  * Loaded on the first question rather than when the panel opens, so 63MB is
  * only spent by someone who actually asks something.
+ *
+ * It is the fallback now. The writer answers first, and the reader only loads
+ * when the writer cannot be reached.
  */
 const READER = "Xenova/distilbert-base-cased-distilled-squad";
 
@@ -382,6 +419,15 @@ export default function CommandPalette() {
       if (!q || thinking) return;
       setQuery("");
       setThinking(true);
+      // Started before the encoder loads, so the two downloads overlap. Only
+      // written answers go back as history, since a quoted span on its own
+      // reads as a non sequitur.
+      const written = write(
+        q,
+        turns.flatMap((t) =>
+          t.answer && t.answer.from === null ? [{ q: t.q, a: t.answer.text }] : [],
+        ),
+      );
       let vec: Float32Array | null = null;
       try {
         await loadEncoder();
@@ -391,8 +437,7 @@ export default function CommandPalette() {
       }
       const hits = rank(q, vec);
 
-      // The passages land straight away. Waiting on a 63MB download before
-      // showing anything would make the first question feel broken.
+      // The passages land straight away, while the writer is still working.
       const id = ++turnIdRef.current;
       setTurns((t) => [...t, { id, q, hits, semantic: !!vec }]);
       setThinking(false);
@@ -400,6 +445,12 @@ export default function CommandPalette() {
 
       const settle = (answer: Answer | null) =>
         setTurns((t) => t.map((x) => (x.id === id ? { ...x, answer } : x)));
+
+      const text = await written;
+      if (text) {
+        settle({ text, from: null });
+        return;
+      }
 
       if (!hits.length) {
         settle(null);
@@ -436,7 +487,8 @@ export default function CommandPalette() {
         const named = namedProject(q, hits);
         const pool = named.length ? named : hits;
         const topScore = pool[0].score || 1;
-        let best: (Answer & { weighted: number }) | null = null;
+        let best: { text: string; score: number; from: number; weighted: number } | null =
+          null;
         for (const h of pool) {
           const i = hits.indexOf(h);
           const r = await read(q, h.snippet);
@@ -447,14 +499,16 @@ export default function CommandPalette() {
             best = { text, score: r.score, from: i, weighted };
           }
         }
-        settle(best && best.score >= ANSWER_FLOOR ? best : null);
+        settle(
+          best && best.score >= ANSWER_FLOOR ? { text: best.text, from: best.from } : null,
+        );
       } catch {
         // Blocked CDN, no WASM, or a refused download. The passages are
         // already on screen, so this degrades to what it did before.
         settle(null);
       }
     },
-    [rank, thinking, loadEncoder, loadReader],
+    [rank, thinking, turns, loadEncoder, loadReader],
   );
 
   const go = useCallback((d: Doc) => {
@@ -538,8 +592,9 @@ export default function CommandPalette() {
                     variants={askItem}
                     className="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--text-muted)]"
                   >
-                    Ask in plain language. Answers are quoted from this page,
-                    never written, so nothing here can be invented.
+                    Ask in plain language. Gemini answers from what this site
+                    says, and the closest passage on the page is quoted
+                    underneath.
                   </motion.p>
 
                   <motion.span
@@ -595,35 +650,38 @@ export default function CommandPalette() {
                       </span>
                     </motion.div>
 
-                    {t.hits.length === 0 ? (
+                    {/* The answer, above the passages, because it is what was
+                        asked for and the passage is the evidence. A written
+                        answer can stand without a passage, since it reads
+                        the whole site, extras included. */}
+                    {t.answer === undefined ? (
+                      <motion.p
+                        variants={askItem}
+                        className="flex items-center gap-2 text-[12px] text-[var(--text-faint)]"
+                      >
+                        <span className="ask-reading" aria-hidden />
+                        Reading the site
+                      </motion.p>
+                    ) : t.answer ? (
+                      <motion.div variants={askItem}>
+                        <p className="whitespace-pre-line text-[15px] leading-[1.6] tracking-tight text-white">
+                          {t.answer.text}
+                        </p>
+                        {t.answer.from !== null ? (
+                          <span className="mt-1.5 block font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
+                            Quoted from {t.hits[t.answer.from].doc.title}
+                          </span>
+                        ) : null}
+                      </motion.div>
+                    ) : t.hits.length === 0 ? (
                       <motion.p variants={askItem} className="text-[13px] leading-[1.7] text-[var(--text-muted)]">
                         Nothing on the page matches that. Try naming a tool, a
                         company, or the kind of work.
                       </motion.p>
-                    ) : (
-                      <>
-                        {/* The answer, when the reader found one it trusts.
-                            Above the passages, because the span is what was
-                            asked for and the passage is the evidence. */}
-                        {t.answer === undefined ? (
-                          <motion.p
-                            variants={askItem}
-                            className="flex items-center gap-2 text-[12px] text-[var(--text-faint)]"
-                          >
-                            <span className="ask-reading" aria-hidden />
-                            Reading the passages
-                          </motion.p>
-                        ) : t.answer ? (
-                          <motion.div variants={askItem}>
-                            <p className="text-[15px] leading-[1.6] tracking-tight text-white">
-                              {t.answer.text}
-                            </p>
-                            <span className="mt-1.5 block font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
-                              Quoted from {t.hits[t.answer.from].doc.title}
-                            </span>
-                          </motion.div>
-                        ) : null}
+                    ) : null}
 
+                    {t.hits.length > 0 ? (
+                      <>
                         {/* The passage that matched, quoted rather than written. */}
                         <motion.div
                           variants={askItem}
@@ -675,7 +733,7 @@ export default function CommandPalette() {
                           </motion.div>
                         ) : null}
                       </>
-                    )}
+                    ) : null}
                   </motion.div>
                 ))}
 
@@ -714,8 +772,9 @@ export default function CommandPalette() {
                   ref={inputRef}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="anything on this page"
+                  placeholder="anything about Ali"
                   aria-label="Ask a question"
+                  maxLength={MAX_QUESTION}
                   className="min-w-0 flex-1 bg-transparent text-[14px] tracking-tight text-white caret-[var(--accent-electric)] placeholder:text-[var(--text-faint)]"
                 />
                 <button
@@ -738,7 +797,7 @@ export default function CommandPalette() {
               >
                 {statusLabel}
               </span>
-              <span>Quoted, never generated</span>
+              <span>Answers by Gemini</span>
             </div>
             </div>
           </motion.div>
