@@ -8,19 +8,25 @@ One Vercel function, `api/ask.js`, that answers questions in the Ask panel on
 Both halves are free. Vercel's Hobby plan hosts the function, and Gemini's free
 tier answers. Neither needs a card.
 
-## Setup
+## Deploying
 
-1. Get a Gemini key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
-2. On [vercel.com/new](https://vercel.com/new), import this repo.
-   - Project name: `alitleis-ask`, so the URL matches the one in
-     `src/app/components/CommandPalette.tsx`.
-   - Root Directory: `ask`
-   - Framework Preset: Other
-   - Environment variable: `GEMINI_API_KEY` set to the key from step 1.
-3. Deploy. The endpoint is `https://alitleis-ask.vercel.app/api/ask`.
+The Vercel project is `alitleis-ask` on the Hobby plan, at
+`https://alitleis-ask.vercel.app/api/ask`, the URL `ASK_API` in
+`src/app/components/CommandPalette.tsx` points at.
 
-If Vercel gives the project a different URL, update `ASK_API` in
-`CommandPalette.tsx` to match.
+It is deployed from this folder with the Vercel CLI and is not connected to
+Git. Site content reaches it through `/ask-context.txt`, so only an edit to
+this folder needs a deploy:
+
+```bash
+cd ask
+npx vercel deploy --prod
+```
+
+The key is the `GEMINI_API_KEY` production variable, from
+[aistudio.google.com/apikey](https://aistudio.google.com/apikey). To replace
+it, run `npx vercel env add GEMINI_API_KEY --environment production --sensitive --force`
+here and paste the new key, then deploy again.
 
 ## Editing what it knows
 
