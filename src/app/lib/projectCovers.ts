@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import SidebandCover from "../components/projectCovers/SidebandCover";
+import ExerlyCover from "../components/projectCovers/ExerlyCover";
 import Eternal2xCover from "../components/projectCovers/Eternal2xCover";
 import EternalMonitorCover from "../components/projectCovers/EternalMonitorCover";
 import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover";
@@ -12,7 +12,7 @@ import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover
  * 16:9 box with `position: relative` around it and nothing else.
  */
 export const COVER_MAP: Record<string, ComponentType> = {
-  sideband: SidebandCover,
+  exerly: ExerlyCover,
   eternal2x: Eternal2xCover,
   eternalMonitor: EternalMonitorCover,
   eternalSummary: EternalSummaryCover,
