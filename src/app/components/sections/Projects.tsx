@@ -105,26 +105,44 @@ export default function Projects() {
           {otherWork.map((p) => {
             const Icon = p.iconKey ? OTHER_ICON[p.iconKey] : null;
             return (
-              <a
+              <div
                 key={p.id}
-                href={p.repo ?? p.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="surface-lift group flex items-center gap-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
+                className="surface-lift group relative flex items-center gap-5 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-5 transition-[border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[var(--border-soft)] hover:bg-[var(--surface-2)]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[var(--border-hairline)] bg-[var(--surface-2)] text-white/85 transition-colors duration-200 group-hover:text-white">
                   {Icon ? <Icon className="text-[22px]" /> : null}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-3">
-                    <span className="text-[15px] font-medium tracking-tight text-white">
+                    {/* Links can't nest. The title stretches over the card
+                        (.card-link), and the store icon sits above it. */}
+                    <a
+                      href={p.repo ?? p.demo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="card-link text-[15px] font-medium tracking-tight text-white"
+                    >
                       {p.title}
+                    </a>
+                    <span className="flex items-center gap-3">
+                      {p.store ? (
+                        <a
+                          href={p.store}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${p.title} on the Chrome Web Store`}
+                          title="Chrome Web Store"
+                          className="relative z-10 -m-1.5 p-1.5 text-white/45 transition-colors duration-200 group-hover:text-white"
+                        >
+                          <FaChrome className="text-[14px]" />
+                        </a>
+                      ) : null}
+                      {p.repo ? (
+                        <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                      ) : (
+                        <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                      )}
                     </span>
-                    {p.repo ? (
-                      <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                    ) : (
-                      <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                    )}
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-[var(--text-dim)]">
                     <span>{p.range.toUpperCase()}</span>
@@ -136,7 +154,7 @@ export default function Projects() {
                     ) : null}
                   </div>
                 </div>
-              </a>
+              </div>
             );
           })}
         </div>

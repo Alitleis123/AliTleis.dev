@@ -505,10 +505,11 @@ export const otherWork: Project[] = [
   {
     id: "better-canvas",
     title: "Better Canvas",
-    range: "2026 – In progress",
+    range: "2026 – Present",
     desc: "Canvas LMS customizer for Chrome and Firefox. Skins, a kanban planner, Pomodoro, GPA and rubric predictors, and a command palette, all local with no accounts and no telemetry.",
     bullets: [],
     tech: ["JavaScript", "Chrome MV3", "Firefox"],
+    store: "https://chromewebstore.google.com/detail/eihlcchoakpglfpkipmbdaeihehoafdm",
     repo: "https://github.com/Alitleis123/Better-Canvas",
     iconKey: "puzzle",
   },
