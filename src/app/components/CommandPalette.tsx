@@ -188,6 +188,12 @@ export default function CommandPalette() {
   /** Turn ids, so a slow read updates the turn it belongs to. */
   const turnIdRef = useRef(0);
   const [thinking, setThinking] = useState(false);
+  /**
+   * True until the writer replies. The next question waits for it, or it
+   * would go out without this answer in its history and lose what "there"
+   * or "it" refers to.
+   */
+  const [waiting, setWaiting] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -363,9 +369,9 @@ export default function CommandPalette() {
    *
    * It used to start the moment the panel opened, so somebody who opened it
    * to look around paid for 23MB of model and 10MB of WASM they never used.
-   * Only a question needs it, and the first one waits for it rather than
-   * falling back to keyword ranking, so the first answer is as good as the
-   * rest.
+   * Only a question needs it. The first one waits for it when the writer
+   * cannot answer, rather than falling back to keyword ranking, so the
+   * reader's first answer is as good as the rest.
    */
   const loadEncoder = useCallback(async () => {
     if (encoderRef.current) return;
@@ -416,9 +422,10 @@ export default function CommandPalette() {
   const ask = useCallback(
     async (raw: string) => {
       const q = raw.trim();
-      if (!q || thinking) return;
+      if (!q || thinking || waiting) return;
       setQuery("");
       setThinking(true);
+      setWaiting(true);
       // Started before the encoder loads, so the two downloads overlap. Only
       // written answers go back as history, since a quoted span on its own
       // reads as a non sequitur.
@@ -427,10 +434,18 @@ export default function CommandPalette() {
         turns.flatMap((t) =>
           t.answer && t.answer.from === null ? [{ q: t.q, a: t.answer.text }] : [],
         ),
-      );
+      ).finally(() => setWaiting(false));
       let vec: Float32Array | null = null;
       try {
-        await loadEncoder();
+        // A written answer does not need the encoder, so it is not held
+        // behind a 33MB download. If it lands first, the passage under it is
+        // ranked by keyword this once. Only when the writer fails does the
+        // question wait, because the reader works from the semantic passages.
+        const first = await Promise.race([
+          loadEncoder().then(() => undefined),
+          written,
+        ]);
+        if (first === null) await loadEncoder();
         vec = (await encoderRef.current?.(q)) ?? null;
       } catch {
         vec = null;
@@ -508,7 +523,7 @@ export default function CommandPalette() {
         settle(null);
       }
     },
-    [rank, thinking, turns, loadEncoder, loadReader],
+    [rank, thinking, waiting, turns, loadEncoder, loadReader],
   );
 
   const go = useCallback((d: Doc) => {
@@ -779,7 +794,7 @@ export default function CommandPalette() {
                 />
                 <button
                   type="submit"
-                  disabled={!query.trim() || thinking}
+                  disabled={!query.trim() || thinking || waiting}
                   aria-label="Ask"
                   className="shrink-0 font-mono text-[11px] tracking-[0.16em] text-[var(--text-faint)] transition-colors duration-200 enabled:hover:text-[var(--accent-electric)] disabled:opacity-40"
                 >
