@@ -17,8 +17,37 @@ const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
 /** The profile changes once per site deploy at most, so a warm instance keeps it. */
 const CONTEXT_TTL_MS = 10 * 60 * 1000;
 
+/**
+ * 4s for the profile plus 8s for each model is 20s at worst, inside the
+ * panel's 25s. Longer, and the panel would give up on an answer the backup
+ * model was about to return.
+ */
+const PROFILE_TIMEOUT_MS = 4000;
+const MODEL_TIMEOUT_MS = 8000;
+
 const MAX_QUESTION = 500;
 const MAX_TURNS = 4;
+
+/**
+ * Per IP, per warm instance. The free quota is shared by every visitor, and
+ * one script looping on this endpoint would otherwise spend it for the day.
+ * It cannot stop requests spread across instances or addresses, but those
+ * only cost the day's quota, after which the panel falls back to its reader.
+ */
+const LIMIT = 20;
+const LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const seen = new Map();
+
+function throttled(ip) {
+  const now = Date.now();
+  if (seen.size > 5000) seen.clear();
+  const entry = seen.get(ip);
+  if (!entry || now - entry.start > LIMIT_WINDOW_MS) {
+    seen.set(ip, { start: now, count: 1 });
+    return false;
+  }
+  return ++entry.count > LIMIT;
+}
 
 const CORS = {
   // Anyone can reach this with curl regardless, so an origin list would only
@@ -43,7 +72,9 @@ let cached = null;
 async function profile() {
   if (cached && Date.now() - cached.at < CONTEXT_TTL_MS) return cached.text;
   try {
-    const res = await fetch(CONTEXT_URL, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(CONTEXT_URL, {
+      signal: AbortSignal.timeout(PROFILE_TIMEOUT_MS),
+    });
     if (!res.ok) throw new Error(`profile fetch returned ${res.status}`);
     cached = { text: await res.text(), at: Date.now() };
   } catch (err) {
@@ -64,6 +95,10 @@ export function OPTIONS() {
 export async function POST(request) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return json({ error: "GEMINI_API_KEY is not set." }, 503);
+
+  // Vercel sets x-forwarded-for itself, so a client cannot pick its own.
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+  if (throttled(ip)) return json({ error: "Too many questions. Try again later." }, 429);
 
   let body;
   try {
@@ -117,7 +152,7 @@ export async function POST(request) {
           method: "POST",
           headers: { "Content-Type": "application/json", "x-goog-api-key": key },
           body: payload,
-          signal: AbortSignal.timeout(15000),
+          signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
         },
       );
       if (!res.ok) {
@@ -125,14 +160,17 @@ export async function POST(request) {
         continue;
       }
       const data = await res.json();
+      const candidate = data.candidates?.[0];
       // Thinking models can return their reasoning as parts flagged `thought`.
-      const answer = (data.candidates?.[0]?.content?.parts ?? [])
+      const answer = (candidate?.content?.parts ?? [])
         .filter((p) => !p.thought && typeof p.text === "string")
         .map((p) => p.text)
         .join("")
         .trim();
-      if (answer) return json({ answer, model });
-      console.error(`${model} returned no text, finishReason ${data.candidates?.[0]?.finishReason}`);
+      // Only a natural stop. A MAX_TOKENS cut leaves text that ends mid
+      // sentence, which would read as an answer and then go back as history.
+      if (answer && candidate.finishReason === "STOP") return json({ answer, model });
+      console.error(`${model} gave no usable answer, finishReason ${candidate?.finishReason}`);
     } catch (err) {
       console.error(`${model} failed:`, err.message);
     }
