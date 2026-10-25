@@ -40,8 +40,9 @@ const when = (t) =>
 
 const within = (items, days) => items.filter((e) => Date.now() - Date.parse(e.t) < days * DAY);
 
+/** Where a visit came from, which only its first page view knows. */
 const source = (v) =>
-  [v.src && `?ref=${v.src}`, v.ref].filter(Boolean).join(" via ") || "direct";
+  v.first ? [v.src && `?ref=${v.src}`, v.ref].filter(Boolean).join(" via ") || "direct" : null;
 
 const meta = (parts) =>
   `<div class="meta">${parts.filter(Boolean).map(esc).join(" · ")}</div>`;
@@ -54,7 +55,7 @@ function who(visits) {
     const row = byOrg.get(key) ?? { org: key, views: 0, ids: new Set(), last: v, from: new Set() };
     row.views++;
     if (v.id) row.ids.add(v.id);
-    row.from.add(source(v));
+    if (v.first) row.from.add(source(v));
     byOrg.set(key, row);
   }
   return [...byOrg.values()]
@@ -64,7 +65,7 @@ function who(visits) {
         `${r.ids.size} visitor${r.ids.size === 1 ? "" : "s"}`,
         `last ${when(r.last.t)}`,
         r.last.place,
-        `from ${[...r.from].join(", ")}`,
+        r.from.size && `from ${[...r.from].join(", ")}`,
       ])}</li>`,
     )
     .join("");
@@ -72,10 +73,12 @@ function who(visits) {
 
 function sources(visits) {
   const counts = new Map();
-  for (const v of visits) counts.set(source(v), (counts.get(source(v)) ?? 0) + 1);
+  for (const v of visits.filter((x) => x.first)) {
+    counts.set(source(v), (counts.get(source(v)) ?? 0) + 1);
+  }
   return [...counts]
     .sort((a, b) => b[1] - a[1])
-    .map(([s, n]) => `<li><b>${esc(s)}</b>${meta([`${n} view${n === 1 ? "" : "s"}`])}</li>`)
+    .map(([s, n]) => `<li><b>${esc(s)}</b>${meta([`${n} visit${n === 1 ? "" : "s"}`])}</li>`)
     .join("");
 }
 

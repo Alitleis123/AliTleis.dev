@@ -39,6 +39,8 @@ export async function POST(request) {
   await record(VISITS, {
     t: new Date().toISOString(),
     path,
+    // The page a visit arrived on. Only that view knows where it came from.
+    first: body.first === true,
     ref: from(body.ref),
     // ?ref= on a link Ali sent, so he can tell which one was opened.
     src: clip(body.src, 80),

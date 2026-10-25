@@ -79,6 +79,7 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
       new URL("visit", new URL(ASK_API, window.location.href)).href,
       JSON.stringify({
         path: pathname,
+        first: firstView,
         ref: firstView ? document.referrer : null,
         src: firstView ? (params.get("ref") ?? params.get("utm_source")) : null,
       }),
