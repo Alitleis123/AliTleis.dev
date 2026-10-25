@@ -115,10 +115,10 @@ export default function Projects() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-3">
                     {/* Links can't nest. The title stretches over the card
-                        (.card-link), and the store and repo icons sit above
-                        it. */}
+                        (.card-link), and the store and website icons sit
+                        above it. */}
                     <a
-                      href={p.demo ?? p.repo}
+                      href={p.repo ?? p.demo}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="card-link text-[15px] font-medium tracking-tight text-white"
@@ -138,19 +138,19 @@ export default function Projects() {
                           <FaChrome className="text-[14px]" />
                         </a>
                       ) : null}
-                      {p.demo && p.repo ? (
+                      {p.repo && p.demo ? (
                         <a
-                          href={p.repo}
+                          href={p.demo}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`${p.title} on GitHub`}
-                          title="GitHub"
+                          aria-label={`${p.title} website`}
+                          title="Website"
                           className="relative z-10 -m-1.5 p-1.5 text-white/45 transition-colors duration-200 group-hover:text-white"
                         >
-                          <FaGithub className="text-[14px]" />
+                          <FaArrowUpRightFromSquare className="text-[12px]" />
                         </a>
                       ) : null}
-                      {p.repo && !p.demo ? (
+                      {p.repo ? (
                         <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
                       ) : (
                         <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
