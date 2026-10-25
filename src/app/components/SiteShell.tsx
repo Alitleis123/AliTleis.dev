@@ -10,7 +10,13 @@ import NavBar from "./NavBar";
 import ResumeButton from "./ResumeButton";
 import ScrollToTop from "./ScrollToTop";
 import AmbientAudio from "./AmbientAudio";
-import CommandPalette from "./CommandPalette";
+import CommandPalette, { ASK_API } from "./CommandPalette";
+
+/** Where page views go, beside the Ask function. Both live in ask/. */
+const VISIT_API = new URL("visit", ASK_API).href;
+
+/** The referrer and ?ref= belong to the page load, so only its first view sends them. */
+let firstView = true;
 
 /**
  * The document chrome, which the studio does not want.
@@ -55,6 +61,30 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (entering) clearSwitchArrival();
   }, [entering, pathname]);
+
+  // Counts each page view for the log at ask/api/admin.js. Opening the site
+  // once with ?notrack stops counting this browser, so Ali's own visits stay
+  // out of it, and ?notrack=off counts it again.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    try {
+      const flag = params.get("notrack");
+      if (flag === "off") localStorage.removeItem("notrack");
+      else if (flag !== null) localStorage.setItem("notrack", "1");
+      if (localStorage.getItem("notrack")) return;
+    } catch {
+      // Storage is blocked, so there is no opt-out to read. Count the view.
+    }
+    navigator.sendBeacon?.(
+      VISIT_API,
+      JSON.stringify({
+        path: pathname,
+        ref: firstView ? document.referrer : null,
+        src: firstView ? (params.get("ref") ?? params.get("utm_source")) : null,
+      }),
+    );
+    firstView = false;
+  }, [pathname]);
   // Two routes bring their own frame. The suite is a full viewport
   // application, and the chooser is a single screen that would look absurd
   // under a nav offering to take you to the page you are choosing between.

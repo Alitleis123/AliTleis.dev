@@ -44,7 +44,7 @@ type Answer = { text: string; from: number | null };
  * The writer, a Vercel function that answers from the whole site with Gemini.
  * Source and setup are in ask/. The override exists for local previews.
  */
-const ASK_API =
+export const ASK_API =
   process.env.NEXT_PUBLIC_ASK_API || "https://alitleis-ask.vercel.app/api/ask";
 
 /** The function rejects longer questions, so the input stops there too. */
@@ -812,7 +812,7 @@ export default function CommandPalette() {
               >
                 {statusLabel}
               </span>
-              <span>Answers by Gemini</span>
+              <span>Answers by Gemini · Questions are saved</span>
             </div>
             </div>
           </motion.div>
