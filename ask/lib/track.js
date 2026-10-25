@@ -45,13 +45,20 @@ export async function record(list, entry) {
 /**
  * Lets a log write finish after the response has gone out. This is Vercel's
  * waitUntil, read from the global that @vercel/functions reads, without that
- * package's 25 dependencies. Where the global is missing, as outside Vercel,
- * the write is awaited instead, so an entry is never dropped for it.
+ * package's 25 dependencies. Where the global is missing or fails, as outside
+ * Vercel, the write is awaited instead, so an entry is never dropped for it.
+ *
+ * Never throws. ask.js calls it inside the model loop's try, where an error
+ * would read as a failed model and ask the next one again.
  */
 export async function later(promise) {
-  const waitUntil = globalThis[Symbol.for("@vercel/request-context")]?.get?.()?.waitUntil;
-  if (waitUntil) waitUntil(promise);
-  else await promise;
+  try {
+    const waitUntil = globalThis[Symbol.for("@vercel/request-context")]?.get?.()?.waitUntil;
+    if (waitUntil) return void waitUntil(promise);
+  } catch (err) {
+    console.error("waitUntil failed:", err.message);
+  }
+  await promise;
 }
 
 export async function recent(list) {
