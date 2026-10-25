@@ -12,9 +12,6 @@ import ScrollToTop from "./ScrollToTop";
 import AmbientAudio from "./AmbientAudio";
 import CommandPalette, { ASK_API } from "./CommandPalette";
 
-/** Where page views go, beside the Ask function. Both live in ask/. */
-const VISIT_API = new URL("visit", ASK_API).href;
-
 /** The referrer and ?ref= belong to the page load, so only its first view sends them. */
 let firstView = true;
 
@@ -67,16 +64,19 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   // out of it, and ?notrack=off counts it again.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    const flag = params.get("notrack");
     try {
-      const flag = params.get("notrack");
       if (flag === "off") localStorage.removeItem("notrack");
       else if (flag !== null) localStorage.setItem("notrack", "1");
       if (localStorage.getItem("notrack")) return;
     } catch {
-      // Storage is blocked, so there is no opt-out to read. Count the view.
+      // Storage is blocked, so only this URL's own ?notrack can opt out.
+      if (flag !== null && flag !== "off") return;
     }
+    // Beside the Ask function, both in ask/. Resolved against the page so a
+    // relative ASK_API override still works.
     navigator.sendBeacon?.(
-      VISIT_API,
+      new URL("visit", new URL(ASK_API, window.location.href)).href,
       JSON.stringify({
         path: pathname,
         ref: firstView ? document.referrer : null,

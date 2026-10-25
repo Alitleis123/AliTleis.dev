@@ -14,7 +14,7 @@
  * /api/admin, through lib/track.js.
  */
 
-import { ASKS, record, visitor } from "../lib/track.js";
+import { ASKS, later, record, visitor } from "../lib/track.js";
 
 const CONTEXT_URL = "https://alitleis.dev/ask-context.txt";
 const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
@@ -127,9 +127,10 @@ export async function POST(request) {
       { role: "model", parts: [{ text: t.a.slice(0, 2000) }] },
     ]);
 
-  // The network lookup runs while the model writes, so logging adds only the
-  // database write to the wait. `misses` keeps why each model before the
-  // answering one failed, which is how a spent quota shows up in the log.
+  // The network lookup runs while the model writes, and the log is written
+  // after the answer goes out, so logging adds nothing to the wait. `misses`
+  // keeps why each model before the answering one failed, which is how a spent
+  // quota shows up in the log.
   const started = Date.now();
   const who = visitor(request).catch(() => ({}));
   const misses = [];
@@ -149,7 +150,7 @@ export async function POST(request) {
     context = await profile();
   } catch (err) {
     console.error("Profile unavailable:", err.message);
-    await log({ error: "Profile unavailable" });
+    await later(log({ error: "Profile unavailable" }));
     return json({ error: "The profile could not be loaded." }, 503);
   }
 
@@ -195,7 +196,7 @@ export async function POST(request) {
       // Only a natural stop. A MAX_TOKENS cut leaves text that ends mid
       // sentence, which would read as an answer and then go back as history.
       if (answer && candidate.finishReason === "STOP") {
-        await log({ a: answer, model });
+        await later(log({ a: answer, model }));
         return json({ answer, model });
       }
       console.error(`${model} gave no usable answer, finishReason ${candidate?.finishReason}`);
@@ -206,6 +207,6 @@ export async function POST(request) {
     }
   }
 
-  await log({ error: "No model could answer" });
+  await later(log({ error: "No model could answer" }));
   return json({ error: "No model could answer right now." }, 502);
 }

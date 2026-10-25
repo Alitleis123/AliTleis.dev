@@ -42,6 +42,18 @@ export async function record(list, entry) {
   }
 }
 
+/**
+ * Lets a log write finish after the response has gone out. This is Vercel's
+ * waitUntil, read from the global that @vercel/functions reads, without that
+ * package's 25 dependencies. Where the global is missing, as outside Vercel,
+ * the write is awaited instead, so an entry is never dropped for it.
+ */
+export async function later(promise) {
+  const waitUntil = globalThis[Symbol.for("@vercel/request-context")]?.get?.()?.waitUntil;
+  if (waitUntil) waitUntil(promise);
+  else await promise;
+}
+
 export async function recent(list) {
   const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
   return items.flatMap((item) => {
@@ -56,6 +68,36 @@ export async function recent(list) {
 /** Crawlers and headless checks, which would otherwise read as visitors. */
 export const isBot = (ua) =>
   !ua || /bot|crawl|spider|slurp|headless|lighthouse|preview|curl|python/i.test(ua);
+
+/** Vercel sets x-forwarded-for itself, so a client cannot pick its own. */
+export const address = (request) =>
+  request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "";
+
+/**
+ * Per address, per warm instance, the same kind of limit the Ask function
+ * keeps. Requests spread across instances or addresses get past it, but one
+ * script on one machine can no longer push real visits out of the capped list
+ * or spend the day's lookups.
+ */
+export function limiter(limit, windowMs) {
+  const seen = new Map();
+  return (key) => {
+    const now = Date.now();
+    if (seen.size > 5000) seen.clear();
+    const entry = seen.get(key);
+    if (!entry || now - entry.start > windowMs) {
+      seen.set(key, { start: now, count: 1 });
+      return false;
+    }
+    return ++entry.count > limit;
+  };
+}
+
+/**
+ * Text fields only, from either response shape. The keyless tier answers flat,
+ * the documented one nests them under company and location.
+ */
+const text = (v) => (typeof v === "string" && v ? v.slice(0, 120) : null);
 
 /**
  * Who an address belongs to. Vercel's headers already carry the city, but not
@@ -72,7 +114,15 @@ async function lookup(ip) {
     const res = await fetch(`https://api.ipapi.is/?q=${encodeURIComponent(ip)}`, {
       signal: AbortSignal.timeout(2500),
     });
-    if (res.ok) found = await res.json();
+    if (res.ok) {
+      const d = await res.json();
+      found = {
+        company: text(d.company) ?? text(d.company?.name),
+        city: text(d.city) ?? text(d.location?.city),
+        region: text(d.region) ?? text(d.location?.state),
+        country: text(d.country) ?? text(d.location?.country),
+      };
+    }
   } catch (err) {
     console.error("Network lookup failed:", err.message);
   }
@@ -111,8 +161,7 @@ function device(ua) {
  */
 export async function visitor(request) {
   const h = request.headers;
-  // Vercel sets x-forwarded-for itself, so a client cannot pick its own.
-  const ip = h.get("x-forwarded-for")?.split(",")[0].trim() || "";
+  const ip = address(request);
   const ua = h.get("user-agent") || "";
   const net = ip ? await lookup(ip) : null;
   const city = h.get("x-vercel-ip-city");
@@ -125,7 +174,7 @@ export async function visitor(request) {
     id: ip
       ? createHash("sha256").update(`${DB_TOKEN}|${ip}|${ua}`).digest("hex").slice(0, 8)
       : null,
-    org: net?.company || null,
+    org: net?.company ?? null,
     place: place.length ? place.join(", ") : null,
     device: device(ua),
   };

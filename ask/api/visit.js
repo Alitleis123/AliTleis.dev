@@ -4,9 +4,12 @@
  * A beacon posts as text/plain, which skips the CORS preflight and never
  * reads the response, so this answers 204 whatever happens.
  */
-import { VISITS, isBot, record, visitor } from "../lib/track.js";
+import { VISITS, address, isBot, limiter, record, visitor } from "../lib/track.js";
 
 const done = () => new Response(null, { status: 204 });
+
+/** A reader moving through the site sends a few views, not dozens. */
+const throttled = limiter(30, 10 * 60 * 1000);
 
 const clip = (v, max) => (typeof v === "string" && v ? v.slice(0, max) : null);
 
@@ -22,6 +25,7 @@ function from(referrer) {
 
 export async function POST(request) {
   if (isBot(request.headers.get("user-agent"))) return done();
+  if (throttled(address(request) || "unknown")) return done();
 
   let body;
   try {
