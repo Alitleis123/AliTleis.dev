@@ -315,7 +315,7 @@ function OtherWorkList({ className }: { className: string }) {
       {otherWork.map((item) => (
         <a
           key={item.id}
-          href={item.repo ?? item.demo ?? "#"}
+          href={item.demo ?? item.repo ?? "#"}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 border-b border-[var(--st-line)] px-3 py-2 transition-colors duration-150 hover:bg-[var(--st-hover)]"
@@ -328,7 +328,7 @@ function OtherWorkList({ className }: { className: string }) {
               {[item.range, item.tech?.[0]].filter(Boolean).join(" · ")}
             </span>
           </span>
-          {item.repo ? (
+          {item.repo && !item.demo ? (
             <LuGithub
               aria-hidden
               className="shrink-0 text-[13px] text-[var(--st-faint)]"

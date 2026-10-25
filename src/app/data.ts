@@ -470,6 +470,7 @@ export const otherWork: Project[] = [
     bullets: [],
     tech: ["Next.js", "React", "TypeScript", "Express", "MongoDB Atlas", "Azure Blob Storage"],
     demo: "https://topchoicerealtyny.com/",
+    repo: "https://github.com/whoisaldo/topchoicerealty",
     iconKey: "home",
   },
   {
