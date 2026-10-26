@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { withBasePath } from "../data";
 import { scrollBehavior } from "../lib/animations";
 import { useFocusTrap } from "../lib/useFocusTrap";
+import { ASK_API } from "../lib/askApi";
 
 type Doc = {
   id: string;
@@ -39,13 +40,6 @@ type Hit = { doc: Doc; score: number; snippet: string };
  * the answer from the whole site instead.
  */
 type Answer = { text: string; from: number | null };
-
-/**
- * The writer, a Vercel function that answers from the whole site with Gemini.
- * Source and setup are in ask/. The override exists for local previews.
- */
-export const ASK_API =
-  process.env.NEXT_PUBLIC_ASK_API || "https://alitleis-ask.vercel.app/api/ask";
 
 /** The function rejects longer questions, so the input stops there too. */
 const MAX_QUESTION = 500;

@@ -11,7 +11,7 @@
  * dead backend costs answer quality rather than the whole feature.
  *
  * Every question that reaches a model is logged with its outcome for
- * /api/admin, through lib/track.js.
+ * the control panel, through lib/track.js.
  */
 
 import { ASKS, later, record, visitor } from "../lib/track.js";
