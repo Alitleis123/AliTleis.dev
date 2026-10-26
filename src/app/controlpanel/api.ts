@@ -11,15 +11,19 @@ import type { PanelData } from "./model";
 
 const TOKEN = "cp-session";
 
-/** Where the session lives when storage is blocked, for this tab only. */
+/**
+ * This tab's session, ahead of storage. When storage reads but will not save,
+ * a stale token left in it must not win over the one just issued.
+ */
 let memory: string | null = null;
 
 export const token = {
   get: () => {
+    if (memory) return memory;
     try {
-      return localStorage.getItem(TOKEN) ?? memory;
+      return localStorage.getItem(TOKEN);
     } catch {
-      return memory;
+      return null;
     }
   },
   set: (value: string) => {

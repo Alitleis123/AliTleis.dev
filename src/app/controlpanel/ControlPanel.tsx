@@ -62,9 +62,17 @@ const back = (t?: string) => (t ? new Date(Date.parse(t) - OVERLAP_MS).toISOStri
 const KEEP = 3000;
 
 function merge(prev: PanelData, next: PanelData): PanelData {
+  // A poll reads in pages, and an entry logged between two pages shows up on
+  // both, so the fresh entries are checked against each other as well.
   const join = <T extends { t: string }>(fresh: T[], held: T[]) => {
-    const seen = new Set(held.map((e) => JSON.stringify(e)));
-    return [...fresh.filter((e) => !seen.has(JSON.stringify(e))), ...held]
+    const seen = new Set<string>();
+    return [...fresh, ...held]
+      .filter((e) => {
+        const key = JSON.stringify(e);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
       .sort((a, b) => b.t.localeCompare(a.t))
       .slice(0, KEEP);
   };
