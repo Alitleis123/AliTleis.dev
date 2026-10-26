@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { LuArrowLeft, LuKeyRound, LuScanFace } from "react-icons/lu";
+import { LuKeyRound, LuScanFace } from "react-icons/lu";
 import { enroll, passkeysWork, unlock, why } from "./api";
 
 /**
@@ -50,13 +49,7 @@ export default function Lock({
   return (
     <div className="st-root st-hatch flex min-h-[100dvh] flex-col bg-[var(--st-stage)] text-[var(--st-text)]">
       <header className="flex shrink-0 items-center gap-2.5 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2.5">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[12px] text-[var(--st-faint)] transition-colors hover:text-[var(--st-text)]"
-        >
-          <LuArrowLeft aria-hidden /> alitleis.dev
-        </Link>
-        <span className="cp-rec ml-2" />
+        <span className="cp-rec" />
         <span className="st-tc text-[var(--st-faint)]">controlpanel.aep</span>
         <span className="st-tc ml-auto text-[var(--st-faint)]">00:00:00:00</span>
       </header>
