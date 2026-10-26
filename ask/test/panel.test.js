@@ -40,7 +40,7 @@ globalThis.fetch = async (url, init) => {
       case "HGETALL": return { result: [...h()].flat() };
       case "LPUSH": { const l = store.get(key) ?? []; l.unshift(args[0]); store.set(key, l); return { result: l.length }; }
       case "LTRIM": return { result: "OK" };
-      case "LRANGE": return { result: store.get(key) ?? [] };
+      case "LRANGE": return { result: (store.get(key) ?? []).slice(args[0], args[1] + 1) };
       default: throw new Error(`fake Redis has no ${cmd}`);
     }
   });
@@ -329,6 +329,24 @@ test("CORS answers the panel's origin and nobody else's", async () => {
 
   const res = await authCall({ action: "status" }, { origin: "https://evil.test" });
   assert.equal(res.headers.get("access-control-allow-origin"), null);
+});
+
+test("a poll with a time gets only what came after it, across pages", async () => {
+  const { token } = await enrollFirst();
+  // 250 views a second apart, oldest pushed first, so the list is newest first.
+  const t0 = Date.parse("2026-10-01T00:00:00.000Z");
+  store.set("dev:visits", []);
+  for (let i = 0; i < 250; i++) {
+    store.get("dev:visits").unshift(JSON.stringify({ t: new Date(t0 + i * 1000).toISOString(), path: `/${i}` }));
+  }
+  const all = await call(panel.GET, "/api/panel", { method: "GET", token });
+  assert.equal(all.body.visits.length, 250);
+
+  const since = new Date(t0 + 99 * 1000).toISOString();
+  const res = await call(panel.GET, `/api/panel?visits=${encodeURIComponent(since)}&asks=`, { method: "GET", token });
+  assert.equal(res.body.visits.length, 150);
+  assert.equal(res.body.visits.at(-1).path, "/100");
+  assert.deepEqual(res.body.asks, []);
 });
 
 // ── Visits ──────────────────────────────────────────────────────────────────

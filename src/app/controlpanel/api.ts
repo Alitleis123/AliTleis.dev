@@ -48,7 +48,7 @@ async function call<T>(name: string, init: RequestInit = {}): Promise<T> {
     cache: "no-store",
   });
   const body = await res.json().catch(() => ({}));
-  if (res.status === 401 && name === "panel") throw new SignedOut();
+  if (res.status === 401 && name.startsWith("panel")) throw new SignedOut();
   if (!res.ok) throw new Error(body.error || `The panel's API answered ${res.status}.`);
   return body as T;
 }
@@ -60,7 +60,9 @@ export const status = () => auth<{ enrolled: boolean; signedIn: boolean }>("stat
 export const lock = () => auth("lock").finally(token.clear);
 export const pair = () => auth<{ code: string; expires: number }>("pair");
 
-export const load = () => call<PanelData>("panel");
+/** The whole log, or with `since` only what came after those times. */
+export const load = (since?: { visits: string; asks: string }) =>
+  call<PanelData>(since ? `panel?${new URLSearchParams(since)}` : "panel");
 export const edit = <T = { ok: true }>(body: object) =>
   call<T>("panel", { method: "POST", body: JSON.stringify(body) });
 

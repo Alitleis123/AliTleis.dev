@@ -3,11 +3,12 @@
  * whole log with Ali's notes on it, and POST changes those notes: a name for a
  * visitor, a named link to send someone, a device to forget.
  *
- * The page at alitleis.dev/controlpanel does all the counting. The lists are
- * capped at 3,000 entries each, which is small enough to send whole.
+ * The page at alitleis.dev/controlpanel does all the counting. It loads the
+ * whole log once, up to 3,000 entries a list, and then polls with ?visits=
+ * and ?asks= set to the newest time it holds, for what came after.
  */
 import { randomBytes } from "node:crypto";
-import { ASKS, LABELS, LINKS, VISITS, hash, idOf, must, recent } from "../lib/track.js";
+import { ASKS, LABELS, LINKS, VISITS, hash, idOf, must, newer, recent } from "../lib/track.js";
 import { forget, passkeys, preflight, reply, signedIn } from "../lib/owner.js";
 
 export const OPTIONS = preflight;
@@ -27,9 +28,12 @@ export async function GET(request) {
   try {
     const device = await signedIn(request);
     if (!device) return reply(request, { error: "Signed out." }, 401);
+    const q = new URL(request.url).searchParams;
+    // Present but empty means the panel holds none yet, so everything is newer.
+    const read = (list, key) => (q.has(key) ? newer(list, q.get(key)) : recent(list));
     const [visits, asks, labels, links, keys] = await Promise.all([
-      recent(VISITS),
-      recent(ASKS),
+      read(VISITS, "visits"),
+      read(ASKS, "asks"),
       hash(LABELS),
       hash(LINKS),
       passkeys(),

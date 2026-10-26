@@ -50,6 +50,26 @@ const COMPS: { id: CompId; name: string; icon: IconType }[] = [
 /** Often enough to watch someone move through the site, rare enough for the free tier. */
 const POLL_MS = 20_000;
 
+/**
+ * A poll asks for entries newer than the newest held, less a minute. Ask
+ * entries are written when the answer is done but stamped when the question
+ * came in, so a slow answer can land in the list behind a quicker, later one.
+ * The overlap catches it, and the merge drops what is already there.
+ */
+const OVERLAP_MS = 60_000;
+const back = (t?: string) => (t ? new Date(Date.parse(t) - OVERLAP_MS).toISOString() : "");
+const KEEP = 3000;
+
+function merge(prev: PanelData, next: PanelData): PanelData {
+  const join = <T extends { t: string }>(fresh: T[], held: T[]) => {
+    const seen = new Set(held.map((e) => JSON.stringify(e)));
+    return [...fresh.filter((e) => !seen.has(JSON.stringify(e))), ...held]
+      .sort((a, b) => b.t.localeCompare(a.t))
+      .slice(0, KEEP);
+  };
+  return { ...next, visits: join(next.visits, prev.visits), asks: join(next.asks, prev.asks) };
+}
+
 /** The inspector docks at lg and is a sheet below it, so only one is mounted. */
 const subscribeWide = (cb: () => void) => {
   const mq = window.matchMedia("(min-width: 1024px)");
@@ -77,11 +97,16 @@ export default function ControlPanel() {
   const [query, setQuery] = useState("");
   const wide = useWide();
   const sheetRef = useRef<HTMLDivElement>(null);
+  // What the last poll left, for the next one to build on.
+  const held = useRef<PanelData | null>(null);
 
   const refresh = useCallback(async () => {
     setSyncing(true);
     try {
-      const d = await load();
+      const prev = held.current;
+      const fresh = await load(prev ? { visits: back(prev.visits[0]?.t), asks: back(prev.asks[0]?.t) } : undefined);
+      const d = prev ? merge(prev, fresh) : fresh;
+      held.current = d;
       setData(d);
       setNow(Date.now());
       setError(null);
@@ -92,6 +117,7 @@ export default function ControlPanel() {
     } catch (err) {
       if (err instanceof SignedOut) {
         token.clear();
+        held.current = null;
         setData(null);
         setPhase("locked");
       } else {
@@ -141,6 +167,7 @@ export default function ControlPanel() {
 
   const signOut = useCallback(async () => {
     await lock().catch(() => {});
+    held.current = null;
     setData(null);
     setSelected(null);
     setPhase("locked");

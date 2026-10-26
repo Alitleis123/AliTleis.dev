@@ -89,15 +89,37 @@ export async function hash(key) {
   return out;
 }
 
-export async function recent(list) {
-  const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
-  return items.flatMap((item) => {
+const parsed = (items) =>
+  items.flatMap((item) => {
     try {
       return [JSON.parse(item)];
     } catch {
       return [];
     }
   });
+
+export async function recent(list) {
+  const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
+  return parsed(items);
+}
+
+/**
+ * Entries logged after `since`, read from the head of the list a page at a
+ * time. The panel polls with this, so a poll moves a few new entries out of
+ * Upstash rather than the whole log, which on the free plan's 10GB a month
+ * would run out after a few days of leaving the panel open.
+ */
+export async function newer(list, since) {
+  const out = [];
+  for (let start = 0; start < KEEP; start += 100) {
+    const [items] = await must([["LRANGE", list, start, start + 99]]);
+    for (const entry of parsed(items)) {
+      if (entry.t <= since) return out;
+      out.push(entry);
+    }
+    if (items.length < 100) break;
+  }
+  return out;
 }
 
 /** Crawlers and headless checks, which would otherwise read as visitors. */
