@@ -144,7 +144,6 @@ export default function Overview({
       <div className="overflow-hidden rounded-[4px] border border-[var(--st-line)] md:hidden">
         <Timeline
           people={people}
-          everyone={everyone}
           range={range}
           selected={selected}
           onSelect={onSelect}

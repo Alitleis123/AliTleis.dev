@@ -1281,6 +1281,16 @@ section {
    light, and form controls sized for reading rather than for chrome.
    ─────────────────────────────────────────────────────────────── */
 
+/* The panel is read rather than edited, so its labels run a size up and a
+   step brighter than the suite's 10px chrome. */
+.cp-root {
+  --st-faint: rgba(244, 244, 241, 0.62);
+}
+
+.cp-root .st-label {
+  font-size: 11px;
+}
+
 /* A level meter, segmented like the ones on an audio track. The fill uses
    the same stripe as the trough, so its segments sit on the trough's. */
 .cp-meter {

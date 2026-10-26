@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { IconType } from "react-icons";
 import {
+  LuChevronDown,
   LuLayoutDashboard,
   LuLink,
   LuLock,
@@ -47,6 +48,9 @@ const COMPS: { id: CompId; name: string; icon: IconType }[] = [
   { id: "links", name: "Links", icon: LuLink },
   { id: "devices", name: "Devices", icon: LuShieldCheck },
 ];
+
+/** Layers the docked timeline shows, so it stays a strip under the viewer. */
+const TRACKS = 4;
 
 /** Often enough to watch someone move through the site, rare enough for the free tier. */
 const POLL_MS = 20_000;
@@ -104,6 +108,14 @@ export default function ControlPanel() {
   const [rangeId, setRangeId] = useState<RangeId>("7d");
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  // Folded or open, kept per browser like a panel in the suite.
+  const [timeline, setTimeline] = useState(() => {
+    try {
+      return localStorage.getItem("cp-timeline") !== "closed";
+    } catch {
+      return true;
+    }
+  });
   const wide = useWide();
   const sheetRef = useRef<HTMLDivElement>(null);
   // What the last poll left, for the next one to build on.
@@ -274,7 +286,7 @@ export default function ControlPanel() {
   );
 
   return (
-    <div className="st-root flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)] text-[var(--st-text)]">
+    <div className="st-root cp-root flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)] text-[var(--st-text)]">
       {/* The top bar: the file, who is on air, the range and the session. */}
       <header className="flex shrink-0 items-center gap-2.5 border-b border-[var(--st-line)] px-3 py-2">
         <BackToChooser />
@@ -395,15 +407,15 @@ export default function ControlPanel() {
             })}
           </nav>
           <div className="shrink-0 border-t border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2.5">
+            {/* The footage the project is cut from: this site's visits. */}
             {[
+              ["File", "controlpanel.aep"],
+              ["Media", "alitleis.dev"],
               ["Range", `${day(range.start)} – ${day(range.end)}`],
-              ["Synced", clock(now)],
-              ["Polling", `${POLL_MS / 1000}s`],
-              ["Keys", "1–5 · R · Esc"],
             ].map(([k, v]) => (
               <div key={k} className="flex items-baseline gap-2 py-[3px]">
                 <span className="st-label shrink-0">{k}</span>
-                <span className="st-tc ml-auto text-[10px] text-[var(--st-dim)]">{v}</span>
+                <span className="st-tc ml-auto text-[var(--st-text)]">{v}</span>
               </div>
             ))}
           </div>
@@ -461,20 +473,32 @@ export default function ControlPanel() {
         )}
       </div>
 
-      <div className="hidden max-h-[38vh] shrink-0 flex-col border-t border-[var(--st-line)] md:flex">
+      <div className="hidden shrink-0 flex-col border-t border-[var(--st-line)] md:flex">
         <PanelHead label="Timeline · Sessions">
-          <span className="ml-auto flex items-center gap-3">
-            <span className="flex items-center gap-1.5 text-[11px] text-[var(--st-faint)]">
-              <span className="h-2.5 w-3.5 rounded-[2px] border border-[var(--st-sel-line)] bg-[var(--st-clip-on)]" /> Named
+          <span className="ml-auto flex items-center gap-3 text-[12px] text-[var(--st-faint)]">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rotate-45 rounded-[1px] bg-[var(--st-accent)]" /> one visit
             </span>
-            <span className="flex items-center gap-1.5 text-[11px] text-[var(--st-faint)]">
-              <span className="h-2.5 w-3.5 rounded-[2px] border border-[var(--st-line-strong)] bg-[var(--st-clip)]" /> Unnamed
-            </span>
+            {people.length > TRACKS && <span>{TRACKS} of {people.length} visitors</span>}
+            <button
+              type="button"
+              aria-expanded={timeline}
+              onClick={() => {
+                setTimeline(!timeline);
+                try {
+                  localStorage.setItem("cp-timeline", timeline ? "closed" : "open");
+                } catch {
+                  // Storage is blocked, so the choice lasts until the page reloads.
+                }
+              }}
+              className="cp-btn h-6! px-2!"
+            >
+              {timeline ? "Hide" : "Show"}
+              <LuChevronDown aria-hidden className={timeline ? "rotate-180" : ""} />
+            </button>
           </span>
         </PanelHead>
-        <div className="min-h-0 overflow-y-auto">
-          <Timeline people={people} everyone={everyone} range={range} selected={selected} onSelect={select} tracks={8} />
-        </div>
+        {timeline && <Timeline people={people} range={range} selected={selected} onSelect={select} tracks={TRACKS} />}
       </div>
 
       {!wide && sel && (
