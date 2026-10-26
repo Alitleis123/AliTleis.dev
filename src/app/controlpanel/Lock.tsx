@@ -6,8 +6,9 @@ import { LuArrowLeft, LuKeyRound, LuScanFace } from "react-icons/lu";
 import { enroll, passkeysWork, unlock, why } from "./api";
 
 /**
- * What anyone but Ali sees: the frame an editor shows for footage it cannot
- * find. Nothing from the log is on this page or in its bundle. The data only
+ * What anyone but Ali sees: the viewer an editor shows for footage it cannot
+ * find, with the file's title bar across the top and no frame around it.
+ * Nothing from the log is on this page or in its bundle. The data only
  * leaves the API for a session a passkey started.
  *
  * Three ways through. Unlock is the everyday one. Pairing is how a new device
@@ -47,33 +48,32 @@ export default function Lock({
   };
 
   return (
-    <div className="st-root st-hatch relative flex min-h-[100dvh] flex-col items-center justify-center bg-[var(--st-stage)] px-5 py-10 text-[var(--st-text)]">
-      <Link
-        href="/"
-        className="absolute left-4 top-4 inline-flex items-center gap-1.5 text-[12px] text-[var(--st-faint)] transition-colors hover:text-[var(--st-text)]"
-      >
-        <LuArrowLeft aria-hidden /> alitleis.dev
-      </Link>
+    <div className="st-root st-hatch flex min-h-[100dvh] flex-col bg-[var(--st-stage)] text-[var(--st-text)]">
+      <header className="flex shrink-0 items-center gap-2.5 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2.5">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-[12px] text-[var(--st-faint)] transition-colors hover:text-[var(--st-text)]"
+        >
+          <LuArrowLeft aria-hidden /> alitleis.dev
+        </Link>
+        <span className="cp-rec ml-2" />
+        <span className="st-tc text-[var(--st-faint)]">controlpanel.aep</span>
+        <span className="st-tc ml-auto text-[var(--st-faint)]">00:00:00:00</span>
+      </header>
 
-      <div className="w-full max-w-[380px] overflow-hidden rounded-[6px] border border-[var(--st-line-strong)] bg-[var(--st-panel)] shadow-[0_30px_80px_rgba(0,0,0,0.6)]">
-        <div className="flex items-center gap-2 border-b border-[var(--st-line)] bg-[var(--st-panel-hi)] px-3 py-2">
-          <span className="cp-rec" />
-          <span className="st-tc text-[var(--st-faint)]">controlpanel.aep</span>
-          <span className="st-tc ml-auto text-[var(--st-faint)]">00:00:00:00</span>
-        </div>
-
-        <div className="px-6 pb-6 pt-7">
+      <main className="flex flex-1 items-center justify-center px-5 py-10">
+        <div className="w-full max-w-[380px]">
           <p className="st-eyebrow">Media offline</p>
-          <h1 className="mt-3 text-[26px] font-light leading-[1.1] tracking-[-0.03em]">
+          <h1 className="mt-3 text-[40px] font-semibold leading-[1.05] tracking-[-0.035em]">
             {mode === "setup" ? "Set up the first device" : mode === "pair" ? "Pair this device" : "Locked"}
           </h1>
-          <p className="st-body mt-3 text-[13.5px]! leading-[1.6]! text-[var(--st-dim)]">
-            {mode === "setup"
-              ? "Enter the admin password once. This device then makes a passkey, and the password stops working for good."
-              : mode === "pair"
-                ? "On a signed-in device, open Devices and tap Pair a device. Type the code it shows here."
-                : "Only Ali's devices open this panel."}
-          </p>
+          {mode !== "unlock" && (
+            <p className="st-body mt-3 text-[13.5px]! leading-[1.6]! text-[var(--st-dim)]">
+              {mode === "setup"
+                ? "Enter the admin password once. This device then makes a passkey, and the password stops working for good."
+                : "On a signed-in device, open Devices and tap Pair a device. Type the code it shows here."}
+            </p>
+          )}
 
           {!works ? (
             <p className="mt-5 rounded-[3px] border border-[#ff5a4f]/35 bg-[#ff5a4f]/10 px-3 py-2.5 text-[12.5px] text-[#ff8a80]">
@@ -131,7 +131,7 @@ export default function Lock({
             </button>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
