@@ -48,11 +48,13 @@ export async function POST(request) {
           signedIn: Boolean(await signedIn(request)),
         });
 
-      case "enroll-options":
-        if (!(await mayEnroll(request, body))) {
+      case "enroll-options": {
+        const kind = await mayEnroll(request, body);
+        if (!kind) {
           return reply(request, { error: body.code ? "That code did not work." : "Wrong password." }, 403);
         }
-        return reply(request, await enrollOptions());
+        return reply(request, await enrollOptions(kind));
+      }
 
       case "enroll": {
         const token = await enroll(body.credential, body.name);

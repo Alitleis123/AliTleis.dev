@@ -55,11 +55,25 @@ const ALGS = { "-7": "ec", "-8": "ed25519", "-257": "rsa" };
 /** Every stored passkey, keyed by credential id. */
 export const passkeys = () => hash(PASSKEYS);
 
+/**
+ * Writes that depend on what the hash holds, run inside Redis so a second
+ * request cannot slip in between the check and the write. Each returns -1
+ * when its condition fails.
+ */
+// Rewrites a passkey only if it still holds exactly what was read, so a
+// sign-in cannot bring back a device forgotten while it was signing in.
+const SWAP = `if redis.call("HGET", KEYS[1], ARGV[1]) == ARGV[2] then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[3]) end return -1`;
+// Stores the first passkey only while there is none.
+const FIRST = `if redis.call("HLEN", KEYS[1]) == 0 then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) end return -1`;
+// Forgets a passkey only while another is left.
+const DROP = `if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
+
 // ── Challenges ───────────────────────────────────────────────────────────────
 
 /**
  * Random, single use and short lived, so a signature over one cannot be
- * replayed. `kind` keeps an enrollment challenge from being spent on a sign-in.
+ * replayed. `kind` keeps an enrollment challenge from being spent on a sign-in,
+ * and marks one the password granted, which may only add the first passkey.
  */
 async function challenge(kind) {
   const c = b64(randomBytes(32));
@@ -69,20 +83,20 @@ async function challenge(kind) {
 
 /**
  * Checks what the browser says it signed: the right ceremony, on the panel's
- * own origin, over a challenge this issued for that purpose. The challenge is
- * spent whatever the outcome.
+ * own origin, over a challenge this issued. Returns the kind it was issued
+ * for, or null. The challenge is spent whatever the outcome.
  */
-async function client(json, type, kind) {
+async function client(json, type) {
   let data;
   try {
     data = JSON.parse(unb64(json).toString("utf8"));
   } catch {
-    return false;
+    return null;
   }
-  if (data?.type !== type || data.origin !== ORIGIN) return false;
-  if (typeof data.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return false;
-  const [stored] = await must([["GETDEL", `${NS}challenge:${data.challenge}`]]);
-  return stored === kind;
+  if (data?.type !== type || data.origin !== ORIGIN) return null;
+  if (typeof data.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return null;
+  const [kind] = await must([["GETDEL", `${NS}challenge:${data.challenge}`]]);
+  return kind ?? null;
 }
 
 /**
@@ -99,21 +113,22 @@ function authenticator(data) {
 // ── Enrolling ────────────────────────────────────────────────────────────────
 
 /**
- * Whether this request may add a passkey: from a signed-in device, with a
- * pairing code one made, or with the password while there are none at all.
+ * Whether this request may add a passkey, as the kind of challenge to issue:
+ * "enroll" from a signed-in device or with a pairing code one made, "first"
+ * with the password while there are none at all, null otherwise.
  */
 export async function mayEnroll(request, { password, code } = {}) {
-  if (await signedIn(request)) return true;
-  if (code) return redeemPair(code);
-  if (typeof password !== "string" || !password || !process.env.ADMIN_PASSWORD) return false;
+  if (await signedIn(request)) return "enroll";
+  if (code) return (await redeemPair(code)) ? "enroll" : null;
+  if (typeof password !== "string" || !password || !process.env.ADMIN_PASSWORD) return null;
   const [count] = await must([["HLEN", PASSKEYS]]);
-  return count === 0 && same(password, process.env.ADMIN_PASSWORD);
+  return count === 0 && same(password, process.env.ADMIN_PASSWORD) ? "first" : null;
 }
 
-export async function enrollOptions() {
+export async function enrollOptions(kind) {
   const keys = await passkeys();
   return {
-    challenge: await challenge("enroll"),
+    challenge: await challenge(kind),
     rp: { id: RP_ID, name: "Ali Tleis control panel" },
     user: { id: b64("ali"), name: "ali", displayName: "Ali Tleis" },
     pubKeyCredParams: Object.keys(ALGS).map((alg) => ({ type: "public-key", alg: Number(alg) })),
@@ -130,7 +145,8 @@ const TRANSPORTS = new Set(["ble", "hybrid", "internal", "nfc", "usb"]);
 
 /** Stores a new passkey from the browser's answer and signs that device in. */
 export async function enroll(cred, name) {
-  if (!(await client(cred?.clientDataJSON, "webauthn.create", "enroll"))) return null;
+  const kind = await client(cred?.clientDataJSON, "webauthn.create");
+  if (kind !== "enroll" && kind !== "first") return null;
 
   const data = unb64(cred.authenticatorData);
   const auth = authenticator(data);
@@ -153,22 +169,21 @@ export async function enroll(cred, name) {
   const transports = (Array.isArray(cred.transports) ? cred.transports : []).filter((t) =>
     TRANSPORTS.has(t),
   );
-  await must([
-    [
-      "HSET",
-      PASSKEYS,
-      b64(id),
-      JSON.stringify({
-        key: b64(key.export({ format: "der", type: "spki" })),
-        alg: Number(cred.alg),
-        name: typeof name === "string" && name.trim() ? name.trim().slice(0, 60) : "Device",
-        transports,
-        count: auth.count,
-        t: new Date().toISOString(),
-        used: new Date().toISOString(),
-      }),
-    ],
+  const record = JSON.stringify({
+    key: b64(key.export({ format: "der", type: "spki" })),
+    alg: Number(cred.alg),
+    name: typeof name === "string" && name.trim() ? name.trim().slice(0, 60) : "Device",
+    transports,
+    count: auth.count,
+    t: new Date().toISOString(),
+    used: new Date().toISOString(),
+  });
+  // Two challenges the password granted while the hash was empty must not
+  // both add a device. The second one finds the first already there.
+  const [stored] = await must([
+    kind === "first" ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record] : ["HSET", PASSKEYS, b64(id), record],
   ]);
+  if (stored === -1) return null;
   return startSession(b64(id));
 }
 
@@ -191,10 +206,11 @@ export async function signInOptions() {
 
 /** Checks a signature from a stored passkey, and starts a session if it holds. */
 export async function signIn(cred) {
-  if (!(await client(cred?.clientDataJSON, "webauthn.get", "sign-in"))) return null;
+  if ((await client(cred?.clientDataJSON, "webauthn.get")) !== "sign-in") return null;
   const id = b64(unb64(cred.id));
-  const pk = (await passkeys())[id];
-  if (!pk) return null;
+  const [raw] = await must([["HGET", PASSKEYS, id]]);
+  if (!raw) return null;
+  const pk = JSON.parse(raw);
 
   const data = unb64(cred.authenticatorData);
   const auth = authenticator(data);
@@ -213,13 +229,15 @@ export async function signIn(cred) {
   }
   if (!good) return null;
 
-  // A counter that went backwards means the key was copied off its device.
-  // Passkeys that sync between devices report 0 every time, which passes.
-  if (auth.count && auth.count <= (pk.count ?? 0)) return null;
+  // A counter that did not go up means the key was copied off its device.
+  // Passkeys that sync between devices report 0 every time, which passes,
+  // but one that has counted before may not drop back to 0.
+  if ((auth.count || pk.count) && auth.count <= (pk.count ?? 0)) return null;
 
-  await must([
-    ["HSET", PASSKEYS, id, JSON.stringify({ ...pk, count: auth.count, used: new Date().toISOString() })],
+  const [swapped] = await must([
+    ["EVAL", SWAP, 1, PASSKEYS, id, raw, JSON.stringify({ ...pk, count: auth.count, used: new Date().toISOString() })],
   ]);
+  if (swapped === -1) return null;
   return startSession(id);
 }
 
@@ -256,9 +274,7 @@ export async function endSession(request) {
 
 /** Forgets a device, unless it is the last one, which would reopen the password. */
 export async function forget(id) {
-  const [count] = await must([["HLEN", PASSKEYS]]);
-  if (count <= 1) return false;
-  const [removed] = await must([["HDEL", PASSKEYS, String(id)]]);
+  const [removed] = await must([["EVAL", DROP, 1, PASSKEYS, String(id)]]);
   return removed === 1;
 }
 

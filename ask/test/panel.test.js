@@ -21,6 +21,8 @@ delete process.env.VERCEL_ENV;
 // ── A Redis that holds strings and hashes, which is all the panel uses ──────
 
 let store;
+/** Runs just before an EVAL, to land a write in the gap a race would open. */
+let beforeEval = null;
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, init) => {
   if (!String(url).startsWith("https://kv.test/")) return realFetch(url, init);
@@ -34,6 +36,28 @@ globalThis.fetch = async (url, init) => {
       case "INCR": { const n = Number(store.get(key) ?? 0) + 1; store.set(key, String(n)); return { result: n }; }
       case "EXPIRE": return { result: 1 };
       case "HSET": h().set(args[0], args[1]); return { result: 1 };
+      case "HGET": return { result: h().get(args[0]) ?? null };
+      case "EVAL": {
+        // The three scripts in lib/owner.js, told apart by what they check.
+        const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
+        beforeEval?.();
+        const m = store.get(hashKey) ?? store.set(hashKey, new Map()).get(hashKey);
+        if (cmd === "EVAL" && key.includes("== ARGV[2]")) {
+          if (m.get(field) !== a) return { result: -1 };
+          m.set(field, b);
+          return { result: 0 };
+        }
+        if (key.includes("== 0")) {
+          if (m.size !== 0) return { result: -1 };
+          m.set(field, a);
+          return { result: 1 };
+        }
+        if (key.includes("> 1")) {
+          if (m.size <= 1) return { result: -1 };
+          return { result: m.delete(field) ? 1 : 0 };
+        }
+        throw new Error("fake Redis does not know this script");
+      }
       case "HDEL": return { result: h().delete(args[0]) ? 1 : 0 };
       case "HEXISTS": return { result: h().has(args[0]) ? 1 : 0 };
       case "HLEN": return { result: h().size };
@@ -53,6 +77,7 @@ const visit = await import("../api/visit.js");
 
 beforeEach(() => {
   store = new Map();
+  beforeEval = null;
 });
 
 // ── A browser on the panel's page ───────────────────────────────────────────
@@ -149,6 +174,8 @@ async function enrollFirst(d = device()) {
   return { d, token: done.body.token };
 }
 
+const panelPost = (body, token) => call(panel.POST, "/api/panel", { body, token });
+
 async function signInWith(d, overrides) {
   const opts = await authCall({ action: "sign-in-options" });
   return authCall({ action: "sign-in", credential: asserted(d, opts.body, overrides) });
@@ -197,6 +224,16 @@ test("an enrollment challenge works once", async () => {
   const cred = created(d, opts.body);
   assert.equal((await authCall({ action: "enroll", credential: cred })).status, 200);
   assert.equal((await authCall({ action: "enroll", credential: cred })).status, 400);
+});
+
+test("two password challenges cannot both add a device", async () => {
+  const first = await authCall({ action: "enroll-options", password: "hunter2" });
+  const second = await authCall({ action: "enroll-options", password: "hunter2" });
+  const a = device();
+  const b = device();
+  assert.equal((await authCall({ action: "enroll", credential: created(a, first.body) })).status, 200);
+  assert.equal((await authCall({ action: "enroll", credential: created(b, second.body) })).status, 400);
+  assert.equal(store.get("dev:passkeys").size, 1);
 });
 
 test("a pairing code enrolls one more device, once", async () => {
@@ -268,6 +305,45 @@ test("a counter that goes backwards is refused", async () => {
   assert.equal((await signInWith(d)).status, 401);
 });
 
+test("a counter that drops back to zero is refused", async () => {
+  const { d } = await enrollFirst();
+  d.count = 5;
+  assert.equal((await signInWith(d)).status, 200);
+  d.count = 0;
+  assert.equal((await signInWith(d)).status, 401);
+});
+
+test("a device forgotten while it signs in stays forgotten", async () => {
+  const { d, token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  const opts = await authCall({ action: "enroll-options", code: pair.body.code });
+  const other = device();
+  await authCall({ action: "enroll", credential: created(other, opts.body) });
+
+  // The forget lands after sign-in has read the passkey, before it writes.
+  beforeEval = () => {
+    beforeEval = null;
+    store.get("dev:passkeys").delete(b64(d.id));
+  };
+  assert.equal((await signInWith(d)).status, 401);
+  assert.equal(store.get("dev:passkeys").has(b64(d.id)), false);
+});
+
+test("forgetting two devices at once leaves one", async () => {
+  const { d, token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  const opts = await authCall({ action: "enroll-options", code: pair.body.code });
+  const other = device();
+  await authCall({ action: "enroll", credential: created(other, opts.body) });
+
+  const results = await Promise.all([
+    panelPost({ action: "forget", id: b64(d.id) }, token),
+    panelPost({ action: "forget", id: b64(other.id) }, token),
+  ]);
+  assert.deepEqual(results.map((r) => r.status).sort(), [200, 400]);
+  assert.equal(store.get("dev:passkeys").size, 1);
+});
+
 test("locking ends the session", async () => {
   const { token } = await enrollFirst();
   assert.equal((await call(panel.GET, "/api/panel", { method: "GET", token })).status, 200);
@@ -276,8 +352,6 @@ test("locking ends the session", async () => {
 });
 
 // ── The panel ───────────────────────────────────────────────────────────────
-
-const panelPost = (body, token) => call(panel.POST, "/api/panel", { body, token });
 
 test("the panel answers only a signed-in session", async () => {
   assert.equal((await call(panel.GET, "/api/panel", { method: "GET" })).status, 401);
@@ -289,12 +363,15 @@ test("labels and links round trip through the panel", async () => {
   const { token } = await enrollFirst();
   assert.equal((await panelPost({ action: "label", id: "abcd1234", name: "Jane", hidden: false }, token)).status, 200);
   assert.equal((await panelPost({ action: "label", id: "../etc", name: "x" }, token)).status, 400);
-  const link = await panelPost({ action: "link", name: "Jane at Google", note: "Sent after the career fair" }, token);
+  const link = await panelPost({ action: "link", name: "Jane at Google", note: "Sent after the career fair", path: "/studio/" }, token);
   assert.match(link.body.code, /^[a-z2-9]{6}$/);
+  const odd = await panelPost({ action: "link", name: "Odd", path: "https://evil.test/" }, token);
 
   const data = await call(panel.GET, "/api/panel", { method: "GET", token });
   assert.deepEqual(data.body.labels.abcd1234, { name: "Jane", hidden: false });
   assert.equal(data.body.links[link.body.code].name, "Jane at Google");
+  assert.equal(data.body.links[link.body.code].path, "/studio/");
+  assert.equal(data.body.links[odd.body.code].path, "/", "only the site's own pages");
   assert.equal(data.body.devices.length, 1);
   assert.equal(data.body.devices[0].key, undefined, "public keys stay server side");
   assert.match(data.body.you, /^[0-9a-f]{8}$/);

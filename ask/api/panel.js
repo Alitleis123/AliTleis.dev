@@ -15,6 +15,9 @@ export const OPTIONS = preflight;
 
 const clip = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
+/** The pages a named link may open, the same three the panel offers. */
+const PAGES = new Set(["/", "/galaxy/", "/studio/"]);
+
 /** Six characters a recipient will not read anything into, unlike ?ref=jane. */
 async function newCode() {
   for (;;) {
@@ -85,7 +88,17 @@ export async function POST(request) {
         if (!name) return reply(request, { error: "Give the link a name." }, 400);
         const code = await newCode();
         await must([
-          ["HSET", LINKS, code, JSON.stringify({ name, note: clip(body.note, 200) || null, t: new Date().toISOString() })],
+          [
+            "HSET",
+            LINKS,
+            code,
+            JSON.stringify({
+              name,
+              note: clip(body.note, 200) || null,
+              path: PAGES.has(body.path) ? body.path : "/",
+              t: new Date().toISOString(),
+            }),
+          ],
         ]);
         return reply(request, { code });
       }
