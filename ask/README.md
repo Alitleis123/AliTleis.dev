@@ -28,6 +28,31 @@ The key is the `GEMINI_API_KEY` production variable, from
 it, run `npx vercel env add GEMINI_API_KEY --environment production --sensitive --force`
 here and paste the new key, then deploy again.
 
+## The log
+
+`api/ask.js` logs every question that reaches a model, with the answer or the
+error, the model, the time taken and why any earlier model missed.
+`api/visit.js` logs the page views the site sends with `navigator.sendBeacon`.
+Both go to an Upstash Redis database on the free plan, connected to this
+project through the Vercel Marketplace as `KV_REST_API_URL` and
+`KV_REST_API_TOKEN`. Each list keeps its newest 3,000 entries.
+
+Each entry keeps the visitor's network (a company or school shows up by name,
+a home connection as its ISP, from api.ipapi.is), the city from Vercel's
+headers, the device, and a salted hash of address and browser. It never keeps
+the address.
+
+Read it at `https://alitleis-ask.vercel.app/api/admin`. The browser asks for a
+password: any username, and the `ADMIN_PASSWORD` production variable as the
+password. Change that variable in the Vercel dashboard and redeploy to
+replace it.
+
+- Open the site once with `?notrack` on each of your own browsers so your
+  visits stay out of the log. `?notrack=off` counts that browser again.
+- Send links as `https://alitleis.dev/?ref=company-name` to see exactly which
+  one was opened.
+- Local and preview runs log to `dev:` keys, apart from production.
+
 ## Editing what it knows
 
 - Site content comes from `src/app/data.ts`, the same as the page.

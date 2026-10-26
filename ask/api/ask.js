@@ -9,7 +9,12 @@
  * which is why there are two: when the first is out or busy, the second
  * answers. If both fail, the panel falls back to its in-browser reader, so a
  * dead backend costs answer quality rather than the whole feature.
+ *
+ * Every question that reaches a model is logged with its outcome for
+ * /api/admin, through lib/track.js.
  */
+
+import { ASKS, later, record, visitor } from "../lib/track.js";
 
 const CONTEXT_URL = "https://alitleis.dev/ask-context.txt";
 const MODELS = ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
@@ -122,11 +127,30 @@ export async function POST(request) {
       { role: "model", parts: [{ text: t.a.slice(0, 2000) }] },
     ]);
 
+  // The network lookup runs while the model writes, and the log is written
+  // after the answer goes out, so logging adds nothing to the wait. `misses`
+  // keeps why each model before the answering one failed, which is how a spent
+  // quota shows up in the log.
+  const started = Date.now();
+  const who = visitor(request).catch(() => ({}));
+  const misses = [];
+  const log = async (outcome) =>
+    record(ASKS, {
+      t: new Date(started).toISOString(),
+      q: question,
+      turn: history.length / 2 + 1,
+      ...outcome,
+      misses: misses.length ? misses : undefined,
+      ms: Date.now() - started,
+      ...(await who),
+    });
+
   let context;
   try {
     context = await profile();
   } catch (err) {
     console.error("Profile unavailable:", err.message);
+    await later(log({ error: "Profile unavailable" }));
     return json({ error: "The profile could not be loaded." }, 503);
   }
 
@@ -158,6 +182,7 @@ export async function POST(request) {
       );
       if (!res.ok) {
         console.error(`${model} returned ${res.status}: ${(await res.text()).slice(0, 300)}`);
+        misses.push(`${model}: HTTP ${res.status}`);
         continue;
       }
       const data = await res.json();
@@ -170,12 +195,18 @@ export async function POST(request) {
         .trim();
       // Only a natural stop. A MAX_TOKENS cut leaves text that ends mid
       // sentence, which would read as an answer and then go back as history.
-      if (answer && candidate.finishReason === "STOP") return json({ answer, model });
+      if (answer && candidate.finishReason === "STOP") {
+        await later(log({ a: answer, model }));
+        return json({ answer, model });
+      }
       console.error(`${model} gave no usable answer, finishReason ${candidate?.finishReason}`);
+      misses.push(`${model}: ${candidate?.finishReason ?? "no candidate"}`);
     } catch (err) {
       console.error(`${model} failed:`, err.message);
+      misses.push(`${model}: ${err.message}`);
     }
   }
 
+  await later(log({ error: "No model could answer" }));
   return json({ error: "No model could answer right now." }, 502);
 }
