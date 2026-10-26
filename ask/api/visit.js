@@ -44,6 +44,10 @@ export async function POST(request) {
     ref: from(body.ref),
     // ?ref= on a link Ali sent, so he can tell which one was opened.
     src: clip(body.src, 80),
+    // The last ?ref= this browser arrived with, sent on every view after it,
+    // so someone who opened a named link is still named when they come back
+    // without it.
+    tag: clip(body.tag, 80),
     ...(await visitor(request)),
   });
   return done();

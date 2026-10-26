@@ -1274,3 +1274,121 @@ section {
     animation: none;
   }
 }
+
+/* ── Control panel ─────────────────────────────────────────────
+   /controlpanel takes the suite's palette through .st-root and adds
+   only what the suite has no equivalent for: level meters, the record
+   light, and form controls sized for reading rather than for chrome.
+   ─────────────────────────────────────────────────────────────── */
+
+/* A level meter, segmented like the ones on an audio track. The fill uses
+   the same stripe as the trough, so its segments sit on the trough's. */
+.cp-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 1px;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 3px, transparent 3px 5px);
+}
+
+.cp-meter > span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--st-accent) 0 3px, transparent 3px 5px);
+}
+
+/* Red because recording is red in every editor, and it means the same here:
+   someone is on the site right now. Grey when nobody is. */
+.cp-rec {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--st-faint);
+}
+
+.cp-rec-on {
+  background: #ff5a4f;
+  box-shadow: 0 0 10px rgba(255, 90, 79, 0.55);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cp-rec-on {
+    animation: cp-rec 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes cp-rec {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.cp-input {
+  height: 32px;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--st-line-strong);
+  border-radius: 3px;
+  background: var(--st-stage);
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--st-text);
+}
+
+.cp-input::placeholder {
+  color: var(--st-faint);
+}
+
+.cp-btn {
+  display: inline-flex;
+  height: 28px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--st-line-strong);
+  border-radius: 3px;
+  background: var(--st-panel-hi);
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--st-dim);
+  white-space: nowrap;
+  transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.cp-btn:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--st-text);
+}
+
+.cp-btn:disabled {
+  opacity: 0.45;
+}
+
+.cp-btn-primary {
+  border-color: transparent;
+  background: var(--st-accent);
+  color: #2a1a02;
+  font-weight: 500;
+}
+
+.cp-btn-primary:hover:not(:disabled) {
+  border-color: transparent;
+  color: #2a1a02;
+  filter: brightness(1.12);
+}
+
+/* iOS zooms the page into any field under 16px, so touch gets 16px and the
+   taller target a thumb needs. */
+@media (pointer: coarse) {
+  .cp-input {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .cp-btn {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+}

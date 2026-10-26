@@ -1,6 +1,7 @@
 /**
- * The log behind /api/admin: every question asked in the Ask panel with what
- * came back, and every page view the site reports to /api/visit.
+ * The log behind the control panel at alitleis.dev/controlpanel: every
+ * question asked in the Ask panel with what came back, and every page view the
+ * site reports to /api/visit.
  *
  * Kept in Upstash Redis on the free plan, as two capped lists of JSON, newest
  * first. Logging never fails a request. Without the database variables, or
@@ -12,14 +13,17 @@ const DB_URL = process.env.KV_REST_API_URL;
 const DB_TOKEN = process.env.KV_REST_API_TOKEN;
 
 /** Local and preview runs log beside production rather than into it. */
-const NS = process.env.VERCEL_ENV === "production" ? "" : "dev:";
+export const NS = process.env.VERCEL_ENV === "production" ? "" : "dev:";
 export const ASKS = `${NS}asks`;
 export const VISITS = `${NS}visits`;
+/** The panel's own notes: names Ali gave visitors, and the links he sent out. */
+export const LABELS = `${NS}labels`;
+export const LINKS = `${NS}links`;
 
 /** Roughly a year of a portfolio's traffic, and well under the free 256MB. */
 const KEEP = 3000;
 
-async function redis(commands) {
+export async function redis(commands) {
   if (!DB_URL || !DB_TOKEN) return null;
   const res = await fetch(`${DB_URL}/pipeline`, {
     method: "POST",
@@ -28,7 +32,13 @@ async function redis(commands) {
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`Upstash returned ${res.status}`);
-  return (await res.json()).map((r) => r.result);
+  // A pipeline answers 200 even when one of its commands failed, with that
+  // command's error in place of its result. Passed on as undefined, a failed
+  // conditional write in lib/owner.js would read as one that went through.
+  const out = await res.json();
+  const failed = out.find((r) => r.error);
+  if (failed) throw new Error(`Upstash command failed: ${failed.error}`);
+  return out.map((r) => r.result);
 }
 
 export async function record(list, entry) {
@@ -61,15 +71,61 @@ export async function later(promise) {
   await promise;
 }
 
-export async function recent(list) {
-  const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
-  return items.flatMap((item) => {
+/**
+ * For the panel and its sign-in, where a missing database is an error to show
+ * rather than an entry to drop.
+ */
+export async function must(commands) {
+  const out = await redis(commands);
+  if (!out) throw new Error("KV_REST_API_URL and KV_REST_API_TOKEN are not set.");
+  return out;
+}
+
+/** A Redis hash of JSON values, as an object. Upstash sends HGETALL flat. */
+export async function hash(key) {
+  const [flat] = await must([["HGETALL", key]]);
+  const out = {};
+  for (let i = 0; i + 1 < (flat?.length ?? 0); i += 2) {
+    try {
+      out[flat[i]] = JSON.parse(flat[i + 1]);
+    } catch {
+      // A hand-edited entry that is not JSON is skipped, not fatal.
+    }
+  }
+  return out;
+}
+
+const parsed = (items) =>
+  items.flatMap((item) => {
     try {
       return [JSON.parse(item)];
     } catch {
       return [];
     }
   });
+
+export async function recent(list) {
+  const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
+  return parsed(items);
+}
+
+/**
+ * Entries logged after `since`, read from the head of the list a page at a
+ * time. The panel polls with this, so a poll moves a few new entries out of
+ * Upstash rather than the whole log, which on the free plan's 10GB a month
+ * would run out after a few days of leaving the panel open.
+ */
+export async function newer(list, since) {
+  const out = [];
+  for (let start = 0; start < KEEP; start += 100) {
+    const [items] = await must([["LRANGE", list, start, start + 99]]);
+    for (const entry of parsed(items)) {
+      if (entry.t <= since) return out;
+      out.push(entry);
+    }
+    if (items.length < 100) break;
+  }
+  return out;
 }
 
 /** Crawlers and headless checks, which would otherwise read as visitors. */
@@ -161,10 +217,21 @@ function device(ua) {
 }
 
 /**
- * What the log keeps about whoever sent the request. Never the address itself:
- * the id is a salted hash of address and browser, enough to tell a return
- * visit from a new one. The salt is the database token, which is secret, so
- * the id cannot be reversed by hashing every IPv4 address.
+ * A salted hash of address and browser, the same for every view one browser
+ * sends from one network. The salt is the database token, which is secret, so
+ * nobody outside can work out which id is theirs.
+ */
+export function idOf(request) {
+  const ip = address(request);
+  if (!ip) return null;
+  const ua = request.headers.get("user-agent") || "";
+  return createHash("sha256").update(`${DB_TOKEN}|${ip}|${ua}`).digest("hex").slice(0, 8);
+}
+
+/**
+ * What the log keeps about whoever sent the request: the address, the network
+ * and place it belongs to, the device, and the id that ties one browser's
+ * views together.
  */
 export async function visitor(request) {
   const h = request.headers;
@@ -178,9 +245,8 @@ export async function visitor(request) {
     h.get("x-vercel-ip-country") ?? net?.country,
   ].filter(Boolean);
   return {
-    id: ip
-      ? createHash("sha256").update(`${DB_TOKEN}|${ip}|${ua}`).digest("hex").slice(0, 8)
-      : null,
+    id: idOf(request),
+    ip: ip || null,
     org: net?.company ?? null,
     place: place.length ? place.join(", ") : null,
     device: device(ua),

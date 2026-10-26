@@ -10,7 +10,8 @@ import NavBar from "./NavBar";
 import ResumeButton from "./ResumeButton";
 import ScrollToTop from "./ScrollToTop";
 import AmbientAudio from "./AmbientAudio";
-import CommandPalette, { ASK_API } from "./CommandPalette";
+import CommandPalette from "./CommandPalette";
+import { askEndpoint } from "../lib/askApi";
 
 /** The referrer and ?ref= belong to the page load, so only its first view sends them. */
 let firstView = true;
@@ -59,38 +60,50 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     if (entering) clearSwitchArrival();
   }, [entering, pathname]);
 
-  // Counts each page view for the log at ask/api/admin.js. Opening the site
-  // once with ?notrack stops counting this browser, so Ali's own visits stay
-  // out of it, and ?notrack=off counts it again.
+  // Counts each page view for the control panel at /controlpanel. Opening the
+  // site once with ?notrack stops counting this browser, so Ali's own visits
+  // stay out of it, and ?notrack=off counts it again. Signing in to the panel
+  // sets the same flag.
   useEffect(() => {
+    if (pathname?.startsWith("/controlpanel")) return;
     const params = new URLSearchParams(window.location.search);
     const flag = params.get("notrack");
+    const src = params.get("ref") ?? params.get("utm_source");
+    // The last ?ref= this browser arrived with, kept so a return visit from a
+    // named link is still named without the link.
+    let tag: string | null = null;
     try {
       if (flag === "off") localStorage.removeItem("notrack");
       else if (flag !== null) localStorage.setItem("notrack", "1");
       if (localStorage.getItem("notrack")) return;
+      if (src) localStorage.setItem("ref-tag", src.slice(0, 80));
+      tag = localStorage.getItem("ref-tag");
     } catch {
       // Storage is blocked, so only this URL's own ?notrack can opt out.
       if (flag !== null && flag !== "off") return;
+      tag = src;
     }
-    // Beside the Ask function, both in ask/. Resolved against the page so a
-    // relative ASK_API override still works.
     navigator.sendBeacon?.(
-      new URL("visit", new URL(ASK_API, window.location.href)).href,
+      askEndpoint("visit"),
       JSON.stringify({
         path: pathname,
         first: firstView,
         ref: firstView ? document.referrer : null,
-        src: firstView ? (params.get("ref") ?? params.get("utm_source")) : null,
+        src: firstView ? src : null,
+        tag,
       }),
     );
     firstView = false;
   }, [pathname]);
-  // Two routes bring their own frame. The suite is a full viewport
-  // application, and the chooser is a single screen that would look absurd
-  // under a nav offering to take you to the page you are choosing between.
+  // Three routes bring their own frame. The suite and the control panel are
+  // full viewport applications, and the chooser is a single screen that would
+  // look absurd under a nav offering to take you to the page you are choosing
+  // between.
   const bare =
-    pathname?.startsWith("/studio") || pathname === "/" || pathname === "";
+    pathname?.startsWith("/studio") ||
+    pathname?.startsWith("/controlpanel") ||
+    pathname === "/" ||
+    pathname === "";
 
   if (bare) return <>{children}</>;
 
