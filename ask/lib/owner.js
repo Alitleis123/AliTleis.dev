@@ -183,7 +183,7 @@ export async function enroll(cred, name) {
   const [stored] = await must([
     kind === "first" ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record] : ["HSET", PASSKEYS, b64(id), record],
   ]);
-  if (stored === -1) return null;
+  if (!(stored >= 0)) return null;
   return startSession(b64(id));
 }
 
@@ -237,7 +237,7 @@ export async function signIn(cred) {
   const [swapped] = await must([
     ["EVAL", SWAP, 1, PASSKEYS, id, raw, JSON.stringify({ ...pk, count: auth.count, used: new Date().toISOString() })],
   ]);
-  if (swapped === -1) return null;
+  if (!(swapped >= 0)) return null;
   return startSession(id);
 }
 

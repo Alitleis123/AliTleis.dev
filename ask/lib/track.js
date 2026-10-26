@@ -32,7 +32,13 @@ export async function redis(commands) {
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`Upstash returned ${res.status}`);
-  return (await res.json()).map((r) => r.result);
+  // A pipeline answers 200 even when one of its commands failed, with that
+  // command's error in place of its result. Passed on as undefined, a failed
+  // conditional write in lib/owner.js would read as one that went through.
+  const out = await res.json();
+  const failed = out.find((r) => r.error);
+  if (failed) throw new Error(`Upstash command failed: ${failed.error}`);
+  return out.map((r) => r.result);
 }
 
 export async function record(list, entry) {

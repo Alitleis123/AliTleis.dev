@@ -23,6 +23,8 @@ delete process.env.VERCEL_ENV;
 let store;
 /** Runs just before an EVAL, to land a write in the gap a race would open. */
 let beforeEval = null;
+/** When set, every EVAL answers with an error, the way a pipeline reports one. */
+let evalFails = false;
 const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, init) => {
   if (!String(url).startsWith("https://kv.test/")) return realFetch(url, init);
@@ -38,6 +40,7 @@ globalThis.fetch = async (url, init) => {
       case "HSET": h().set(args[0], args[1]); return { result: 1 };
       case "HGET": return { result: h().get(args[0]) ?? null };
       case "EVAL": {
+        if (evalFails) return { error: "ERR script failed" };
         // The three scripts in lib/owner.js, told apart by what they check.
         const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
         beforeEval?.();
@@ -78,6 +81,7 @@ const visit = await import("../api/visit.js");
 beforeEach(() => {
   store = new Map();
   beforeEval = null;
+  evalFails = false;
 });
 
 // ── A browser on the panel's page ───────────────────────────────────────────
@@ -342,6 +346,14 @@ test("forgetting two devices at once leaves one", async () => {
   ]);
   assert.deepEqual(results.map((r) => r.status).sort(), [200, 400]);
   assert.equal(store.get("dev:passkeys").size, 1);
+});
+
+test("a failed Redis command ends the sign-in instead of passing", async () => {
+  const { d } = await enrollFirst();
+  evalFails = true;
+  const res = await signInWith(d);
+  assert.equal(res.status, 503);
+  assert.equal(res.body.token, undefined);
 });
 
 test("locking ends the session", async () => {
