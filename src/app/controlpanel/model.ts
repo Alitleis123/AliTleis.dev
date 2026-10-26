@@ -37,7 +37,7 @@ export type Ask = {
 };
 
 export type Label = { name: string | null; hidden: boolean };
-export type Link = { name: string; note: string | null; t: string };
+export type Link = { name: string; note: string | null; path?: string; t: string };
 export type Device = { id: string; name: string; t: string; used: string | null };
 
 export type PanelData = {
@@ -145,15 +145,22 @@ export function visitors(data: PanelData): Map<string, Visitor> {
     return v;
   };
 
-  for (let i = data.visits.length - 1; i >= 0; i--) {
-    const visit = data.visits[i];
+  // Oldest first, by time rather than list order. A view is stamped when it
+  // arrives but written after its network lookup, so a slow lookup can land
+  // in the list behind a later view.
+  const byTime = <T extends { t: string }>(list: T[]) => [...list].sort((a, b) => a.t.localeCompare(b.t));
+  for (const visit of byTime(data.visits)) {
     const v = get(visit);
     v.views.push(visit);
     for (const tag of [visit.tag, visit.src]) {
       if (tag && !v.tags.includes(tag)) v.tags.push(tag);
     }
   }
-  for (let i = data.asks.length - 1; i >= 0; i--) get(data.asks[i]).asks.push(data.asks[i]);
+  for (const ask of byTime(data.asks)) get(ask).asks.push(ask);
+
+  // The named link a view carried: its own ?ref= first, then the one the
+  // browser kept from an earlier arrival.
+  const linkOf = (x: Visit) => [x.src, x.tag].find((code) => code && data.links[code]) ?? null;
 
   for (const v of out.values()) {
     for (const view of v.views) {
@@ -166,7 +173,8 @@ export function visitors(data: PanelData): Map<string, Visitor> {
         v.sessions.push({ start: t, end: t, views: [view], source: sourceOf(view, data.links) });
       }
     }
-    v.link = v.tags.findLast((tag) => data.links[tag]) ?? null;
+    // The newest view decides, so reopening an older link names them by it.
+    v.link = v.views.map(linkOf).findLast(Boolean) ?? null;
     const named = v.label?.name || (v.link && data.links[v.link].name);
     v.known = Boolean(named);
     v.name = named || (v.you ? "You" : v.org) || (v.id ? `Visitor ${v.id.slice(0, 4)}` : "Unknown visitor");

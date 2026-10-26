@@ -11,24 +11,29 @@ import type { PanelData } from "./model";
 
 const TOKEN = "cp-session";
 
+/** Where the session lives when storage is blocked, for this tab only. */
+let memory: string | null = null;
+
 export const token = {
   get: () => {
     try {
-      return localStorage.getItem(TOKEN);
+      return localStorage.getItem(TOKEN) ?? memory;
     } catch {
-      return null;
+      return memory;
     }
   },
   set: (value: string) => {
+    memory = value;
     try {
       localStorage.setItem(TOKEN, value);
       // Ali's own browsing stops counting once he has signed in here.
       localStorage.setItem("notrack", "1");
     } catch {
-      // Private browsing with storage blocked keeps the session for this tab only.
+      // Storage is blocked, so the copy in memory is the session.
     }
   },
   clear: () => {
+    memory = null;
     try {
       localStorage.removeItem(TOKEN);
     } catch {}
@@ -37,8 +42,7 @@ export const token = {
 
 export class SignedOut extends Error {}
 
-async function call<T>(name: string, init: RequestInit = {}): Promise<T> {
-  const t = token.get();
+async function call<T>(name: string, init: RequestInit = {}, t = token.get()): Promise<T> {
   const res = await fetch(askEndpoint(name), {
     ...init,
     headers: {
@@ -57,7 +61,12 @@ const auth = <T>(action: string, extra: object = {}) =>
   call<T>("auth", { method: "POST", body: JSON.stringify({ action, ...extra }) });
 
 export const status = () => auth<{ enrolled: boolean; signedIn: boolean }>("status");
-export const lock = () => auth("lock").finally(token.clear);
+/** Drops the token here first, so nothing still running can use it, then ends it on the server. */
+export function lock() {
+  const t = token.get();
+  token.clear();
+  return call("auth", { method: "POST", body: JSON.stringify({ action: "lock" }) }, t);
+}
 export const pair = () => auth<{ code: string; expires: number }>("pair");
 
 /** The whole log, or with `since` only what came after those times. */

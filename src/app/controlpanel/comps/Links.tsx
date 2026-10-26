@@ -63,7 +63,7 @@ export default function Links({
     setBusy(true);
     setError(null);
     try {
-      const { code } = await edit<{ code: string }>({ action: "link", name, note });
+      const { code } = await edit<{ code: string }>({ action: "link", name, note, path: page });
       setFresh(url(code, page));
       setName("");
       setNote("");
@@ -152,7 +152,9 @@ export default function Links({
                     <div className="min-w-0 flex-1">
                       <p className="text-[14px] text-[var(--st-text)]">{link.name}</p>
                       {link.note && <p className="mt-0.5 text-[12px] text-[var(--st-faint)]">{link.note}</p>}
-                      <p className="st-tc mt-1 select-all truncate text-[11px] text-[var(--st-dim)]">{url(code)}</p>
+                      <p className="st-tc mt-1 select-all truncate text-[11px] text-[var(--st-dim)]">
+                        {url(code, link.path)}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className={`st-tc text-[12px] ${o.people.length ? "text-[var(--st-accent)]" : "text-[var(--st-faint)]"}`}>
@@ -164,7 +166,7 @@ export default function Links({
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <Copy text={url(code)} />
+                    <Copy text={url(code, link.path)} />
                     <button type="button" className="cp-btn" onClick={() => remove(code, link.name)} aria-label={`Delete the link for ${link.name}`}>
                       <LuTrash2 aria-hidden /> Delete
                     </button>

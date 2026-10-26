@@ -21,6 +21,7 @@ import {
   active,
   clock,
   day,
+  keyOf,
   liveNow,
   ms,
   plural,
@@ -99,12 +100,17 @@ export default function ControlPanel() {
   const sheetRef = useRef<HTMLDivElement>(null);
   // What the last poll left, for the next one to build on.
   const held = useRef<PanelData | null>(null);
+  // Bumped on Lock, so a poll that was already in flight cannot reopen the
+  // panel when its answer lands afterwards.
+  const generation = useRef(0);
 
   const refresh = useCallback(async () => {
+    const mine = generation.current;
     setSyncing(true);
     try {
       const prev = held.current;
       const fresh = await load(prev ? { visits: back(prev.visits[0]?.t), asks: back(prev.asks[0]?.t) } : undefined);
+      if (mine !== generation.current) return;
       const d = prev ? merge(prev, fresh) : fresh;
       held.current = d;
       setData(d);
@@ -115,6 +121,7 @@ export default function ControlPanel() {
       setEnrolled(true);
       setPhase("open");
     } catch (err) {
+      if (mine !== generation.current) return;
       if (err instanceof SignedOut) {
         token.clear();
         held.current = null;
@@ -165,12 +172,14 @@ export default function ControlPanel() {
     };
   }, [phase, refresh]);
 
+  // The log leaves the screen first, then the server ends the session.
   const signOut = useCallback(async () => {
-    await lock().catch(() => {});
+    generation.current++;
     held.current = null;
     setData(null);
     setSelected(null);
     setPhase("locked");
+    await lock().catch(() => {});
   }, []);
 
   // 1 to 5 open the comps, R syncs, Escape closes the inspector.
@@ -202,8 +211,19 @@ export default function ControlPanel() {
 
   if (phase === "checking") {
     return (
-      <div className="st-root st-hatch flex min-h-[100dvh] items-center justify-center bg-[var(--st-stage)]">
-        <span className="st-tc text-[var(--st-faint)]">Connecting…</span>
+      <div className="st-root st-hatch flex min-h-[100dvh] flex-col items-center justify-center gap-3 bg-[var(--st-stage)] px-6 text-center">
+        {error ? (
+          <>
+            <span role="alert" className="st-tc whitespace-normal! text-[#ff8a80]">
+              {error}
+            </span>
+            <button type="button" className="cp-btn" onClick={refresh}>
+              <LuRefreshCw aria-hidden /> Try again
+            </button>
+          </>
+        ) : (
+          <span className="st-tc text-[var(--st-faint)]">Connecting…</span>
+        )}
       </div>
     );
   }
@@ -225,7 +245,10 @@ export default function ControlPanel() {
   const counts: Record<CompId, string> = {
     overview: plural(people.reduce((n, v) => n + v.views.filter((x) => ms(x.t) >= range.start).length, 0), "view"),
     visitors: plural(people.length, "visitor"),
-    asks: plural(data.asks.filter((a) => ms(a.t) >= range.start).length, "question"),
+    asks: plural(
+      data.asks.filter((a) => ms(a.t) >= range.start && !everyone.get(keyOf(a))?.hidden).length,
+      "question",
+    ),
     links: plural(Object.keys(data.links).length, "link"),
     devices: plural(data.devices.length, "passkey"),
   };
