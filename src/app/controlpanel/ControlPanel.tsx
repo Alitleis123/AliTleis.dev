@@ -498,7 +498,12 @@ export default function ControlPanel() {
             </button>
           </span>
         </PanelHead>
-        {timeline && <Timeline people={people} range={range} selected={selected} onSelect={select} tracks={TRACKS} />}
+        {timeline && (
+          // Capped for a short window, where four rows would be most of it.
+          <div className="max-h-[32vh] overflow-y-auto">
+            <Timeline people={people} range={range} selected={selected} onSelect={select} tracks={TRACKS} />
+          </div>
+        )}
       </div>
 
       {!wide && sel && (

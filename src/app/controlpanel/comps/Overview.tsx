@@ -149,6 +149,11 @@ export default function Overview({
           onSelect={onSelect}
           tracks={5}
         />
+        {people.length > 5 && (
+          <p className="st-tc border-t border-[var(--st-line)] px-3 py-1.5 text-[var(--st-faint)]">
+            5 of {people.length} visitors
+          </p>
+        )}
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">

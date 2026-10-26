@@ -48,6 +48,9 @@ export default function Timeline({
   const laneRef = useRef<HTMLDivElement>(null);
   const shown = people.slice(0, tracks);
   const at = (t: number) => Math.min(100, Math.max(0, ((t - range.start) / range.ms) * 100));
+  // A keyframe's center, held 7px inside each edge so the whole diamond and
+  // the bar around it stay in the lane, at the range's start and at now.
+  const key = (t: number) => `clamp(7px, ${at(t)}%, calc(100% - 7px))`;
   const rule = useMemo(() => ticks(range), [range]);
 
   // Labels need about 60px each, so a phone shows every other day or fewer.
@@ -121,8 +124,6 @@ export default function Timeline({
           const visits = v.sessions.filter((s) => s.end >= range.start);
           const on = selected === v.key;
           const tone = v.known ? "var(--st-accent)" : "rgb(150, 162, 182)";
-          const from = visits.length ? at(visits[0].start) : 0;
-          const to = visits.length ? at(visits.at(-1)!.end) : 0;
           return (
             <div key={v.key} style={{ height: ROW_H }} className="relative border-b border-[var(--st-line)]">
               {visits.length > 0 && (
@@ -130,8 +131,8 @@ export default function Timeline({
                   aria-hidden
                   className="absolute top-1/2 h-[14px] -translate-y-1/2 rounded-[3px] border"
                   style={{
-                    left: `calc(${from}% - 7px)`,
-                    width: `calc(${to - from}% + 14px)`,
+                    left: `calc(${key(visits[0].start)} - 7px)`,
+                    right: `calc(100% - ${key(visits.at(-1)!.end)} - 7px)`,
                     background: v.known ? "var(--st-clip-on)" : "var(--st-clip)",
                     borderColor: on ? tone : v.known ? "var(--st-sel-line)" : "var(--st-line-strong)",
                   }}
@@ -145,7 +146,7 @@ export default function Timeline({
                   aria-label={`${v.name}, ${plural(s.views.length, "page")} on ${stamp(s.start)}`}
                   onClick={() => onSelect(v.key)}
                   className="absolute top-1/2 h-[9px] w-[9px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] transition-transform hover:scale-125"
-                  style={{ left: `min(${at(s.start)}%, calc(100% - 8px))`, background: tone }}
+                  style={{ left: key(s.start), background: tone }}
                 />
               ))}
             </div>
