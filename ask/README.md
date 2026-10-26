@@ -37,21 +37,38 @@ Both go to an Upstash Redis database on the free plan, connected to this
 project through the Vercel Marketplace as `KV_REST_API_URL` and
 `KV_REST_API_TOKEN`. Each list keeps its newest 3,000 entries.
 
-Each entry keeps the visitor's network (a company or school shows up by name,
-a home connection as its ISP, from api.ipapi.is), the city from Vercel's
-headers, the device, and a salted hash of address and browser. It never keeps
-the address.
+Each entry keeps the visitor's IP address, their network (a company or school
+shows up by name, a home connection as its ISP, from api.ipapi.is), the city
+from Vercel's headers, the device, and an id that ties one browser's views
+together.
 
-Read it at `https://alitleis-ask.vercel.app/api/admin`. The browser asks for a
-password: any username, and the `ADMIN_PASSWORD` production variable as the
-password. Change that variable in the Vercel dashboard and redeploy to
-replace it.
+## The control panel
 
-- Open the site once with `?notrack` on each of your own browsers so your
-  visits stay out of the log. `?notrack=off` counts that browser again.
-- Send links as `https://alitleis.dev/?ref=company-name` to see exactly which
-  one was opened.
-- Local and preview runs log to `dev:` keys, apart from production.
+The log is read at `https://alitleis.dev/controlpanel`, which unlocks with a
+passkey: Face ID on the iPhone, Touch ID on a Mac, Windows Hello on a PC. The
+page holds no data. `api/panel.js` sends the log only to a session that
+`api/auth.js` started from a stored passkey. `lib/owner.js` explains how the
+parts fit together.
+
+- The first device sets up with the `ADMIN_PASSWORD` production variable,
+  and only while no passkey is stored. After that the password opens nothing.
+- A Mac on the same Apple ID gets the iPhone's passkey through iCloud
+  Keychain. Any other device pairs with a one-time code from Devices on a
+  signed-in one.
+- Lost every device: delete the `passkeys` hash in the Upstash console, and
+  setup opens to the password again.
+- Named links come from Links in the panel. Whoever opens one is called by
+  that name, on that visit and every later one from the same browser.
+- Signing in stops counting that browser's visits. `?notrack` does the same
+  on a browser that never signs in, and `?notrack=off` undoes it.
+- Local and preview runs log to `dev:` keys, apart from production, and need
+  `PANEL_ORIGIN` set to the page's origin, like `http://localhost:3000`.
+
+The tests run offline against a fake Upstash and real P-256 and Ed25519 keys:
+
+```bash
+node --test ask/test/*.test.js
+```
 
 ## Editing what it knows
 

@@ -1,6 +1,7 @@
 /**
- * The log behind /api/admin: every question asked in the Ask panel with what
- * came back, and every page view the site reports to /api/visit.
+ * The log behind the control panel at alitleis.dev/controlpanel: every
+ * question asked in the Ask panel with what came back, and every page view the
+ * site reports to /api/visit.
  *
  * Kept in Upstash Redis on the free plan, as two capped lists of JSON, newest
  * first. Logging never fails a request. Without the database variables, or
@@ -12,14 +13,17 @@ const DB_URL = process.env.KV_REST_API_URL;
 const DB_TOKEN = process.env.KV_REST_API_TOKEN;
 
 /** Local and preview runs log beside production rather than into it. */
-const NS = process.env.VERCEL_ENV === "production" ? "" : "dev:";
+export const NS = process.env.VERCEL_ENV === "production" ? "" : "dev:";
 export const ASKS = `${NS}asks`;
 export const VISITS = `${NS}visits`;
+/** The panel's own notes: names Ali gave visitors, and the links he sent out. */
+export const LABELS = `${NS}labels`;
+export const LINKS = `${NS}links`;
 
 /** Roughly a year of a portfolio's traffic, and well under the free 256MB. */
 const KEEP = 3000;
 
-async function redis(commands) {
+export async function redis(commands) {
   if (!DB_URL || !DB_TOKEN) return null;
   const res = await fetch(`${DB_URL}/pipeline`, {
     method: "POST",
@@ -59,6 +63,30 @@ export async function later(promise) {
     console.error("waitUntil failed:", err.message);
   }
   await promise;
+}
+
+/**
+ * For the panel and its sign-in, where a missing database is an error to show
+ * rather than an entry to drop.
+ */
+export async function must(commands) {
+  const out = await redis(commands);
+  if (!out) throw new Error("KV_REST_API_URL and KV_REST_API_TOKEN are not set.");
+  return out;
+}
+
+/** A Redis hash of JSON values, as an object. Upstash sends HGETALL flat. */
+export async function hash(key) {
+  const [flat] = await must([["HGETALL", key]]);
+  const out = {};
+  for (let i = 0; i + 1 < (flat?.length ?? 0); i += 2) {
+    try {
+      out[flat[i]] = JSON.parse(flat[i + 1]);
+    } catch {
+      // A hand-edited entry that is not JSON is skipped, not fatal.
+    }
+  }
+  return out;
 }
 
 export async function recent(list) {
@@ -161,10 +189,21 @@ function device(ua) {
 }
 
 /**
- * What the log keeps about whoever sent the request. Never the address itself:
- * the id is a salted hash of address and browser, enough to tell a return
- * visit from a new one. The salt is the database token, which is secret, so
- * the id cannot be reversed by hashing every IPv4 address.
+ * A salted hash of address and browser, the same for every view one browser
+ * sends from one network. The salt is the database token, which is secret, so
+ * nobody outside can work out which id is theirs.
+ */
+export function idOf(request) {
+  const ip = address(request);
+  if (!ip) return null;
+  const ua = request.headers.get("user-agent") || "";
+  return createHash("sha256").update(`${DB_TOKEN}|${ip}|${ua}`).digest("hex").slice(0, 8);
+}
+
+/**
+ * What the log keeps about whoever sent the request: the address, the network
+ * and place it belongs to, the device, and the id that ties one browser's
+ * views together.
  */
 export async function visitor(request) {
   const h = request.headers;
@@ -178,9 +217,8 @@ export async function visitor(request) {
     h.get("x-vercel-ip-country") ?? net?.country,
   ].filter(Boolean);
   return {
-    id: ip
-      ? createHash("sha256").update(`${DB_TOKEN}|${ip}|${ua}`).digest("hex").slice(0, 8)
-      : null,
+    id: idOf(request),
+    ip: ip || null,
     org: net?.company ?? null,
     place: place.length ? place.join(", ") : null,
     device: device(ua),
