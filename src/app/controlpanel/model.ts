@@ -184,19 +184,20 @@ export function visitors(data: PanelData): Map<string, Visitor> {
 
 // ── Ranges ──────────────────────────────────────────────────────────────────
 
+/** Each range with what the range before it is called, and how the views chart splits it. */
 export const RANGES = [
-  { id: "24h", label: "24H", ms: 24 * 60 * 60 * 1000 },
-  { id: "7d", label: "7D", ms: 7 * 24 * 60 * 60 * 1000 },
-  { id: "30d", label: "30D", ms: 30 * 24 * 60 * 60 * 1000 },
-  { id: "90d", label: "90D", ms: 90 * 24 * 60 * 60 * 1000 },
+  { id: "24h", label: "24H", ms: 24 * 60 * 60 * 1000, before: "day before", bars: 24, per: "per hour" },
+  { id: "7d", label: "7D", ms: 7 * 24 * 60 * 60 * 1000, before: "week before", bars: 7, per: "per day" },
+  { id: "30d", label: "30D", ms: 30 * 24 * 60 * 60 * 1000, before: "30 days before", bars: 30, per: "per day" },
+  { id: "90d", label: "90D", ms: 90 * 24 * 60 * 60 * 1000, before: "90 days before", bars: 13, per: "per week" },
 ] as const;
 
 export type RangeId = (typeof RANGES)[number]["id"];
-export type Range = { start: number; end: number; ms: number; label: string };
+export type Range = (typeof RANGES)[number] & { start: number; end: number };
 
 export function rangeOf(id: RangeId, now: number): Range {
   const r = RANGES.find((x) => x.id === id) ?? RANGES[1];
-  return { start: now - r.ms, end: now, ms: r.ms, label: r.label };
+  return { ...r, start: now - r.ms, end: now };
 }
 
 const inRange = (t: number, r: { start: number; end: number }) => t >= r.start && t <= r.end;
@@ -208,23 +209,22 @@ export function active(all: Map<string, Visitor>, r: Range) {
     .sort((a, b) => b.last - a.last);
 }
 
-export type Totals = { views: number; visitors: number; sessions: number; questions: number };
+export type Totals = { views: number; visitors: number; questions: number };
 
 export function totals(all: Map<string, Visitor>, r: { start: number; end: number }): Totals {
-  const out = { views: 0, visitors: 0, sessions: 0, questions: 0 };
+  const out = { views: 0, visitors: 0, questions: 0 };
   for (const v of all.values()) {
     if (v.hidden) continue;
     const views = v.views.filter((x) => inRange(ms(x.t), r)).length;
     const asks = v.asks.filter((a) => inRange(ms(a.t), r)).length;
     out.views += views;
     out.questions += asks;
-    out.sessions += v.sessions.filter((s) => inRange(s.start, r)).length;
     if (views || asks) out.visitors++;
   }
   return out;
 }
 
-/** Views per bucket across the range, for the traffic lane and the meters. */
+/** Views per bucket across the range, for the views chart. */
 export function buckets(all: Map<string, Visitor>, r: Range, count: number) {
   const out = new Array<number>(count).fill(0);
   const width = (r.end - r.start) / count;

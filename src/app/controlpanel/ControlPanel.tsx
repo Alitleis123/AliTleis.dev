@@ -287,11 +287,11 @@ export default function ControlPanel() {
 
   return (
     <div className="st-root cp-root flex h-[100dvh] flex-col overflow-hidden bg-[var(--st-chrome)] text-[var(--st-text)]">
-      {/* The top bar: the file, who is on air, the range and the session. */}
+      {/* The top bar: who is on the site, the file, the range and the session. */}
       <header className="flex shrink-0 items-center gap-2.5 border-b border-[var(--st-line)] px-3 py-2">
         <BackToChooser />
         <span className={`cp-rec ${live ? "cp-rec-on" : ""}`} aria-hidden />
-        <span className="st-tc text-[11px] text-[var(--st-dim)]">{live ? `${live} on air` : "Off air"}</span>
+        <span className="st-tc text-[11px] text-[var(--st-dim)]">{live ? `${live} on the site` : "Nobody on the site"}</span>
         <span className="st-tc hidden text-[var(--st-faint)] sm:block">controlpanel.aep</span>
 
         <div className="ml-auto flex items-center gap-2">
@@ -328,11 +328,10 @@ export default function ControlPanel() {
             type="button"
             onClick={refresh}
             className="cp-btn px-2!"
-            aria-label={`Sync now, last synced ${clock(now)}`}
-            title="Sync (R)"
+            aria-label={`Refresh, updated ${clock(now)}`}
+            title={`Refresh (R), updated ${clock(now)}`}
           >
             <LuRefreshCw aria-hidden className={syncing ? "animate-spin" : ""} />
-            <span className="st-tc hidden text-[10.5px] md:inline">{new Date(now).toLocaleTimeString("en-US")}</span>
           </button>
           <button type="button" onClick={signOut} className="cp-btn px-2!" aria-label="Lock the panel" title="Lock">
             <LuLock aria-hidden />
@@ -364,9 +363,7 @@ export default function ControlPanel() {
 
       <div className="flex min-h-0 flex-1">
         <aside className="hidden w-[196px] shrink-0 flex-col border-r border-[var(--st-line)] bg-[var(--st-panel)] md:flex lg:w-[216px]">
-          <PanelHead label="Project">
-            <span className="st-tc ml-auto text-[var(--st-faint)]">{COMPS.length}</span>
-          </PanelHead>
+          <PanelHead label="Project" />
           <nav aria-label="Comps" className="min-h-0 flex-1 overflow-y-auto">
             {COMPS.map((c, i) => {
               const on = c.id === comp;
@@ -376,6 +373,7 @@ export default function ControlPanel() {
                   type="button"
                   aria-current={on ? "page" : undefined}
                   onClick={() => setComp(c.id)}
+                  title={`${c.name} (${i + 1})`}
                   className={`relative flex w-full items-center gap-2.5 border-b border-[var(--st-line)] px-3 py-2.5 text-left transition-colors ${
                     on ? "bg-[var(--st-sel)]" : "hover:bg-[var(--st-hover)]"
                   }`}
@@ -401,7 +399,6 @@ export default function ControlPanel() {
                     </span>
                     <span className="st-tc block text-[10px] text-[var(--st-faint)]">{counts[c.id]}</span>
                   </span>
-                  <span className="st-tc text-[10px] text-[var(--st-faint)]">{i + 1}</span>
                 </button>
               );
             })}
@@ -423,9 +420,7 @@ export default function ControlPanel() {
 
         <main className="flex min-w-0 flex-1 flex-col">
           <div className="hidden md:block">
-            <PanelHead label={`Composition · ${current.name}`}>
-              <span className="st-tc ml-auto text-[10px] text-[var(--st-faint)]">{counts[comp]}</span>
-            </PanelHead>
+            <PanelHead label={current.name} />
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto bg-[var(--st-stage)] p-3 sm:p-4">
             <div key={comp} className="st-reveal mx-auto max-w-[1100px]">
@@ -474,12 +469,16 @@ export default function ControlPanel() {
       </div>
 
       <div className="hidden shrink-0 flex-col border-t border-[var(--st-line)] md:flex">
-        <PanelHead label="Timeline · Sessions">
+        <PanelHead label="Timeline">
           <span className="ml-auto flex items-center gap-3 text-[12px] text-[var(--st-faint)]">
             <span className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rotate-45 rounded-[1px] bg-[var(--st-accent)]" /> one visit
             </span>
-            {people.length > TRACKS && <span>{TRACKS} of {people.length} visitors</span>}
+            {people.length > TRACKS && (
+              <span>
+                Latest {TRACKS} of {people.length} visitors
+              </span>
+            )}
             <button
               type="button"
               aria-expanded={timeline}

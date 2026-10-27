@@ -128,7 +128,7 @@ export default function Inspector({
           <Fact k="First seen">{stamp(v.first)}</Fact>
           <Fact k="Last seen">{stamp(v.last)}</Fact>
           <Fact k="Activity">
-            {plural(v.views.length, "view")} · {plural(v.sessions.length, "session")}
+            {plural(v.views.length, "view")} · {plural(v.sessions.length, "visit")}
             {v.asks.length ? ` · ${plural(v.asks.length, "question")}` : ""}
           </Fact>
           {v.id && (

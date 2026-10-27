@@ -4,10 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { clock, day, plural, stamp, type Range, type Visitor } from "./model";
 
 /**
- * The range as a comp's layers. Each recent visitor is one layer, its bar
- * running from their first visit in the range to their last, with a keyframe
- * at every visit. The playhead sits at now, on the right edge, the way a live
- * recording grows.
+ * The range as a comp's layers. Each recent visitor is one layer with a
+ * keyframe at every visit. The playhead sits at now, on the right edge, the
+ * way a live recording grows.
  */
 
 const ROW_H = 40;
@@ -48,8 +47,8 @@ export default function Timeline({
   const laneRef = useRef<HTMLDivElement>(null);
   const shown = people.slice(0, tracks);
   const at = (t: number) => Math.min(100, Math.max(0, ((t - range.start) / range.ms) * 100));
-  // A keyframe's center, held 7px inside each edge so the whole diamond and
-  // the bar around it stay in the lane, at the range's start and at now.
+  // A keyframe's center, held 7px inside each edge so the whole diamond
+  // stays in the lane, at the range's start and at now.
   const key = (t: number) => `clamp(7px, ${at(t)}%, calc(100% - 7px))`;
   const rule = useMemo(() => ticks(range), [range]);
 
@@ -79,16 +78,10 @@ export default function Timeline({
               type="button"
               onClick={() => onSelect(v.key)}
               style={{ height: ROW_H }}
-              className={`flex w-full items-center gap-2 border-b border-[var(--st-line)] px-2.5 text-left transition-colors ${
+              className={`flex w-full items-center border-b border-[var(--st-line)] px-3 text-left transition-colors ${
                 selected === v.key ? "bg-[var(--st-sel)]" : "hover:bg-[var(--st-hover)]"
               }`}
             >
-              {/* The layer's label color: amber once Ali or a link has named them. */}
-              <span
-                aria-hidden
-                className="h-3 w-3 shrink-0 rounded-[2px]"
-                style={{ background: v.known ? "var(--st-accent)" : "rgba(122, 136, 158, 0.7)" }}
-              />
               <span className="min-w-0">
                 <span className={`block truncate text-[12.5px] ${v.known ? "text-[var(--st-text)]" : "text-[var(--st-dim)]"}`}>
                   {v.name}
@@ -122,22 +115,12 @@ export default function Timeline({
 
         {shown.map((v) => {
           const visits = v.sessions.filter((s) => s.end >= range.start);
-          const on = selected === v.key;
-          const tone = v.known ? "var(--st-accent)" : "rgb(150, 162, 182)";
           return (
-            <div key={v.key} style={{ height: ROW_H }} className="relative border-b border-[var(--st-line)]">
-              {visits.length > 0 && (
-                <span
-                  aria-hidden
-                  className="absolute top-1/2 h-[14px] -translate-y-1/2 rounded-[3px] border"
-                  style={{
-                    left: `calc(${key(visits[0].start)} - 7px)`,
-                    right: `calc(100% - ${key(visits.at(-1)!.end)} - 7px)`,
-                    background: v.known ? "var(--st-clip-on)" : "var(--st-clip)",
-                    borderColor: on ? tone : v.known ? "var(--st-sel-line)" : "var(--st-line-strong)",
-                  }}
-                />
-              )}
+            <div
+              key={v.key}
+              style={{ height: ROW_H }}
+              className={`relative border-b border-[var(--st-line)] ${selected === v.key ? "bg-[var(--st-sel)]" : ""}`}
+            >
               {visits.map((s) => (
                 <button
                   key={s.start}
@@ -145,8 +128,8 @@ export default function Timeline({
                   title={`${stamp(s.start)} · ${plural(s.views.length, "page")}`}
                   aria-label={`${v.name}, ${plural(s.views.length, "page")} on ${stamp(s.start)}`}
                   onClick={() => onSelect(v.key)}
-                  className="absolute top-1/2 h-[9px] w-[9px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] transition-transform hover:scale-125"
-                  style={{ left: key(s.start), background: tone }}
+                  className="absolute top-1/2 h-[10px] w-[10px] -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-[1px] bg-[var(--st-accent)] transition-transform hover:scale-125"
+                  style={{ left: key(s.start) }}
                 />
               ))}
             </div>
