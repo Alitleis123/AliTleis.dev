@@ -5,11 +5,13 @@ import Timeline from "../Timeline";
 import {
   ago,
   buckets,
+  day,
   liveNow,
   ms,
   plural,
   rank,
   sourceOf,
+  stamp,
   totals,
   type Link,
   type Range,
@@ -20,7 +22,7 @@ import { Card, Empty, Levels } from "../ui";
 
 /**
  * The first comp: who is on the site now, the range's numbers against the
- * range before it, and where the views came from.
+ * range before it, the views over the range, and where they came from.
  */
 export default function Overview({
   everyone,
@@ -48,7 +50,7 @@ export default function Overview({
     () => totals(everyone, { start: range.start - range.ms, end: range.start }),
     [everyone, range],
   );
-  const bars = useMemo(() => buckets(everyone, range, 24), [everyone, range]);
+  const bars = useMemo(() => buckets(everyone, range, range.bars), [everyone, range]);
 
   const views = useMemo(
     () => people.flatMap((v) => v.views.filter((x) => ms(x.t) >= range.start).map((x) => ({ x, v }))),
@@ -60,33 +62,24 @@ export default function Overview({
   const pages = rank(views, ({ x }) => x.path.replace(/\/?$/, "/"));
   const devices = rank(people, (v) => v.device);
 
-  const meter = (key: keyof Totals, label: string) => {
-    const delta = prev[key] ? Math.round(((cur[key] - prev[key]) / prev[key]) * 100) : null;
-    return (
-      <div className="min-w-0 rounded-[4px] border border-[var(--st-line)] bg-[var(--st-panel)] px-3.5 pb-3 pt-3">
-        <span className="st-label">{label}</span>
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="st-metric-v">{cur[key].toLocaleString()}</span>
-          {delta != null && (
-            <span className={`st-tc text-[10.5px] ${delta >= 0 ? "text-[var(--st-audio)]" : "text-[#ff8a80]"}`}>
-              {delta >= 0 ? "+" : ""}
-              {delta}%
-            </span>
-          )}
-        </div>
-        <span className="st-tc mt-1 block text-[10px] text-[var(--st-faint)]">
-          {prev[key].toLocaleString()} in the previous {range.label}
-        </span>
-      </div>
-    );
-  };
+  const meter = (key: keyof Totals, label: string) => (
+    <div className="min-w-0 rounded-[4px] border border-[var(--st-line)] bg-[var(--st-panel)] px-3 pb-3 pt-3 sm:px-3.5">
+      <span className="st-label">{label}</span>
+      <span className="st-metric-v mt-2 block">{cur[key].toLocaleString()}</span>
+      <span className="mt-1.5 block text-[12px] leading-snug text-[var(--st-faint)]">
+        {prev[key].toLocaleString()} the {range.before}
+      </span>
+    </div>
+  );
 
   const peak = Math.max(1, ...bars);
+  // A day's range is told by the hour, the longer ones by the day.
+  const when = (t: number) => (range.id === "24h" ? stamp(t) : day(t));
 
   return (
     <div className="flex flex-col gap-3">
       <Card
-        label="On air"
+        label="On the site now"
         right={<span className="st-tc text-[10px] text-[var(--st-faint)]">last 5 minutes</span>}
       >
         {live.length ? (
@@ -116,40 +109,51 @@ export default function Overview({
         )}
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        {meter("views", "Views")}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {meter("visitors", "Visitors")}
-        {meter("sessions", "Sessions")}
+        {meter("views", "Page views")}
         {meter("questions", "Questions")}
       </div>
 
-      {/* The range's traffic as a level strip, readable at a glance on a phone
-          where the timeline is below the fold. */}
-      <div className="flex h-[54px] items-end gap-[3px] rounded-[4px] border border-[var(--st-line)] bg-[var(--st-panel)] px-3 pb-2.5 pt-3">
-        {bars.map((n, i) => (
-          <span
-            key={i}
-            title={plural(n, "view")}
-            className="flex-1 rounded-[1px]"
-            style={{
-              height: n ? `${Math.max(10, (n / peak) * 100)}%` : "2px",
-              background: n ? "var(--st-accent)" : "var(--st-line-strong)",
-              opacity: n ? 0.45 + 0.55 * (n / peak) : 1,
-            }}
-          />
-        ))}
-      </div>
+      {/* The range's views, one bar per hour, day or five days. */}
+      <Card
+        label="Page views"
+        right={<span className="st-tc text-[10px] text-[var(--st-faint)]">{range.per}</span>}
+      >
+        <div className="flex h-[64px] items-end gap-[3px] px-3 pt-3">
+          {bars.map((n, i) => (
+            <span
+              key={i}
+              title={`${plural(n, "view")}, ${stamp(range.start + (i * range.ms) / range.bars)} to ${stamp(range.start + ((i + 1) * range.ms) / range.bars)}`}
+              className="flex-1 rounded-[1px]"
+              style={{
+                height: n ? `${Math.max(10, (n / peak) * 100)}%` : "2px",
+                background: n ? "var(--st-accent)" : "var(--st-line-strong)",
+                opacity: n ? 0.45 + 0.55 * (n / peak) : 1,
+              }}
+            />
+          ))}
+        </div>
+        <div className="st-tc flex justify-between px-3 pb-2.5 pt-1.5 text-[10px] text-[var(--st-faint)]">
+          <span>{when(range.start)}</span>
+          <span>now</span>
+        </div>
+      </Card>
 
       {/* The docked timeline is md and up. On a phone it lives here. */}
       <div className="overflow-hidden rounded-[4px] border border-[var(--st-line)] md:hidden">
         <Timeline
           people={people}
-          everyone={everyone}
           range={range}
           selected={selected}
           onSelect={onSelect}
           tracks={5}
         />
+        {people.length > 5 && (
+          <p className="st-tc border-t border-[var(--st-line)] px-3 py-1.5 text-[var(--st-faint)]">
+            Latest 5 of {people.length} visitors
+          </p>
+        )}
       </div>
 
       <div className="grid gap-3 lg:grid-cols-2">
