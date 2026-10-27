@@ -189,7 +189,7 @@ export const RANGES = [
   { id: "24h", label: "24H", ms: 24 * 60 * 60 * 1000, before: "day before", bars: 24, per: "per hour" },
   { id: "7d", label: "7D", ms: 7 * 24 * 60 * 60 * 1000, before: "week before", bars: 7, per: "per day" },
   { id: "30d", label: "30D", ms: 30 * 24 * 60 * 60 * 1000, before: "30 days before", bars: 30, per: "per day" },
-  { id: "90d", label: "90D", ms: 90 * 24 * 60 * 60 * 1000, before: "90 days before", bars: 13, per: "per week" },
+  { id: "90d", label: "90D", ms: 90 * 24 * 60 * 60 * 1000, before: "90 days before", bars: 18, per: "per 5 days" },
 ] as const;
 
 export type RangeId = (typeof RANGES)[number]["id"];

@@ -115,7 +115,7 @@ export default function Overview({
         {meter("questions", "Questions")}
       </div>
 
-      {/* The range's views, one bar per hour, day or week. */}
+      {/* The range's views, one bar per hour, day or five days. */}
       <Card
         label="Page views"
         right={<span className="st-tc text-[10px] text-[var(--st-faint)]">{range.per}</span>}
@@ -124,7 +124,7 @@ export default function Overview({
           {bars.map((n, i) => (
             <span
               key={i}
-              title={`${plural(n, "view")}, ${when(range.start + (i * range.ms) / range.bars)}`}
+              title={`${plural(n, "view")}, ${stamp(range.start + (i * range.ms) / range.bars)} to ${stamp(range.start + ((i + 1) * range.ms) / range.bars)}`}
               className="flex-1 rounded-[1px]"
               style={{
                 height: n ? `${Math.max(10, (n / peak) * 100)}%` : "2px",
