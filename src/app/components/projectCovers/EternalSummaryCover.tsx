@@ -1,79 +1,39 @@
 "use client";
 
-import { BUILD_YEAR } from "../../data";
+// Straight from the project site's tokens (sidebandstudio.github.io/Eternal-Summary).
+const BG = "#100F14";
+const RAISE = "#17161C";
+const RAISE_2 = "#201F27";
+const INK = "#EDEAE4";
+const DIM = "#A8A3AE";
+const FAINT = "#857F8D";
+const LINE = "rgba(237,234,228,0.11)";
+const ACCENT = "#7B8CFF";
+const SERIF = "Newsreader, 'Iowan Old Style', Charter, Georgia, serif";
 
-// Straight from ui.css and the project site: --accent on --bg, with
-// --raise for the rail.
-const PURPLE = "#7B8CFF";
-const PINK = "#A78BFF";
-const CYAN = "#6EA8FF";
-const SIDEBAR_BG = "#17161C";
-const MAIN_BG = "#100F14";
+// The site's mark, drawn on a 48x28 box.
+const INFINITY = "M13 5c9 0 13 18 22 18 9 0 11-18 0-18-9 0-13 18-22 18-9 0-11-18 0-18z";
 
-type NavItem = { label: string; icon: "home" | "star" | "play" | "gear" | "down" | "info"; active?: boolean };
+function Mark({ x, y, scale }: { x: number; y: number; scale: number }) {
+  return (
+    <path
+      d={INFINITY}
+      transform={`translate(${x}, ${y}) scale(${scale})`}
+      fill="none"
+      stroke="url(#es-mark)"
+      strokeWidth="3.2"
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    />
+  );
+}
 
-const NAV: NavItem[] = [
-  { label: "What it does", icon: "star", active: true },
-  { label: "A look", icon: "play" },
-  { label: "How to use it", icon: "gear" },
-  { label: "Install", icon: "down" },
-  { label: "About", icon: "info" },
-];
-
-function NavIcon({ kind, color }: { kind: NavItem["icon"]; color: string }) {
-  const sw = 1.4;
-  const common = { fill: "none", stroke: color, strokeWidth: sw, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-  switch (kind) {
-    case "home":
-      return (
-        <g {...common}>
-          <path d="M-6 0 L0 -6 L6 0 L6 6 L-6 6 Z" />
-          <line x1="-2" y1="6" x2="-2" y2="2" />
-          <line x1="2" y1="6" x2="2" y2="2" />
-        </g>
-      );
-    case "star":
-      return (
-        <g {...common}>
-          <path d="M0 -6 L1.8 -1.8 L6 -1.8 L2.6 1.2 L4 5.6 L0 3 L-4 5.6 L-2.6 1.2 L-6 -1.8 L-1.8 -1.8 Z" />
-        </g>
-      );
-    case "play":
-      return (
-        <g {...common}>
-          <path d="M-4 -5 L5 0 L-4 5 Z" />
-        </g>
-      );
-    case "gear":
-      return (
-        <g {...common}>
-          <circle r="2.5" />
-          <path d="M0 -7 L0 -5 M0 5 L0 7 M-7 0 L-5 0 M5 0 L7 0 M-5 -5 L-3.5 -3.5 M3.5 3.5 L5 5 M-5 5 L-3.5 3.5 M3.5 -3.5 L5 -5" />
-        </g>
-      );
-    case "down":
-      return (
-        <g {...common}>
-          <line x1="0" y1="-5" x2="0" y2="3" />
-          <path d="M-3 0 L0 3 L3 0" />
-          <line x1="-5" y1="6" x2="5" y2="6" />
-        </g>
-      );
-    case "info":
-      return (
-        <g {...common}>
-          <circle r="6" />
-          <line x1="0" y1="-2" x2="0" y2="4" />
-          <circle cx="0" cy="-4" r="0.4" fill={color} />
-        </g>
-      );
-  }
+/** A line of placeholder text in the rail. */
+function Line({ x, y, w, o = 0.32 }: { x: number; y: number; w: number; o?: number }) {
+  return <rect x={x} y={y} width={w} height="4" rx="2" fill={INK} opacity={o} />;
 }
 
 export default function EternalSummaryCover() {
-  const SIDEBAR_W = 150;
-  const mainCenterX = SIDEBAR_W + (800 - SIDEBAR_W) / 2;
-
   return (
     <svg
       viewBox="0 0 800 450"
@@ -83,150 +43,118 @@ export default function EternalSummaryCover() {
       style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}
     >
       <defs>
-        <linearGradient id="es-logoStroke" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={CYAN} />
-          <stop offset="50%" stopColor={PURPLE} />
-          <stop offset="100%" stopColor={PINK} />
+        <linearGradient id="es-mark" x1="4" y1="5" x2="44" y2="23" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#38BDF8" />
+          <stop offset=".5" stopColor={ACCENT} />
+          <stop offset="1" stopColor="#C084FC" />
         </linearGradient>
-        <linearGradient id="es-headlineGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor={PURPLE} />
-          <stop offset="100%" stopColor={PINK} />
+        <linearGradient id="es-lit" x1="0" y1="0" x2="1" y2="0.2">
+          <stop stopColor="#38BDF8" />
+          <stop offset=".45" stopColor={ACCENT} />
+          <stop offset="1" stopColor="#C084FC" />
         </linearGradient>
-        <radialGradient id="es-ambient" cx="50%" cy="40%" r="55%">
-          <stop offset="0%" stopColor="rgba(123,140,255,0.20)" />
-          <stop offset="55%" stopColor="rgba(123,140,255,0.04)" />
+        <radialGradient id="es-glow" cx="78%" cy="52%" r="45%">
+          <stop offset="0%" stopColor="rgba(123,140,255,0.13)" />
           <stop offset="100%" stopColor="rgba(123,140,255,0)" />
         </radialGradient>
-        <radialGradient id="es-orbCenter" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#1C1B26" />
-          <stop offset="60%" stopColor="#131219" />
-          <stop offset="100%" stopColor="#0C0B10" />
-        </radialGradient>
-        <radialGradient id="es-orbGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(167,139,255,0.40)" />
-          <stop offset="55%" stopColor="rgba(123,140,255,0.18)" />
-          <stop offset="100%" stopColor="rgba(123,140,255,0)" />
-        </radialGradient>
-        <linearGradient id="es-btn" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#5F73F5" />
-          <stop offset="100%" stopColor="#7B8CFF" />
-        </linearGradient>
       </defs>
 
-      {/* Main background */}
-      <rect width="800" height="450" fill={MAIN_BG} />
-      <rect x={SIDEBAR_W} y="0" width={800 - SIDEBAR_W} height="450" fill="url(#es-ambient)" />
+      <rect width="800" height="450" fill={BG} />
+      <rect width="800" height="450" fill="url(#es-glow)" />
 
-      {/* Sidebar */}
-      <g>
-        <rect width={SIDEBAR_W} height="450" fill={SIDEBAR_BG} />
-        <line x1={SIDEBAR_W} y1="0" x2={SIDEBAR_W} y2="450" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+      {/* Hero, as on the site: the mark, the serif headline, two actions. */}
+      <Mark x={40} y={66} scale={1.3} />
 
-        {/* Brand: ES logo + wordmark */}
-        <g transform="translate(20, 30)">
-          {/* Logo mark, infinity-like ring */}
-          <g transform="translate(13, 13)">
-            <circle r="11" fill="none" stroke="url(#es-logoStroke)" strokeWidth="1.5" />
-            <path
-              d="M -5 0 C -5 -3, -2 -3, 0 0 C 2 3, 5 3, 5 0 C 5 -3, 2 -3, 0 0 C -2 3, -5 3, -5 0 Z"
-              fill="none"
-              stroke="url(#es-logoStroke)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
+      <text fontFamily={SERIF} fontSize="46" letterSpacing="-1.2" fill={INK}>
+        <tspan x="40" y="152">Read the page,</tspan>
+        <tspan x="40" y="200">
+          <tspan fill="url(#es-lit)" fontStyle="italic">
+            not all of it
+          </tspan>
+          .
+        </tspan>
+      </text>
+
+      <text fontFamily={SERIF} fontSize="15" fill={DIM}>
+        <tspan x="40" y="240">One click summarizes the page you&apos;re on,</tspan>
+        <tspan x="40" y="260">with sources you can check.</tspan>
+      </text>
+
+      <g transform="translate(40, 282)">
+        <rect width="126" height="34" rx="17" fill={INK} />
+        <circle cx="21" cy="17" r="7" fill="#EA4335" />
+        <path d="M21 10 A7 7 0 0 1 27.06 20.5 L21 17 Z" fill="#FBBC05" />
+        <path d="M27.06 20.5 A7 7 0 0 1 14.94 20.5 L21 17 Z" fill="#34A853" />
+        <circle cx="21" cy="17" r="3" fill="#4285F4" stroke="#fff" strokeWidth="1.2" />
+        <text x="36" y="21.5" fontSize="12" fontWeight="500" fill={BG}>
+          Add to Chrome
+        </text>
+        <rect x="136" width="116" height="34" rx="17" fill="none" stroke={LINE} strokeWidth="1.2" />
+        <path d="M153 12 L161 17 L153 22 Z" fill={INK} />
+        <text x="169" y="21.5" fontSize="12" fontWeight="500" fill={INK}>
+          Watch it work
+        </text>
+      </g>
+      <text y="342" fontSize="11" fill={FAINT}>
+        <tspan x="40">Free</tspan>
+        <tspan x="78">No account</tspan>
+      </text>
+
+      {/* The rail, open beside a page. */}
+      <g transform="translate(486, 72)">
+        <rect width="276" height="300" rx="12" fill={RAISE} stroke={LINE} />
+
+        <Mark x={14} y={16} scale={0.5} />
+        <text x="44" y="26" fontSize="10.5" fontWeight="600" fill={INK}>
+          Eternal Summary
+        </text>
+        <text x="44" y="39" fontSize="8.5" fill={FAINT}>
+          2 min read
+        </text>
+        <g transform="translate(236, 25)" fill="none" stroke={FAINT} strokeWidth="1.2" strokeLinecap="round">
+          <circle r="2.6" />
+          <path d="M0 -5.5V-4M0 4V5.5M-5.5 0H-4M4 0H5.5M-3.9 -3.9L-2.8 -2.8M2.8 2.8L3.9 3.9M-3.9 3.9L-2.8 2.8M2.8 -2.8L3.9 -3.9" />
+        </g>
+        <path d="M252 21 L259 28 M259 21 L252 28" stroke={FAINT} strokeWidth="1.2" strokeLinecap="round" />
+        <line x1="0" y1="52" x2="276" y2="52" stroke={LINE} />
+
+        <text x="14" y="70" fontSize="9" fontWeight="600" fill={ACCENT}>
+          Worth reading
+        </text>
+        <Line x={82} y={64} w={150} o={0.22} />
+        <line x1="0" y1="84" x2="276" y2="84" stroke={LINE} />
+
+        <rect x="12" y="94" width="252" height="24" rx="12" fill={BG} />
+        <rect x="14" y="96" width="62" height="20" rx="10" fill={RAISE_2} />
+        <g fontSize="8.5" textAnchor="middle">
+          <text x="45" y="109" fill={INK}>Summary</text>
+          <text x="104" y="109" fill={DIM}>Bullets</text>
+          <text x="160" y="109" fill={DIM}>Key points</text>
+          <text x="226" y="109" fill={DIM}>Plain English</text>
+        </g>
+
+        <text x="14" y="140" fontSize="8.5" fill={FAINT}>
+          Summary
+        </text>
+        <rect x="14" y="150" width="2" height="88" rx="1" fill={ACCENT} opacity="0.6" />
+        {[240, 228, 244, 220, 236, 232, 246, 150].map((w, i) => (
+          <Line key={i} x={24} y={152 + i * 11} w={w - 6} />
+        ))}
+
+        <text x="14" y="262" fontSize="8.5" fill={FAINT}>
+          Sources
+        </text>
+        {[1, 2, 3].map((n, i) => (
+          <g key={n} transform={`translate(${60 + i * 18}, 259)`}>
+            <circle r="6.5" fill={RAISE_2} stroke={LINE} />
+            <text y="3" fontSize="7.5" textAnchor="middle" fill={DIM}>
+              {n}
+            </text>
           </g>
-          <text x="34" y="18" fontSize="11" fontWeight="700" fill="#ffffff" letterSpacing="0.1">
-            Eternal Summary
-          </text>
-        </g>
-
-        {/* Nav items */}
-        {NAV.map((item, i) => {
-          const y = 106 + i * 32;
-          const labelColor = item.active ? "#ffffff" : "rgba(180,180,200,0.55)";
-          const iconColor = item.active ? "#ffffff" : "rgba(180,180,200,0.55)";
-          return (
-            <g key={item.label} transform={`translate(0, ${y})`}>
-              {item.active ? (
-                <rect x="10" y="-10" width={SIDEBAR_W - 20} height="22" rx="5" fill="rgba(123,140,255,0.12)" />
-              ) : null}
-              <g transform="translate(24, 1)">
-                <NavIcon kind={item.icon} color={iconColor} />
-              </g>
-              <text x="40" y="5" fontSize="10" fontWeight={item.active ? 600 : 500} fill={labelColor} letterSpacing="0.2">
-                {item.label}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Sidebar footer */}
-        <g transform="translate(20, 395)">
-          <text fontSize="8.5" fill="rgba(123,140,255,0.90)" fontWeight="500">
-            GitHub Repository
-          </text>
-          <text y="14" fontSize="7.5" fill="rgba(180,180,200,0.45)">
-            © {BUILD_YEAR} Ali Tleis
-          </text>
-          <text y="25" fontSize="7.5" fill="rgba(180,180,200,0.45)">
-            CS @ Northeastern University
-          </text>
-        </g>
-      </g>
-
-      {/* Centered orb */}
-      <g transform={`translate(${mainCenterX}, 130)`}>
-        {/* Outer glow halo */}
-        <circle r="62" fill="url(#es-orbGlow)" />
-        {/* Outer ring */}
-        <circle r="38" fill="none" stroke="url(#es-logoStroke)" strokeWidth="2.5" />
-        {/* Inner dark sphere */}
-        <circle r="33" fill="url(#es-orbCenter)" />
-        {/* Infinity-style mark inside */}
-        <g>
-          <path
-            d="M -10 0 C -10 -6, -4 -6, 0 0 C 4 6, 10 6, 10 0 C 10 -6, 4 -6, 0 0 C -4 6, -10 6, -10 0 Z"
-            fill="none"
-            stroke="url(#es-logoStroke)"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </g>
-      </g>
-
-      {/* Headline */}
-      <g textAnchor="middle">
-        <text x={mainCenterX} y="230" fontSize="36" fontWeight="800" fill="#ffffff" letterSpacing="-1">
-          Read the page,
-        </text>
-        <text x={mainCenterX} y="272" fontSize="36" fontWeight="800" fill="url(#es-headlineGrad)" letterSpacing="-1">
-          not all of it.
-        </text>
-      </g>
-
-      {/* Subtitle */}
-      <g textAnchor="middle" fill="rgba(180,180,200,0.65)" fontSize="11">
-        <text x={mainCenterX} y="306">
-          Summarizes whatever you are reading, answers questions about it,
-        </text>
-        <text x={mainCenterX} y="322">
-          and shows you the passages it drew on.
-        </text>
-      </g>
-
-      {/* Get Started button */}
-      <g transform={`translate(${mainCenterX - 60}, 348)`}>
-        <rect width="120" height="34" rx="17" fill="url(#es-btn)" />
-        <rect width="120" height="34" rx="17" fill="none" stroke="rgba(167,139,255,0.40)" strokeWidth="1" />
-        <text x="60" y="22" textAnchor="middle" fontSize="12" fontWeight="700" fill="#ffffff" letterSpacing="0.3">
-          Install it
-        </text>
-      </g>
-
-      {/* Tab-style URL bar at top right (subtle browser hint) */}
-      <g transform="translate(620, 18)" fontFamily="var(--font-geist-mono), ui-monospace, monospace">
-        <text fontSize="8" fill="rgba(180,180,200,0.35)" letterSpacing="0.5">
-          alitleis123.github.io/Eternal-Summary
+        ))}
+        <line x1="0" y1="278" x2="276" y2="278" stroke={LINE} />
+        <text x="14" y="293" fontSize="8.5" fill={FAINT}>
+          Ask about this page
         </text>
       </g>
     </svg>
