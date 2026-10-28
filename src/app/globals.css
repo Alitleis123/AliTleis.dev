@@ -62,7 +62,7 @@
      ramp put 9px mono labels at 2.06:1, far under the 4.5:1 small text needs. */
   --text-muted: rgba(237, 237, 234, 0.68); /* ~7.7:1 */
   --text-dim: rgba(237, 237, 234, 0.56);   /* ~5.4:1 */
-  --text-faint: rgba(237, 237, 234, 0.43); /* ~3.9:1 */
+  --text-faint: rgba(237, 237, 234, 0.5);  /* ~4.7:1 */
 
   --border-hairline: rgba(237, 237, 234, 0.08);
   --border-soft: rgba(237, 237, 234, 0.14);
