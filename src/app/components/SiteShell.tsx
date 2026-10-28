@@ -97,13 +97,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   // On a phone the Resume and audio pills open on top of the portrait, so
-  // below sm they wait until the page has scrolled past it. Once shown they
-  // stay, or scrolling back up would hide the pause button mid-playback.
-  const [scrolled, setScrolled] = useState(false);
+  // below sm they wait until the page has scrolled past it, or until audio
+  // starts, since a saved preference resumes it at the top of the page. Once
+  // shown they stay, or scrolling back up would hide the pause button
+  // mid-playback.
+  const [shown, setShown] = useState(false);
   useEffect(() => {
     const onScroll = () => {
       if (window.scrollY <= 300) return;
-      setScrolled(true);
+      setShown(true);
       window.removeEventListener("scroll", onScroll);
     };
     onScroll();
@@ -152,11 +154,11 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
 
       <div
         className={`transition-[opacity,visibility] duration-300 ${
-          scrolled ? "" : "max-sm:invisible max-sm:opacity-0"
+          shown ? "" : "max-sm:invisible max-sm:opacity-0"
         }`}
       >
         <ResumeButton />
-        <AmbientAudio />
+        <AmbientAudio onStart={() => setShown(true)} />
       </div>
       <ScrollToTop />
       <CommandPalette />

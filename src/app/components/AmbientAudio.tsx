@@ -15,7 +15,7 @@ const VOLUME = 0.45;
  * on both ends, since an abrupt start is the thing that makes site audio
  * feel like an accident.
  */
-export default function AmbientAudio() {
+export default function AmbientAudio({ onStart }: { onStart?: () => void }) {
   const [state, setState] = useState<AudioState>("off");
 
   const elRef = useRef<HTMLAudioElement | null>(null);
@@ -163,7 +163,10 @@ export default function AmbientAudio() {
         // this the label and the sound could disagree, and then the button
         // does the opposite of what it says: it reads "off" while audio plays,
         // so pressing it calls play() and the sound never stops.
-        onPlay={() => setState("on")}
+        onPlay={() => {
+          setState("on");
+          onStart?.();
+        }}
         onPause={() => setState("off")}
       />
       <button
