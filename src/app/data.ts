@@ -146,10 +146,10 @@ export const timeline: TimelineEntry[] = [
     subtitle: "Co-Founder · Full-Stack Engineer",
     range: "Jan 2026 - Present",
     meta: "Boston, MA",
-    desc: "Co-founded an independent software studio with four founders. I build the studio site and product pages in Next.js, and develop products across desktop, browser and web.",
+    desc: "One of five founding engineers at an independent software studio. I build the studio site and product pages in Next.js, and develop products across desktop, browser and web.",
     bullets: [
-      "Own the studio site and product pages, built with the Next.js App Router, strict TypeScript, Tailwind CSS and Framer Motion.",
-      "Build the Python and Lua pipeline behind Upflow2x, a DaVinci Resolve plugin, and contribute to products including Eternal Summary, EternalMonitor and Exerly Fitness.",
+      "Own the studio site and product pages, built with the Next.js App Router, strict TypeScript and Tailwind CSS.",
+      "Build the Python and Lua pipeline behind Upflow2x, a DaVinci Resolve plugin, built Eternal Summary and Better Canvas, and own AMD GPU support in EternalMonitor.",
       "Built the engineer roster from structured data, with a profile for each founder and links between products and the people who build them.",
       "Added Playwright checks for the studio pages and a shared copy-style check in CI. Helped move the live site and product links through the 2026 rebrand from Eternal Reverse to Sideband.",
     ],
@@ -159,8 +159,8 @@ export const timeline: TimelineEntry[] = [
     tech: ["Next.js", "TypeScript", "React", "Node.js", "Tailwind CSS", "Python", "Lua", "Playwright"],
     images: [
       { src: withBasePath("/projects/sideband-hero.webp"), alt: "Sideband studio home page" },
-      { src: withBasePath("/projects/sideband-products.webp"), alt: "Sideband product lineup" },
-      { src: withBasePath("/projects/sideband-engineers.webp"), alt: "Sideband founder profiles" },
+      { src: withBasePath("/projects/sideband-products.webp"), alt: "Sideband products page, twelve products ranked on GitHub" },
+      { src: withBasePath("/projects/sideband-engineers.webp"), alt: "Sideband's five founding engineers" },
     ],
   },
   {
