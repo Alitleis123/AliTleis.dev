@@ -112,7 +112,7 @@ export default function Intro() {
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
           <p className="max-w-[54ch] text-[16px] leading-[1.75] text-[var(--text-muted)]">
-            Outside work I build tools for problems I hit myself. Eternal2x
+            Outside work I build tools for problems I hit myself. Upflow2x
             exists because every interpolator I tried smeared the held frames
             in my anime edits. On EternalMonitor, the iPad second-screen app, I
             own AMD GPU support, from the AMF encoder to the software fallback.

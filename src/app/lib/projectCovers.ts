@@ -1,8 +1,8 @@
 import type { ComponentType } from "react";
 import ExerlyCover from "../components/projectCovers/ExerlyCover";
-import Eternal2xCover from "../components/projectCovers/Eternal2xCover";
 import EternalMonitorCover from "../components/projectCovers/EternalMonitorCover";
 import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover";
+import Upflow2xCover from "../components/projectCovers/Upflow2xCover";
 
 /**
  * Purpose-drawn covers, keyed by a project's `coverKey`.
@@ -13,7 +13,7 @@ import EternalSummaryCover from "../components/projectCovers/EternalSummaryCover
  */
 export const COVER_MAP: Record<string, ComponentType> = {
   exerly: ExerlyCover,
-  eternal2x: Eternal2xCover,
   eternalMonitor: EternalMonitorCover,
   eternalSummary: EternalSummaryCover,
+  upflow2x: Upflow2xCover,
 };

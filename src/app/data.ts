@@ -149,7 +149,7 @@ export const timeline: TimelineEntry[] = [
     desc: "Co-founded an independent software studio with four founders. I build the studio site and product pages in Next.js, and develop products across desktop, browser and web.",
     bullets: [
       "Own the studio site and product pages, built with the Next.js App Router, strict TypeScript, Tailwind CSS and Framer Motion.",
-      "Build the Python and Lua pipeline behind Eternal2x, a DaVinci Resolve plugin, and contribute to products including Eternal Summary, EternalMonitor and Exerly Fitness.",
+      "Build the Python and Lua pipeline behind Upflow2x, a DaVinci Resolve plugin, and contribute to products including Eternal Summary, EternalMonitor and Exerly Fitness.",
       "Built the engineer roster from structured data, with a profile for each founder and links between products and the people who build them.",
       "Added Playwright checks for the studio pages and a shared copy-style check in CI. Helped move the live site and product links through the 2026 rebrand from Eternal Reverse to Sideband.",
     ],
@@ -344,29 +344,31 @@ export type Project = {
 
 export const featuredProjects: Project[] = [
   {
-    id: "eternal2x",
-    title: "Eternal2x",
-    subtitle: "eternal2x.com",
+    id: "upflow2x",
+    title: "Upflow2x",
+    subtitle: "upflow2x.com",
     range: "Jan 2026 – Present",
-    desc: "DaVinci Resolve plugin for hand-drawn animation. It finds the real drawings behind duplicated frames, then rebuilds the motion with optical flow.",
+    desc: "DaVinci Resolve Studio plugin for anime. It finds the real drawings behind held frames, draws the missing in-betweens with RIFE and redraws every frame at 2x with Real-ESRGAN, all on your own machine.",
     bullets: [
-      `This one came out of my own edits. I create anime edits for an audience of ${followerLabel}, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted.`,
-      "Anime is drawn on 2s or 3s. Twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing. There is no motion between the frames to interpolate. Eternal2x recovers the unique drawings first, then rebuilds the shot at the original length and frame rate.",
-      "Frame-difference scoring finds the duplicates and infers whether a clip is on 1s, 2s or 3s, so the hold pattern is read off the footage rather than typed in. If a clip has no duplicated frames the plugin says so and stops, instead of inventing motion that was never drawn.",
-      "In-betweens come from DIS optical flow and a per-pixel remap. Where forward and backward motion disagree, which is exactly where flow normally tears, it fades to a soft dissolve instead of emitting a broken frame. Deliberate held poses stay still, and cuts snap rather than blending two shots together.",
-      "The Lua panel is a thin wrapper over the Python modules, so every button has a command-line equivalent and --video runs the whole pipeline without opening Resolve at all.",
-      "362 tests run green against a faked Resolve API, covering the bridge, the installer, the release builder and the site, so CI needs no copy of Resolve Studio. The Lua UI is driven from Python through an embedded Lua runtime.",
-      "Ships a one-click installer that provisions its own Python when the machine has none, plus a startup updater that verifies each download against a SHA-256 checksum before applying it.",
+      `This one came out of my own edits. I create anime edits for an audience of ${followerLabel}, Twixtor smears the held frames, and every other interpolator invented motion between two identical drawings, so I wrote the tool I actually wanted. It was called Eternal2x up to v0.4.0, and it now ships as Upflow2x from Sideband Studio.`,
+      "Anime is drawn on 2s or 3s. Twelve drawings a second, each held for two or three frames to fill 24fps. Most neighbouring frames are therefore identical, which is why running the footage straight through a frame interpolator does nothing. There is no motion between the frames to interpolate. Upflow2x recovers the unique drawings first, then draws only the frames that were never drawn.",
+      "Analyse scores frame differences to find the held drawings and works out whether a clip is on 1s, 2s or 3s. A colour change, a slow fade or a slow pan counts as motion rather than a hold, and a Grainy source setting sees through film grain. It puts a marker on every drawing, so you can move, delete or add markers before rendering, and it never touches markers you placed yourself.",
+      "The in-betweens come from the RIFE 4.25 network through ONNX Runtime, on the GPU through DirectML on Windows, at about 0.13 s an in-between at 2K on a Radeon. Nothing is made by warping pixels along optical flow, which doubles lines and smears fast characters on drawn animation. Held poses stay still, and cuts snap instead of blending two shots together.",
+      "The 2x upscale is Real-ESRGAN's anime video model, about 0.14 s a 1080p frame on a Radeon. It clears compression blocks and keeps thin lines crisp, where Resolve's Super Scale enlarges the blocks. Without a GPU it falls back to Super Scale.",
+      "Render runs in the background with progress and time left, so Resolve stays usable. The result lands on the track above the original at a third of the speed with every frame drawn, ready to time remap, and never covers or moves another clip.",
+      "The Lua panel is a thin wrapper over the Python modules, so every button has a command-line equivalent and --video runs the whole pipeline without opening Resolve. 360+ tests run on Linux, macOS and Windows against a faked Resolve API, with the panel driven through an embedded Lua runtime, so CI needs no copy of Resolve Studio.",
+      "Updates are checked against a SHA-256 checksum before they apply, and a failed update puts back the files it replaced. Release archives are byte reproducible, so rebuilding a tag on any machine gives the published checksums.",
     ],
-    icon: withBasePath("/projects/eternal2x%20about.webp"),
-    iconAlt: "Eternal2x icon",
-    tech: ["Python", "Lua", "OpenCV", "NumPy", "DaVinci Resolve", "pytest"],
-    demo: "https://eternal2x.com",
-    repo: "https://github.com/Alitleis123/Eternal2x.com",
-    coverKey: "eternal2x",
+    icon: withBasePath("/projects/upflow2x-home.webp"),
+    iconAlt: "Upflow2x icon",
+    tech: ["Python", "Lua", "ONNX Runtime", "DirectML", "OpenCV", "NumPy", "DaVinci Resolve", "pytest"],
+    demo: "https://upflow2x.com",
+    repo: "https://github.com/sidebandstudio/Upflow2x",
+    coverKey: "upflow2x",
     gallery: [
-      { src: withBasePath("/projects/eternal2x%20about.webp"), alt: "Eternal2x, about page" },
-      { src: withBasePath("/projects/eternal2x%20download.webp"), alt: "Eternal2x, download page" },
+      { src: withBasePath("/projects/upflow2x-home.webp"), alt: "Upflow2x home page, with the before and after comparison" },
+      { src: withBasePath("/projects/upflow2x-how.webp"), alt: "Upflow2x, how it works" },
+      { src: withBasePath("/projects/upflow2x-download.webp"), alt: "Upflow2x download page" },
     ],
   },
   {
@@ -591,7 +593,7 @@ export const offClockExtras = [
  * the evidence for how you would know.
  */
 export const offClockNote =
-  `I create edits from anime, shows and movies for an audience of ${followerLabel}, and Eternal2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.`;
+  `I create edits from anime, shows and movies for an audience of ${followerLabel}, and Upflow2x came out of doing it. The footage is drawn on 2s, every interpolator I tried smeared the held frames, so I wrote one that treats the duplicates as deliberate. The edits themselves are built in After Effects, with nulls driving parented transforms, compositing in 3D space with camera moves, effects stacked deep, easing hand-tuned on every move, and the sound designed to match the cut.`;
 
 // ───────────────────────────────────────────────────────────────────
 // About
