@@ -374,7 +374,7 @@ export const featuredProjects: Project[] = [
     title: "EternalMonitor",
     subtitle: "eternalmonitor.dev",
     range: "Apr 2026 – Present",
-    desc: "I'm an open-source contributor and own its AMD GPU support. It turns an iPad into a second screen for Windows, extending or mirroring the desktop over Wi-Fi or USB with touch, keyboard and Apple Pencil input, and plays the PC's audio on the iPad.",
+    desc: "I build it with the Sideband team and own its AMD GPU support. It turns an iPad into a second screen for Windows, extending or mirroring the desktop over Wi-Fi or USB with touch, keyboard and Apple Pencil input, and plays the PC's audio on the iPad.",
     metrics: [
       { value: "500+", label: "users", icon: "users" },
       { value: "175+", label: "GitHub stars", icon: "star" },
