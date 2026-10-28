@@ -35,7 +35,7 @@ export default function Intro() {
           </motion.h1>
 
           <motion.div variants={heroItem} className="mt-7">
-            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[var(--signal-dim)] bg-[var(--signal-wash)] px-3.5 py-1.5 text-[13px] font-medium tracking-tight text-white/85">
+            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[var(--signal-dim)] bg-[var(--signal-wash)] px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white/85 sm:text-[13px]">
               <span
                 aria-hidden
                 className="current-dot relative block h-1.5 w-1.5 rounded-full"
