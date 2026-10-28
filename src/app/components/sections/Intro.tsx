@@ -49,7 +49,7 @@ export default function Intro() {
 
           <motion.p
             variants={heroItem}
-            className="mt-8 max-w-[36rem] text-[15px] leading-[1.7] text-[var(--text-muted)]"
+            className="mt-8 max-w-[36rem] text-[18px] leading-[1.65] text-white/85"
           >
             CS and Sociology student at Northeastern. I&apos;m on a seven-month
             co-op at MIT Lincoln Laboratory, where I own the internal AI search
@@ -111,7 +111,7 @@ export default function Intro() {
         className="mt-24 grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-x-16"
       >
         <motion.div variants={staggerChild} className="md:col-span-7">
-          <p className="max-w-[54ch] text-[18px] leading-[1.7] text-[var(--text-muted)]">
+          <p className="max-w-[54ch] text-[16px] leading-[1.75] text-[var(--text-muted)]">
             Outside work I build tools for problems I hit myself. Eternal2x
             exists because every interpolator I tried smeared the held frames
             in my anime edits. On EternalMonitor, the iPad second-screen app, I
