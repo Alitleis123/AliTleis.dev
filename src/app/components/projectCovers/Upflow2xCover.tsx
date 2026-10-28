@@ -78,19 +78,19 @@ export default function Upflow2xCover() {
         </text>
       </g>
 
-      {/* Headline, as on upflow2x.com */}
+      {/* Headline, after upflow2x.com */}
       <g transform="translate(40, 128)">
         <text fontSize="34" fontWeight="600" letterSpacing="-1" fill="#ffffff">
           <tspan x="0" y="0">Upscale and</tspan>
           <tspan x="0" y="40">
-            smooth <tspan fill={AMBER}>anime in</tspan>
+            smooth <tspan fill={AMBER}>video in</tspan>
           </tspan>
           <tspan x="0" y="80" fill={AMBER}>
             Resolve.
           </tspan>
         </text>
         <text fontSize="12" fill="rgba(244,244,241,0.66)">
-          <tspan x="0" y="114">Draws the frames between the drawings,</tspan>
+          <tspan x="0" y="114">Draws the missing in-between frames,</tspan>
           <tspan x="0" y="131">then redraws every frame at 2x, inside</tspan>
           <tspan x="0" y="148">DaVinci Resolve Studio.</tspan>
         </text>
