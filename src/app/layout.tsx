@@ -8,7 +8,7 @@ import SiteShell from "./components/SiteShell";
 // What a search result and a link preview show, so it carries the same facts
 // as the intro rather than lines that could sit on anyone's site.
 const DESCRIPTION =
-  "I'm a CS and Sociology student at Northeastern, on co-op at MIT Lincoln Laboratory, where I own the internal AI search 4,500+ engineers use. I also build Eternal2x and EternalMonitor's AMD GPU support.";
+  "I'm a CS and Sociology student at Northeastern, on co-op at MIT Lincoln Laboratory, where I own the internal AI search 4,500+ engineers use. I also build Upflow2x and EternalMonitor's AMD GPU support.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

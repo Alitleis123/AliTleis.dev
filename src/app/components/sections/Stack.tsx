@@ -60,9 +60,6 @@ export default function Stack() {
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
           What I build with.
         </h2>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
-          CORE · {coreStack.length.toString().padStart(2, "0")} TOOLS
-        </span>
       </div>
 
       {/* Core grid, featured, visual */}
@@ -104,7 +101,7 @@ function RowEntry({
       <div
         className={`flex items-start ${divider ? "md:border-t md:border-[var(--border-hairline)] md:pt-7" : ""}`}
       >
-        <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+        <span className="text-[13px] font-medium text-[var(--text-dim)]">
           {group.title}
         </span>
       </div>

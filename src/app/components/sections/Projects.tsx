@@ -69,9 +69,6 @@ export default function Projects() {
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
           Featured work.
         </h2>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
-          {String(featuredProjects.length).padStart(2, "0")} PROJECTS
-        </span>
       </div>
 
       <motion.div
@@ -79,16 +76,16 @@ export default function Projects() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        // items-start, so expanding one card no longer stretches the one
-        // beside it, since grid rows default to equal height and the sibling was
-        // growing to match.
-        className="grid grid-cols-1 items-start gap-5 md:grid-cols-2"
+        // Collapsed cards stretch to the taller one in their row, so a longer
+        // description does not leave the pair uneven. While any card's notes
+        // are mounted, closing animation included, they all size to their own
+        // content, or the open card would drag the one beside it down with it.
+        className="grid grid-cols-1 gap-5 md:grid-cols-2 [&:has([data-build-notes])]:items-start"
       >
-        {featuredProjects.map((p, i) => (
+        {featuredProjects.map((p) => (
           <ProjectCard
             key={p.id}
             project={p}
-            index={i + 1}
             onOpenGallery={() => openLightbox(p, 0)}
           />
         ))}
@@ -96,10 +93,9 @@ export default function Projects() {
 
       {/* Other Work */}
       <div className="mt-24">
-        <div className="mb-8 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+        <div className="mb-8 flex items-center gap-3 text-[13px] font-medium text-[var(--text-dim)]">
           <span>Other work</span>
           <span className="block h-px flex-1 bg-white/10" />
-          <span>{String(otherWork.length).padStart(2, "0")}</span>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {otherWork.map((p) => {
@@ -144,8 +140,8 @@ export default function Projects() {
                       )}
                     </span>
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-[var(--text-dim)]">
-                    <span>{p.range.toUpperCase()}</span>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[var(--text-dim)]">
+                    <span>{p.range}</span>
                     {p.tech?.length ? (
                       <>
                         <span className="text-[var(--text-faint)]">·</span>
@@ -168,7 +164,7 @@ export default function Projects() {
 /** Small section rule inside an expanded card. */
 function PanelLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-dim)]">
+    <div className="flex items-center gap-3 text-[12px] font-medium text-[var(--text-dim)]">
       <span>{children}</span>
       <span className="block h-px flex-1 bg-white/10" />
     </div>
@@ -177,11 +173,9 @@ function PanelLabel({ children }: { children: React.ReactNode }) {
 
 function ProjectCard({
   project,
-  index,
   onOpenGallery,
 }: {
   project: Project;
-  index: number;
   onOpenGallery: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -226,15 +220,15 @@ function ProjectCard({
             </span>
 
             {galleryCount > 1 ? (
-              <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-white/85 backdrop-blur-md">
-                {String(galleryCount).padStart(2, "0")} SCREENS
+              <span className="absolute bottom-3 left-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[12px] font-medium text-white/85 backdrop-blur-md">
+                {galleryCount} screens
               </span>
             ) : null}
 
             <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/hero:opacity-100">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 font-mono text-[11px] tracking-[0.22em] text-white backdrop-blur-md">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 text-[12px] font-medium text-white backdrop-blur-md">
                 <FaMagnifyingGlassPlus className="text-[11px]" />
-                VIEW SCREENS
+                View screens
               </span>
             </span>
           </button>
@@ -266,15 +260,15 @@ function ProjectCard({
           </span>
 
           {galleryCount > 1 ? (
-            <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 font-mono text-[10px] tracking-[0.18em] text-white/85 backdrop-blur-md">
-              01 / {String(galleryCount).padStart(2, "0")}
+            <span className="absolute bottom-3 left-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[12px] font-medium text-white/85 backdrop-blur-md">
+              1 of {galleryCount}
             </span>
           ) : null}
 
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover/hero:opacity-100">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 font-mono text-[11px] tracking-[0.22em] text-white backdrop-blur-md">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/65 px-3.5 py-1.5 text-[12px] font-medium text-white backdrop-blur-md">
               <FaMagnifyingGlassPlus className="text-[11px]" />
-              EXPAND
+              Expand
             </span>
           </span>
         </button>
@@ -282,14 +276,10 @@ function ProjectCard({
 
       <div className="relative flex flex-1 flex-col gap-4 p-6">
         {/* Header rail */}
-        <div className="flex items-center justify-between gap-3 font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
-          <div className="flex items-center gap-3">
-            <span>P/{String(index).padStart(2, "0")}</span>
-            <span className="block h-px w-8 bg-white/15" />
-            <span>{project.range.toUpperCase()}</span>
-          </div>
+        <div className="flex items-center justify-between gap-3 text-[13px] text-[var(--text-dim)]">
+          <span>{project.range}</span>
           {isComing ? (
-            <span className="rounded-full border border-[var(--border-hairline)] px-2.5 py-1 text-[10px] uppercase tracking-[0.22em]">
+            <span className="rounded-full border border-[var(--border-hairline)] px-2.5 py-1 text-[12px] font-medium">
               Soon
             </span>
           ) : null}
@@ -297,10 +287,8 @@ function ProjectCard({
 
         {/* Identity
 
-            Fixed min-heights rather than grid stretch. Equal-height rows would
-            make an expanding card drag its neighbour taller again; reserving
-            space for a two-line title, an optional subtitle and a two-line
-            description keeps every collapsed card identical on its own. */}
+            A fixed min-height, so both descriptions in a row start on the
+            same line whether or not a card has a subtitle or metrics. */}
         <div className="min-h-[4.15rem]">
           <h3 className="text-[19px] font-medium leading-tight tracking-tight text-white md:text-[21px]">
             {project.title}
@@ -334,8 +322,8 @@ function ProjectCard({
           ) : null}
         </div>
 
-        {/* Description, clamped so a long one cannot outgrow a short one. */}
-        <p className="line-clamp-2 min-h-[2.75rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
+        {/* Description, in full. The grid evens out the row instead. */}
+        <p className="min-h-[2.75rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
           {project.desc}
         </p>
 
@@ -353,13 +341,10 @@ function ProjectCard({
               aria-expanded={open}
               className="group/det -mx-2 flex items-center justify-between gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-200 hover:bg-white/[0.02]"
             >
-              <span className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-dim)] transition-colors duration-200 group-hover/det:text-[var(--text-muted)]">
+              <span className="text-[13px] text-[var(--text-dim)] transition-colors duration-200 group-hover/det:text-[var(--text-muted)]">
                 How it was built
-                <span className="text-[var(--text-faint)]">
-                  {String(project.bullets.length).padStart(2, "0")}
-                </span>
               </span>
-              <span className="flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] transition-colors duration-200 group-hover/det:border-[var(--border-soft)] group-hover/det:bg-[var(--surface-2)] group-hover/det:text-white">
+              <span className="flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-3 py-1.5 text-[12px] font-medium text-[var(--text-muted)] transition-colors duration-200 group-hover/det:border-[var(--border-soft)] group-hover/det:bg-[var(--surface-2)] group-hover/det:text-white">
                 {open ? "Less" : "More"}
                 <motion.span
                   aria-hidden
@@ -375,6 +360,7 @@ function ProjectCard({
             <AnimatePresence initial={false}>
               {open ? (
                 <motion.div
+                  data-build-notes
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -416,7 +402,7 @@ function ProjectCard({
                           {project.tech.map((t) => (
                             <span
                               key={t}
-                              className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-0.5 text-[11px] tracking-tight text-white/80"
+                              className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-0.5 text-[12px] tracking-tight text-white/80"
                             >
                               {t}
                             </span>

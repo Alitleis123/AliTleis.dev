@@ -9,7 +9,7 @@ export default function Resume() {
   return (
     <motion.section
       id="resume"
-      className="relative z-10 mx-auto max-w-5xl px-6 py-28"
+      className="relative z-10 mx-auto max-w-6xl px-6 py-28"
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"

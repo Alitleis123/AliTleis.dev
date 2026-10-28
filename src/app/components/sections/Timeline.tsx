@@ -22,8 +22,8 @@ function NowDivider() {
         <span className="hidden h-px w-6 bg-white/15 md:block" />
         {/* nowrap: the flex-1 rule below would otherwise compress this label
             into four stacked lines at phone widths. */}
-        <span className="whitespace-nowrap font-mono text-[10px] uppercase tracking-[0.32em] text-white/65">
-          {NOW_MARKER_LABEL.toUpperCase()}
+        <span className="whitespace-nowrap text-[13px] font-medium text-white/70">
+          {NOW_MARKER_LABEL}
         </span>
         <span className="block h-px flex-1 bg-white/10" />
       </div>
@@ -143,23 +143,23 @@ function Entry({ entry }: { entry: TEntry }) {
           (self-start) leaves nothing to stick within. */}
       <div>
       <div className="flex flex-row flex-wrap items-center gap-x-3 gap-y-2 md:sticky md:top-28 md:flex-col md:items-start md:gap-2.5">
-        <div className="font-mono text-[12px] uppercase tracking-[0.22em] text-white/85">
+        <div className="text-[14px] font-medium text-white/85">
           {entry.range}
         </div>
         {duration ? (
-          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--text-faint)]">
+          <div className="text-[13px] text-[var(--text-dim)]">
             {duration}
           </div>
         ) : null}
         {entry.meta ? (
-          <div className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--text-dim)]">
-            <HiOutlineLocationMarker className="text-[12px]" />
+          <div className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-dim)]">
+            <HiOutlineLocationMarker className="text-[13px]" />
             {entry.meta}
           </div>
         ) : null}
         {isCurrent ? (
           <span
-            className="current-pill inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] md:mt-1"
+            className="current-pill inline-flex w-fit items-center gap-1.5 rounded-full border px-2 py-0.5 text-[12px] font-medium md:mt-1"
             style={{
               borderColor: "rgba(var(--signal-rgb),0.45)",
               background: "rgba(var(--signal-rgb),0.10)",
@@ -178,7 +178,7 @@ function Entry({ entry }: { entry: TEntry }) {
           </span>
         ) : null}
         {isEducation ? (
-          <span className="inline-flex w-fit rounded-full border border-[var(--border-hairline)] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-white/65 md:mt-1">
+          <span className="inline-flex w-fit rounded-full border border-[var(--border-hairline)] px-2 py-0.5 text-[12px] font-medium text-white/70 md:mt-1">
             Education
           </span>
         ) : null}
@@ -211,7 +211,7 @@ function Entry({ entry }: { entry: TEntry }) {
               ) : null}
             </div>
           </div>
-          <span className="flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-white/65 transition-[border-color,background-color,color] duration-200 group-hover/hdr:border-[var(--border-soft)] group-hover/hdr:bg-[var(--surface-2)] group-hover/hdr:text-white sm:px-3.5">
+          <span className="flex shrink-0 items-center gap-2 rounded-full border border-[var(--border-hairline)] bg-[var(--surface-1)] px-2.5 py-1.5 text-[12px] font-medium text-white/70 transition-[border-color,background-color,color] duration-200 group-hover/hdr:border-[var(--border-soft)] group-hover/hdr:bg-[var(--surface-2)] group-hover/hdr:text-white sm:px-3.5">
             {/* Label drops on phones so the title isn't squeezed to three lines;
                 the chevron plus aria-expanded still convey state. */}
             <span className="hidden sm:inline">{open ? "Less" : "More"}</span>
@@ -240,8 +240,8 @@ function Entry({ entry }: { entry: TEntry }) {
                 <span className="tabular-figures text-[15px] font-medium tracking-tight text-white">
                   {m.value}
                 </span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-dim)]">
-                  {m.label}
+                <span className="text-[13px] text-[var(--text-dim)]">
+                  {m.label.toLowerCase()}
                 </span>
               </span>
             ))}
@@ -255,13 +255,13 @@ function Entry({ entry }: { entry: TEntry }) {
             {chips.slice(0, 5).map((c) => (
               <span
                 key={c}
-                className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[11px] tracking-tight text-white/70"
+                className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[12px] tracking-tight text-white/70"
               >
                 {c}
               </span>
             ))}
             {chips.length > 5 ? (
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-faint)]">
+              <span className="text-[12px] text-[var(--text-dim)]">
                 +{chips.length - 5}
               </span>
             ) : null}
@@ -281,7 +281,7 @@ function Entry({ entry }: { entry: TEntry }) {
                 {/* Standing note (e.g. clearance status) */}
                 {entry.note ? (
                   <div
-                    className="flex w-fit items-center gap-2.5 rounded-xl border px-3.5 py-2 font-mono text-[11px] tracking-tight"
+                    className="flex w-fit items-center gap-2.5 rounded-xl border px-3.5 py-2 text-[13px] tracking-tight"
                     style={{
                       borderColor: "rgba(var(--signal-rgb),0.28)",
                       background: "rgba(var(--signal-rgb),0.06)",
@@ -311,7 +311,7 @@ function Entry({ entry }: { entry: TEntry }) {
                           <span className="tabular-figures text-[2rem] font-light leading-none tracking-[-0.02em] text-white">
                             {m.value}
                           </span>
-                          <span className="font-mono text-[10px] uppercase leading-[1.5] tracking-[0.24em] text-[var(--text-dim)]">
+                          <span className="text-[13px] leading-[1.5] text-[var(--text-dim)]">
                             {m.label}
                           </span>
                         </div>
@@ -323,14 +323,14 @@ function Entry({ entry }: { entry: TEntry }) {
                 {/* Education stats, only on expansion */}
                 {isEducation && entry.education ? (
                   <RevealBlock index={1}>
-                    <SectionLabel>At a Glance</SectionLabel>
+                    <SectionLabel>At a glance</SectionLabel>
                     <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
                       {entry.education.stats.map((s) => (
                         <div
                           key={s.label}
                           className="surface-lift flex flex-col gap-1 rounded-2xl border border-[var(--border-hairline)] bg-[var(--surface-1)] p-4"
                         >
-                          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--text-dim)]">
+                          <span className="text-[12px] text-[var(--text-dim)]">
                             {s.label}
                           </span>
                           <span className="tabular-figures text-[19px] font-light tracking-tight text-white">
@@ -346,7 +346,7 @@ function Entry({ entry }: { entry: TEntry }) {
                 {entry.bullets.length ? (
                   <RevealBlock index={2}>
                     <SectionLabel>
-                      {isEducation ? "Highlights" : "Responsibilities & Impact"}
+                      {isEducation ? "Highlights" : "Responsibilities & impact"}
                     </SectionLabel>
                     {/* Numbered rather than dotted: eight equal-weight dots read
                         as a wall, while an index column gives the list rhythm and
@@ -380,7 +380,7 @@ function Entry({ entry }: { entry: TEntry }) {
                       {entry.education.coursework.map((c) => (
                         <span
                           key={c}
-                          className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[11px] tracking-tight text-white/80"
+                          className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[12px] tracking-tight text-white/80"
                         >
                           {c}
                         </span>
@@ -394,7 +394,7 @@ function Entry({ entry }: { entry: TEntry }) {
                       {entry.tech.map((t) => (
                         <span
                           key={t}
-                          className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[11px] tracking-tight text-white/80"
+                          className="rounded-full border border-[var(--border-hairline)] bg-white/[0.02] px-2.5 py-1 text-[12px] tracking-tight text-white/80"
                         >
                           {t}
                         </span>
@@ -463,7 +463,7 @@ function RevealBlock({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+    <div className="flex items-center gap-3 text-[12px] font-medium text-[var(--text-dim)]">
       <span>{children}</span>
       <span className="block h-px flex-1 bg-white/10" />
     </div>
@@ -481,7 +481,7 @@ export default function Timeline() {
   return (
     <motion.section
       id="timeline"
-      className="relative z-10 mx-auto max-w-5xl px-6 pt-8 pb-32"
+      className="relative z-10 mx-auto max-w-6xl px-6 pt-8 pb-32"
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
@@ -499,9 +499,6 @@ export default function Timeline() {
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
           Where I&apos;ve worked, studied, and shipped.
         </h2>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
-          {String(entries.length).padStart(2, "0")} ENTRIES
-        </span>
       </div>
 
       {/* Rail container, vertical line drawn between meta column and content column */}

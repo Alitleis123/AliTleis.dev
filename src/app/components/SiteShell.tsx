@@ -2,7 +2,7 @@
 
 import { MotionConfig } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { clearSwitchArrival, isSwitchArrival } from "../lib/switchArrival";
 import { BUILD_YEAR } from "../data";
 import BackgroundRings from "./BackgroundRings";
@@ -95,6 +95,23 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     );
     firstView = false;
   }, [pathname]);
+
+  // On a phone the Resume and audio pills open on top of the portrait, so
+  // below sm they wait until the page has scrolled past it, or until audio
+  // starts, since a saved preference resumes it at the top of the page. Once
+  // shown they stay, or scrolling back up would hide the pause button
+  // mid-playback.
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY <= 300) return;
+      setShown(true);
+      window.removeEventListener("scroll", onScroll);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   // Three routes bring their own frame. The suite and the control panel are
   // full viewport applications, and the chooser is a single screen that would
   // look absurd under a nav offering to take you to the page you are choosing
@@ -135,9 +152,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
 
-      <ResumeButton />
+      <div
+        className={`transition-[opacity,visibility] duration-300 ${
+          shown ? "" : "max-sm:invisible max-sm:opacity-0"
+        }`}
+      >
+        <ResumeButton />
+        <AmbientAudio onStart={() => setShown(true)} />
+      </div>
       <ScrollToTop />
-      <AmbientAudio />
       <CommandPalette />
     </MotionConfig>
   );
