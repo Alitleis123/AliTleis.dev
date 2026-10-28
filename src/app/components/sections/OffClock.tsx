@@ -46,9 +46,6 @@ export default function OffClock() {
         <h2 className="max-w-2xl text-[2rem] font-light leading-[1.15] tracking-[-0.025em] text-white md:text-[2.4rem]">
           Where the editing happens.
         </h2>
-        <span className="font-mono text-[11px] tracking-[0.22em] text-[var(--text-dim)]">
-          {String(offClockFrames.length).padStart(2, "0")} FRAMES
-        </span>
       </div>
 
       <motion.div
@@ -88,7 +85,7 @@ export default function OffClock() {
                     </span>
                   </span>
                 </span>
-                <span className="mt-2 block font-mono text-[10px] uppercase leading-[1.5] tracking-[0.16em] text-[var(--text-dim)] transition-colors duration-200 group-hover/f:text-[var(--text-muted)]">
+                <span className="mt-2 block text-[13px] leading-[1.5] text-[var(--text-dim)] transition-colors duration-200 group-hover/f:text-[var(--text-muted)]">
                   {frame.label}
                 </span>
               </button>
@@ -110,7 +107,7 @@ export default function OffClock() {
                   <span className="tabular-figures text-[17px] font-medium tracking-tight text-white">
                     {s.value}
                   </span>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-[var(--text-dim)]">
+                  <span className="text-[12px] text-[var(--text-dim)]">
                     {s.label}
                   </span>
                 </div>
@@ -182,9 +179,9 @@ function Phone({ onOpen }: { onOpen: () => void }) {
         />
 
         <span className="pointer-events-none absolute inset-x-0 bottom-10 flex justify-center opacity-0 transition-opacity duration-300 group-hover/p:opacity-100">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/75 px-3 py-1.5 font-mono text-[10px] tracking-[0.2em] text-white backdrop-blur-md">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/75 px-3 py-1.5 text-[12px] font-medium text-white backdrop-blur-md">
             <FaMagnifyingGlassPlus className="text-[10px]" />
-            VIEW
+            View
           </span>
         </span>
       </button>

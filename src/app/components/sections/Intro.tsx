@@ -35,7 +35,7 @@ export default function Intro() {
           </motion.h1>
 
           <motion.div variants={heroItem} className="mt-7">
-            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[var(--signal-dim)] bg-[var(--signal-wash)] px-3.5 py-1.5 text-[11.5px] font-medium tracking-tight text-white/85">
+            <span className="inline-flex flex-wrap items-center gap-2.5 rounded-full border border-[var(--signal-dim)] bg-[var(--signal-wash)] px-3.5 py-1.5 text-[13px] font-medium tracking-tight text-white/85">
               <span
                 aria-hidden
                 className="current-dot relative block h-1.5 w-1.5 rounded-full"
@@ -122,8 +122,8 @@ export default function Intro() {
         <motion.div variants={staggerChild} className="md:col-span-5">
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
-                Security Clearance
+              <span className="text-[13px] text-[var(--text-dim)]">
+                Security clearance
               </span>
               <span className="inline-flex items-center gap-2 text-[13px] tracking-tight text-white/85">
                 <span
@@ -135,8 +135,8 @@ export default function Intro() {
               </span>
             </div>
             <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
-                Spoken Languages
+              <span className="text-[13px] text-[var(--text-dim)]">
+                Spoken languages
               </span>
               <span className="text-[13px] tracking-tight text-white/85">
                 {aboutLanguages.map((l, i) => (
@@ -149,7 +149,7 @@ export default function Intro() {
               </span>
             </div>
             <div className="flex items-center justify-between gap-4 border-b border-[var(--border-hairline)] pb-3">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+              <span className="text-[13px] text-[var(--text-dim)]">
                 Off-clock
               </span>
               <span className="text-[13px] tracking-tight text-white/85">
@@ -162,7 +162,7 @@ export default function Intro() {
               </span>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+              <span className="text-[13px] text-[var(--text-dim)]">
                 Based in
               </span>
               <span className="inline-flex items-center gap-1.5 text-[13px] tracking-tight text-white/85">
