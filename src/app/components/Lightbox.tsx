@@ -69,11 +69,11 @@ export default function Lightbox({
         >
           {/* Top bar */}
           <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-4 px-5 py-4">
-            <div className="flex items-center gap-3 font-mono text-[11px] tracking-[0.22em] text-white/85">
-              <span>{state.title.toUpperCase()}</span>
+            <div className="flex items-center gap-3 text-[13px] font-medium text-white/85">
+              <span>{state.title}</span>
               <span className="text-white/40">·</span>
-              <span>
-                {String(state.index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+              <span className="text-white/70">
+                {state.index + 1} of {total}
               </span>
             </div>
             <button

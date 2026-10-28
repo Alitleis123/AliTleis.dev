@@ -220,7 +220,7 @@ function ProjectCard({
             </span>
 
             {galleryCount > 1 ? (
-              <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[11px] font-medium text-white/85 backdrop-blur-md">
+              <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[12px] font-medium text-white/85 backdrop-blur-md">
                 {galleryCount} screens
               </span>
             ) : null}
@@ -260,7 +260,7 @@ function ProjectCard({
           </span>
 
           {galleryCount > 1 ? (
-            <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[11px] font-medium text-white/85 backdrop-blur-md">
+            <span className="absolute left-3 top-3 inline-flex items-center rounded-full border border-white/15 bg-black/55 px-2 py-0.5 text-[12px] font-medium text-white/85 backdrop-blur-md">
               1 of {galleryCount}
             </span>
           ) : null}
