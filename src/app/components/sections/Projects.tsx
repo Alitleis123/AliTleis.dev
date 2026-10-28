@@ -77,10 +77,10 @@ export default function Projects() {
         whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
         // Collapsed cards stretch to the taller one in their row, so a longer
-        // description does not leave the pair uneven. Once any card is open
-        // they all size to their own content, or the open card would drag the
-        // one beside it down with it.
-        className="grid grid-cols-1 gap-5 md:grid-cols-2 [&:has([aria-expanded=true])]:items-start"
+        // description does not leave the pair uneven. While any card's notes
+        // are mounted, closing animation included, they all size to their own
+        // content, or the open card would drag the one beside it down with it.
+        className="grid grid-cols-1 gap-5 md:grid-cols-2 [&:has([data-build-notes])]:items-start"
       >
         {featuredProjects.map((p) => (
           <ProjectCard
@@ -360,6 +360,7 @@ function ProjectCard({
             <AnimatePresence initial={false}>
               {open ? (
                 <motion.div
+                  data-build-notes
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
