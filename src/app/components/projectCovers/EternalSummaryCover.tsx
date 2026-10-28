@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 // Straight from the project site's tokens (sidebandstudio.github.io/Eternal-Summary).
 const BG = "#100F14";
 const RAISE = "#17161C";
@@ -14,13 +16,13 @@ const SERIF = "Newsreader, 'Iowan Old Style', Charter, Georgia, serif";
 // The site's mark, drawn on a 48x28 box.
 const INFINITY = "M13 5c9 0 13 18 22 18 9 0 11-18 0-18-9 0-13 18-22 18-9 0-11-18 0-18z";
 
-function Mark({ x, y, scale }: { x: number; y: number; scale: number }) {
+function Mark({ x, y, scale, stroke }: { x: number; y: number; scale: number; stroke: string }) {
   return (
     <path
       d={INFINITY}
       transform={`translate(${x}, ${y}) scale(${scale})`}
       fill="none"
-      stroke="url(#es-mark)"
+      stroke={stroke}
       strokeWidth="3.2"
       strokeLinejoin="round"
       strokeLinecap="round"
@@ -34,6 +36,9 @@ function Line({ x, y, w, o = 0.32 }: { x: number; y: number; w: number; o?: numb
 }
 
 export default function EternalSummaryCover() {
+  const id = useId();
+  const mark = `url(#${id}-mark)`;
+
   return (
     <svg
       viewBox="0 0 800 450"
@@ -43,32 +48,32 @@ export default function EternalSummaryCover() {
       style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}
     >
       <defs>
-        <linearGradient id="es-mark" x1="4" y1="5" x2="44" y2="23" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}-mark`} x1="4" y1="5" x2="44" y2="23" gradientUnits="userSpaceOnUse">
           <stop stopColor="#38BDF8" />
           <stop offset=".5" stopColor={ACCENT} />
           <stop offset="1" stopColor="#C084FC" />
         </linearGradient>
-        <linearGradient id="es-lit" x1="0" y1="0" x2="1" y2="0.2">
+        <linearGradient id={`${id}-lit`} x1="0" y1="0" x2="1" y2="0.2">
           <stop stopColor="#38BDF8" />
           <stop offset=".45" stopColor={ACCENT} />
           <stop offset="1" stopColor="#C084FC" />
         </linearGradient>
-        <radialGradient id="es-glow" cx="78%" cy="52%" r="45%">
+        <radialGradient id={`${id}-glow`} cx="78%" cy="52%" r="45%">
           <stop offset="0%" stopColor="rgba(123,140,255,0.13)" />
           <stop offset="100%" stopColor="rgba(123,140,255,0)" />
         </radialGradient>
       </defs>
 
       <rect width="800" height="450" fill={BG} />
-      <rect width="800" height="450" fill="url(#es-glow)" />
+      <rect width="800" height="450" fill={`url(#${id}-glow)`} />
 
       {/* Hero, as on the site: the mark, the serif headline, two actions. */}
-      <Mark x={40} y={66} scale={1.3} />
+      <Mark x={40} y={66} scale={1.3} stroke={mark} />
 
       <text fontFamily={SERIF} fontSize="46" letterSpacing="-1.2" fill={INK}>
         <tspan x="40" y="152">Read the page,</tspan>
         <tspan x="40" y="200">
-          <tspan fill="url(#es-lit)" fontStyle="italic">
+          <tspan fill={`url(#${id}-lit)`} fontStyle="italic">
             not all of it
           </tspan>
           .
@@ -104,7 +109,7 @@ export default function EternalSummaryCover() {
       <g transform="translate(486, 72)">
         <rect width="276" height="300" rx="12" fill={RAISE} stroke={LINE} />
 
-        <Mark x={14} y={16} scale={0.5} />
+        <Mark x={14} y={16} scale={0.5} stroke={mark} />
         <text x="44" y="26" fontSize="10.5" fontWeight="600" fill={INK}>
           Eternal Summary
         </text>

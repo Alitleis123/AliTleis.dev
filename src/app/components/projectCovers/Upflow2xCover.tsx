@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 const AMBER = "#F2A93B";
 const INK = "#1B1C21";
 const PAPER = "#F4F4F1";
@@ -39,6 +41,8 @@ function Strip({ y, frames }: { y: number; frames: number[] }) {
 }
 
 export default function Upflow2xCover() {
+  const id = useId();
+
   return (
     <svg
       viewBox="0 0 800 450"
@@ -48,14 +52,14 @@ export default function Upflow2xCover() {
       style={{ fontFamily: "var(--font-geist-sans), system-ui, sans-serif" }}
     >
       <defs>
-        <radialGradient id="uf2x-glow" cx="76%" cy="44%" r="46%">
+        <radialGradient id={`${id}-glow`} cx="76%" cy="44%" r="46%">
           <stop offset="0%" stopColor="rgba(242,169,59,0.14)" />
           <stop offset="100%" stopColor="rgba(242,169,59,0)" />
         </radialGradient>
       </defs>
 
       <rect width="800" height="450" fill="#111215" />
-      <rect width="800" height="450" fill="url(#uf2x-glow)" />
+      <rect width="800" height="450" fill={`url(#${id}-glow)`} />
 
       {/* Wordmark, below the card's corner badge. The mark is the site's
           icon: three frames, the amber one drawn between the other two. */}
