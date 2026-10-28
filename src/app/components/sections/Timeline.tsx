@@ -481,7 +481,7 @@ export default function Timeline() {
   return (
     <motion.section
       id="timeline"
-      className="relative z-10 mx-auto max-w-5xl px-6 pt-8 pb-32"
+      className="relative z-10 mx-auto max-w-6xl px-6 pt-8 pb-32"
       variants={fadeUp}
       initial="hidden"
       whileInView="visible"
