@@ -76,10 +76,11 @@ export default function Projects() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.05 }}
-        // items-start, so expanding one card no longer stretches the one
-        // beside it, since grid rows default to equal height and the sibling was
-        // growing to match.
-        className="grid grid-cols-1 items-start gap-5 md:grid-cols-2"
+        // Collapsed cards stretch to the taller one in their row, so a longer
+        // description does not leave the pair uneven. Once any card is open
+        // they all size to their own content, or the open card would drag the
+        // one beside it down with it.
+        className="grid grid-cols-1 gap-5 md:grid-cols-2 [&:has([aria-expanded=true])]:items-start"
       >
         {featuredProjects.map((p) => (
           <ProjectCard
@@ -286,10 +287,8 @@ function ProjectCard({
 
         {/* Identity
 
-            Fixed min-heights rather than grid stretch. Equal-height rows would
-            make an expanding card drag its neighbour taller again; reserving
-            space for a two-line title, an optional subtitle and a two-line
-            description keeps every collapsed card identical on its own. */}
+            A fixed min-height, so both descriptions in a row start on the
+            same line whether or not a card has a subtitle or metrics. */}
         <div className="min-h-[4.15rem]">
           <h3 className="text-[19px] font-medium leading-tight tracking-tight text-white md:text-[21px]">
             {project.title}
@@ -323,8 +322,8 @@ function ProjectCard({
           ) : null}
         </div>
 
-        {/* Description, clamped so a long one cannot outgrow a short one. */}
-        <p className="line-clamp-2 min-h-[2.75rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
+        {/* Description, in full. The grid evens out the row instead. */}
+        <p className="min-h-[2.75rem] text-[13px] leading-[1.7] text-[var(--text-muted)]">
           {project.desc}
         </p>
 
