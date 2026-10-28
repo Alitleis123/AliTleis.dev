@@ -93,7 +93,7 @@ export default function Projects() {
 
       {/* Other Work */}
       <div className="mt-24">
-        <div className="mb-8 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.28em] text-[var(--text-dim)]">
+        <div className="mb-8 flex items-center gap-3 text-[13px] font-medium text-[var(--text-dim)]">
           <span>Other work</span>
           <span className="block h-px flex-1 bg-white/10" />
         </div>
