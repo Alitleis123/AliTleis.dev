@@ -97,10 +97,15 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   // On a phone the Resume and audio pills open on top of the portrait, so
-  // below sm they wait until the page has scrolled past it.
+  // below sm they wait until the page has scrolled past it. Once shown they
+  // stay, or scrolling back up would hide the pause button mid-playback.
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 300);
+    const onScroll = () => {
+      if (window.scrollY <= 300) return;
+      setScrolled(true);
+      window.removeEventListener("scroll", onScroll);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
