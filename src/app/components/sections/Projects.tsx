@@ -11,7 +11,7 @@ import {
   FaStar,
   FaUsers,
 } from "react-icons/fa6";
-import { TbCalculator, TbCalendarEvent, TbHome, TbPuzzle } from "react-icons/tb";
+import { TbCalculator, TbCalendarEvent, TbHome, TbPalette, TbPuzzle } from "react-icons/tb";
 import { SiCplusplus } from "react-icons/si";
 import { COVER_MAP } from "../../lib/projectCovers";
 import { fadeUp, staggerParent, staggerChild } from "../../lib/animations";
@@ -30,6 +30,7 @@ const OTHER_ICON: Record<string, IconCmp> = {
   calendar: TbCalendarEvent,
   cplusplus: SiCplusplus,
   home: TbHome,
+  palette: TbPalette,
   puzzle: TbPuzzle,
 };
 
