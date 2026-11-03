@@ -69,7 +69,7 @@ export default function Lock({
           )}
 
           {!works ? (
-            <p className="mt-5 rounded-[3px] border border-[#ff5a4f]/35 bg-[#ff5a4f]/10 px-3 py-2.5 text-[12.5px] text-[#ff8a80]">
+            <p className="mt-5 rounded-[3px] border border-cp-red/35 bg-cp-red/10 px-3 py-2.5 text-[12.5px] text-cp-red-text">
               Passkeys need an https page in a current browser, and this one has neither.
             </p>
           ) : mode === "unlock" ? (
@@ -105,7 +105,7 @@ export default function Lock({
           )}
 
           {error && (
-            <p role="alert" className="mt-3 text-[12.5px] text-[#ff8a80]">
+            <p role="alert" className="mt-3 text-[12.5px] text-cp-red-text">
               {error}
             </p>
           )}

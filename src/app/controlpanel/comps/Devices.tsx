@@ -167,7 +167,7 @@ export default function Devices({
       </Card>
 
       {error && (
-        <p role="alert" className="px-1 text-[12.5px] text-[#ff8a80]">
+        <p role="alert" className="px-1 text-[12.5px] text-cp-red-text">
           {error}
         </p>
       )}

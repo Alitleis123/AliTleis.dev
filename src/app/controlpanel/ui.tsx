@@ -136,7 +136,7 @@ export function Chip({ children, tone = "plain" }: { children: React.ReactNode; 
     tone === "accent"
       ? "border-[var(--st-sel-line)] bg-[var(--st-sel)] text-[var(--st-accent)]"
       : tone === "red"
-        ? "border-[#ff5a4f]/40 bg-[#ff5a4f]/10 text-[#ff8a80]"
+        ? "border-cp-red/40 bg-cp-red/10 text-cp-red-text"
         : "border-[var(--st-line-strong)] text-[var(--st-dim)]";
   return (
     <span className={`st-tc inline-flex items-center rounded-[3px] border px-1.5 py-px text-[10px] ${colors}`}>

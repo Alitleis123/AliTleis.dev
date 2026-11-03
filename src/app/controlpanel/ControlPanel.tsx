@@ -234,7 +234,7 @@ export default function ControlPanel() {
       <div className="st-root st-hatch flex min-h-[100dvh] flex-col items-center justify-center gap-3 bg-[var(--st-stage)] px-6 text-center">
         {error ? (
           <>
-            <span role="alert" className="st-tc whitespace-normal! text-[#ff8a80]">
+            <span role="alert" className="st-tc whitespace-normal! text-cp-red-text">
               {error}
             </span>
             <button type="button" className="cp-btn" onClick={refresh}>
@@ -253,7 +253,7 @@ export default function ControlPanel() {
       <>
         <Lock enrolled={enrolled} onOpen={refresh} />
         {error && (
-          <p role="alert" className="st-tc fixed inset-x-0 bottom-4 text-center text-[11px] text-[#ff8a80]">
+          <p role="alert" className="st-tc fixed inset-x-0 bottom-4 text-center text-[11px] text-cp-red-text">
             {error}
           </p>
         )}
@@ -340,7 +340,7 @@ export default function ControlPanel() {
       </header>
 
       {error && (
-        <p role="alert" className="st-tc shrink-0 border-b border-[#ff5a4f]/30 bg-[#ff5a4f]/10 px-3 py-1.5 text-[11px] text-[#ff8a80]">
+        <p role="alert" className="st-tc shrink-0 border-b border-cp-red/30 bg-cp-red/10 px-3 py-1.5 text-[11px] text-cp-red-text">
           Could not sync: {error}
         </p>
       )}

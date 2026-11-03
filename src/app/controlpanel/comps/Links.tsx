@@ -137,7 +137,7 @@ export default function Links({
               </div>
             </div>
           )}
-          {error && <p className="text-[12px] text-[#ff8a80]">{error}</p>}
+          {error && <p className="text-[12px] text-cp-red-text">{error}</p>}
         </form>
       </Card>
 

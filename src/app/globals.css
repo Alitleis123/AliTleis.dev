@@ -96,6 +96,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* The control panel's red, for errors, failed asks and the live dot. The
+   lighter shade is for text, which needs the extra contrast on dark grey. */
+@theme {
+  --color-cp-red: #ff5a4f;
+  --color-cp-red-text: #ff8a80;
+}
+
 /* Base document styles. Smooth scrolling only for visitors who have not asked
    for less motion. An unconditional copy of this rule used to sit beside it,
    which made the media query do nothing. */
@@ -1269,8 +1276,8 @@ section {
 }
 
 .cp-rec-on {
-  background: #ff5a4f;
-  box-shadow: 0 0 10px rgba(255, 90, 79, 0.55);
+  background: var(--color-cp-red);
+  box-shadow: 0 0 10px color-mix(in oklab, var(--color-cp-red) 55%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {

@@ -107,7 +107,7 @@ export default function Inspector({
               {v.hidden ? "Count in stats again" : "Hide from stats"}
             </button>
           )}
-          {error && <p className="mt-2 text-[12px] text-[#ff8a80]">{error}</p>}
+          {error && <p className="mt-2 text-[12px] text-cp-red-text">{error}</p>}
         </div>
 
         <div className="border-b border-[var(--st-line)] px-4 py-3">
@@ -149,7 +149,7 @@ export default function Inspector({
                       <span className="st-tc mr-2 text-[10px] text-[var(--st-faint)]">{clock(ms(a.t))}</span>
                       {a.q}
                     </summary>
-                    <p className={`mt-1.5 whitespace-pre-wrap text-[12.5px] leading-relaxed ${a.a ? "text-[var(--st-dim)]" : "text-[#ff8a80]"}`}>
+                    <p className={`mt-1.5 whitespace-pre-wrap text-[12.5px] leading-relaxed ${a.a ? "text-[var(--st-dim)]" : "text-cp-red-text"}`}>
                       {a.a ?? a.error}
                     </p>
                   </details>
