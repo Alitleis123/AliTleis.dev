@@ -129,33 +129,6 @@ a:disabled, button:disabled, [aria-disabled="true"] {
   cursor: not-allowed;
 }
 
-.section-divider {
-  position: relative;
-  height: 28px;
-  margin: 24px auto 14px;
-  max-width: 72rem;
-}
-
-.section-divider::before {
-  content: "";
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  top: 50%;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.10),
-    transparent
-  );
-  transform: translateY(-50%);
-}
-
-.section-divider::after {
-  content: none;
-}
-
 /* Subtle selection styling */
 ::selection {
   background: rgba(79, 70, 229, 0.25);
@@ -189,19 +162,6 @@ a:disabled, button:disabled, [aria-disabled="true"] {
   text-transform: uppercase;
   color: var(--text-dim);
   font-weight: 500;
-}
-
-/* =========================
-   Global depth & polish
-   ========================= */
-
-/* Section divider line (optional utility) */
-.section-divider {
-  position: relative;
-}
-
-.section-divider::after {
-  content: "";
 }
 
 /* =========================
@@ -281,20 +241,12 @@ p {
 }
 
 /* =========================
-   Global components & polish
-   ========================= */
-
-/* =========================
    Hero name + profile polish
    ========================= */
 
 section {
   scroll-margin-top: 6.5rem;
 }
-
-/* =========================
-   Resume preview polish
-   ========================= */
 
 /* =========================
    Current role (MIT LL) accent
