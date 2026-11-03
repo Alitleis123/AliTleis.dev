@@ -24,7 +24,7 @@ const TARGETS = [
   // Card heroes render ~650px wide but open full-screen in the lightbox.
   { dir: "projects", maxWidth: 1600 },
   // Logo tiles render at 64x64.
-  { dir: "Timeline", maxWidth: 192 },
+  { dir: "timeline", maxWidth: 192 },
   // Hero portrait renders at most 20rem / 320px wide.
   { dir: "portrait", maxWidth: 900 },
   // Off-clock cards render ~360px in the 3-up grid, full-screen in the lightbox.
@@ -32,7 +32,7 @@ const TARGETS = [
 ];
 
 /** Favicon/apple-icon must stay PNG — keep the format, just shrink it. */
-const KEEP_AS_PNG = new Set(["Portfolio ICON.png"]);
+const KEEP_AS_PNG = new Set(["portfolio-icon.png"]);
 
 const SOURCE_EXT = new Set([".png", ".jpg", ".jpeg"]);
 const kb = (bytes) => Math.round(bytes / 1024);

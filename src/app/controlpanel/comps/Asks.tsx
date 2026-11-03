@@ -39,7 +39,7 @@ export default function Asks({
   const tile = (label: string, value: string, note?: string, warn = false) => (
     <div className="min-w-0 rounded-[4px] border border-[var(--st-line)] bg-[var(--st-panel)] px-3.5 py-3">
       <span className="st-label">{label}</span>
-      <span className={`st-metric-v mt-2 block ${warn ? "text-[#ff8a80]!" : ""}`}>{value}</span>
+      <span className={`st-metric-v mt-2 block ${warn ? "text-cp-red-text!" : ""}`}>{value}</span>
       {note && <span className="st-tc mt-1 block text-[10px] text-[var(--st-faint)]">{note}</span>}
     </div>
   );
@@ -65,7 +65,7 @@ export default function Asks({
             type="button"
             aria-pressed={failedOnly}
             onClick={() => setFailedOnly(!failedOnly)}
-            className={`cp-btn h-6! px-2! text-[11px]! ${failedOnly ? "border-[#ff5a4f]/40! text-[#ff8a80]!" : ""}`}
+            className={`cp-btn h-6! px-2! text-[11px]! ${failedOnly ? "border-cp-red/40! text-cp-red-text!" : ""}`}
           >
             Failed only
           </button>
@@ -96,7 +96,7 @@ export default function Asks({
                     </summary>
                     <p
                       className={`mt-2.5 whitespace-pre-wrap rounded-[3px] border border-[var(--st-line)] bg-[var(--st-stage)] px-3 py-2.5 text-[13px] leading-relaxed ${
-                        a.a ? "text-[var(--st-dim)]" : "text-[#ff8a80]"
+                        a.a ? "text-[var(--st-dim)]" : "text-cp-red-text"
                       }`}
                     >
                       {a.a ?? a.error}

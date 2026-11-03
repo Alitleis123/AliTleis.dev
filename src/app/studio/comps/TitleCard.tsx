@@ -55,7 +55,7 @@ export default function TitleCard() {
             <span className="relative h-[52px] w-[52px] shrink-0 overflow-hidden rounded-full border border-[var(--st-line-strong)] bg-black sm:hidden">
               <Image
                 src={withBasePath(
-                  "/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp",
+                  "/portrait/ali.webp",
                 )}
                 alt="Ali Tleis"
                 fill
@@ -142,7 +142,7 @@ export default function TitleCard() {
           <div className="relative aspect-[4/5] overflow-hidden rounded-[3px] border border-[var(--st-line-strong)] bg-black shadow-[0_30px_70px_-24px_rgba(0,0,0,0.95)]">
             <Image
               src={withBasePath(
-                "/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp",
+                "/portrait/ali.webp",
               )}
               alt="Ali Tleis"
               fill

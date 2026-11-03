@@ -90,7 +90,7 @@ export default function Intro() {
             {/* No glow blob, the frame and the grid behind it do the work. */}
             <div className="relative aspect-[3/4] w-[15rem] overflow-hidden rounded-lg border border-[var(--border-soft)] sm:w-[17rem] md:w-[20rem]">
               <img
-                src={withBasePath("/portrait/36B2F96D-AEC4-4C74-BA04-B7D58EE30BE0.webp")}
+                src={withBasePath("/portrait/ali.webp")}
                 alt="Ali Tleis portrait"
                 decoding="async"
                 fetchPriority="high"

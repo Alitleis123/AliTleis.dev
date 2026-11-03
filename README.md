@@ -1,8 +1,15 @@
 # alitleis.dev
 
-Personal portfolio — a single-page site built with Next.js and statically exported to GitHub Pages.
+Ali Tleis's portfolio. A Next.js site statically exported to GitHub Pages, with a small Vercel backend in `ask/`.
 
 **Live:** [alitleis.dev](https://alitleis.dev)
+
+## Pages
+
+- `/` is a chooser between the two views below.
+- `/galaxy/` is the reading view, one scrolling page with Intro, Projects, Timeline, Stack, Off-clock, Resume and Contact. Its command palette searches the site and holds the Ask panel.
+- `/studio/` lays the same content out as a video editing suite, with a timeline to scrub and a reel to play.
+- `/controlpanel/` is the owner's log of visits and Ask questions. It shows only a lock screen until you sign in, and it asks search engines not to index it.
 
 ## Stack
 
@@ -25,48 +32,62 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Build
 
 ```bash
-npm run build   # static export → ./out
+npm run build   # static export to ./out
 ```
+
+The build checks that `public/studio/resume-page.webp` was drawn from the current `public/resume/resume.pdf`. A mismatch fails the build in CI and only warns locally. Redraw it with `python scripts/render-resume-preview.py`.
 
 ## Structure
 
 ```
 src/app/
-  data.ts                  # all site content — timeline, projects, stack, about
-  layout.tsx               # metadata (OG/Twitter), fonts, nav, footer
-  page.tsx                 # section composition
+  data.ts                  # all site content: timeline, projects, stack, about
+  tiktokStats.ts           # TikTok counts, rewritten by a weekly workflow
+  layout.tsx               # metadata (OG/Twitter), fonts, SiteShell
+  page.tsx                 # the chooser at /
+  galaxy/                  # the reading view
+  studio/                  # the editing suite view
+  controlpanel/            # the visit and Ask log
+  ask-context.txt/         # plain-text profile the Ask backend reads
   opengraph-image.png      # 1200x630 share card (+ .alt.txt for alt text)
   sitemap.ts / robots.ts   # generated as static files on export
-  globals.css              # design tokens + keyframes
+  globals.css              # design tokens, keyframes, studio and panel styles
   components/
-    sections/              # Intro, Projects, Timeline, Stack, Resume, Contact
+    SiteShell.tsx          # nav, footer and command palette for the reading view
+    sections/              # the reading view's sections
     projectCovers/         # hand-built SVG covers per project
+  lib/                     # shared hooks and helpers
+ask/                       # Vercel functions for Ask, visits and the control panel
+scripts/                   # image, search index, resume preview and TikTok helpers
 public/
   resume/resume.pdf        # linked from the navbar and Resume section
-  projects/ Timeline/ portrait/
+  projects/ timeline/ portrait/ offclock/ studio/
 ```
 
 ### Editing content
 
-Nearly all copy lives in `src/app/data.ts` — the timeline entries, project cards,
-tech stack groups, and about-section pillars. Components read from it, so
-content changes rarely require touching JSX.
+Nearly all copy lives in `src/app/data.ts`, including the timeline entries, project cards, tech stack groups and about details. Components read from it, so content changes rarely require touching JSX.
 
 Two things to know:
 
 - **`current: true`** on a timeline entry drives the accent rail node, the
-  pulsing "Current" pill, and the indigo logo tile. Only one entry should have it.
+  pulsing "Current" pill, and the amber border on its logo tile. Only one entry
+  should have it.
 - **The timeline's "Now" marker** is derived at build time in `next.config.ts`
   and exposed via `NEXT_PUBLIC_NOW_LABEL` / `NEXT_PUBLIC_NOW_SORTKEY`. It
-  advances on every deploy — don't hardcode it.
+  advances on every deploy, so don't hardcode it.
 
-The share card is a static `opengraph-image.png` rather than a generated route,
-because GitHub Pages sets `Content-Type` from the file extension — an
-extensionless `/opengraph-image` route gets served as `application/octet-stream`
-and scrapers like LinkedIn reject it.
+The share card is a static `opengraph-image.png` rather than a generated route. GitHub Pages sets `Content-Type` from the file extension, so an extensionless `/opengraph-image` route gets served as `application/octet-stream` and scrapers like LinkedIn reject it.
 
 ## Deployment
 
 Pushing to `main` triggers `.github/workflows/pages.yml`, which builds the
 static export and publishes `./out` to GitHub Pages. The custom domain is set
-via `public/CNAME`.
+via `public/CNAME`. The same workflow rebuilds at 07:00 UTC on the 1st of each
+month, so the "Now" marker and copyright year keep moving.
+
+`.github/workflows/tiktok-stats.yml` refreshes `src/app/tiktokStats.ts` every
+Monday and commits it when the numbers change.
+
+`ask/` deploys on its own with the Vercel CLI. Merging to `main` does not
+deploy it. See `ask/README.md`.

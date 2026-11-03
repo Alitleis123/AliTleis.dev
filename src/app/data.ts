@@ -119,7 +119,7 @@ export const timeline: TimelineEntry[] = [
       { value: "40%", label: "Fewer tokens per request" },
     ],
     note: "Security Clearance: DoD Investigation in Progress",
-    icon: withBasePath("/Timeline/MIT%20Lincoln%20Lab%20Logo.webp"),
+    icon: withBasePath("/timeline/mit-lincoln-lab.webp"),
     iconAlt: "MIT Lincoln Laboratory logo",
     iconText: "MIT LL",
     tech: [
@@ -153,7 +153,7 @@ export const timeline: TimelineEntry[] = [
       "Built the engineer roster from structured data, with a profile for each founder and links between products and the people who build them.",
       "Added Playwright checks for the studio pages and a shared copy-style check in CI. Helped move the live site and product links through the 2026 rebrand from Eternal Reverse to Sideband.",
     ],
-    icon: withBasePath("/Timeline/sideband.png"),
+    icon: withBasePath("/timeline/sideband.png"),
     iconAlt: "Sideband studio logo",
     iconText: "SB",
     tech: ["Next.js", "TypeScript", "React", "Node.js", "Tailwind CSS", "Python", "Lua", "Playwright"],
@@ -183,7 +183,7 @@ export const timeline: TimelineEntry[] = [
     metrics: [
       { value: "30%", label: "Less reconciliation time" },
     ],
-    icon: withBasePath("/Timeline/Top%20Choice%20Realty.webp"),
+    icon: withBasePath("/timeline/top-choice-realty.webp"),
     iconAlt: "Top Choice Realty logo",
     tech: [
       "Next.js",
@@ -199,11 +199,11 @@ export const timeline: TimelineEntry[] = [
     ],
     images: [
       {
-        src: withBasePath("/projects/Top%20choice%20image%201.webp"),
+        src: withBasePath("/projects/top-choice-listings.webp"),
         alt: "Top Choice Realty platform, listings view",
       },
       {
-        src: withBasePath("/projects/Top%20choice%20image%202.webp"),
+        src: withBasePath("/projects/top-choice-dashboard.webp"),
         alt: "Top Choice Realty platform, agent dashboard",
       },
     ],
@@ -217,7 +217,7 @@ export const timeline: TimelineEntry[] = [
     subtitle: "B.S. Computer Science & Sociology",
     range: "2024 – 2028",
     meta: "Boston, MA",
-    icon: withBasePath("/Timeline/nu-logo.webp"),
+    icon: withBasePath("/timeline/nu-logo.webp"),
     iconAlt: "Northeastern University seal",
     iconText: "NU",
     desc: "B.S. Computer Science and Sociology via Northeastern's co-op program, with coursework alternating against full-time engineering placements.",
@@ -260,7 +260,7 @@ export const timeline: TimelineEntry[] = [
     metrics: [
       { value: "20+", label: "Workstations provisioned" },
     ],
-    icon: withBasePath("/Timeline/RobertDe%20Falco.webp"),
+    icon: withBasePath("/timeline/robert-defalco.webp"),
     iconAlt: "Robert DeFalco Realty logo",
     tech: ["PowerShell", "Python", "Windows", "Linux", "Microsoft Intune", "Active Directory"],
   },
@@ -418,7 +418,7 @@ export const featuredProjects: Project[] = [
       "83 end-to-end tests drive real Chrome over the DevTools Protocol. Only the chrome.* surface and the network are stubbed, so they exercise the real path, page to content script to service worker to backend. Coverage includes style isolation, cache expiry, focus trapping, rate-limit paths, and a check that repeated opens strand nothing on the page.",
       "The backend reads truncated and non-JSON model replies rather than dropping them, keeping the prose the model did manage to write instead of leaking raw JSON into the panel, and retries a busy model with backoff. Both endpoints share a limit of 30 requests a minute per IP, because an open endpoint on a metered key is an easy way to burn quota.",
     ],
-    icon: withBasePath("/Timeline/eternal%20summary%20icon.webp"),
+    icon: withBasePath("/timeline/eternal-summary.webp"),
     iconAlt: "Eternal Summary icon",
     tech: [
       "JavaScript",
