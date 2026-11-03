@@ -43,7 +43,7 @@ src/app/
     projectCovers/         # hand-built SVG covers per project
 public/
   resume/resume.pdf        # linked from the navbar and Resume section
-  projects/ Timeline/ portrait/
+  projects/ timeline/ portrait/
 ```
 
 ### Editing content
