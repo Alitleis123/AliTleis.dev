@@ -115,10 +115,9 @@ export default function Projects() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-3">
                     {/* Links can't nest. The title stretches over the card
-                        (.card-link), and the store and website icons sit
-                        above it. */}
+                        (.card-link), and the icon links sit above it. */}
                     <a
-                      href={p.repo ?? p.demo}
+                      href={p.demo ?? p.repo}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="card-link text-[15px] font-medium tracking-tight text-white"
@@ -126,6 +125,18 @@ export default function Projects() {
                       {p.title}
                     </a>
                     <span className="flex items-center gap-3">
+                      {p.demo ? (
+                        <a
+                          href={p.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${p.title} website`}
+                          title="Website"
+                          className="relative z-10 -m-1.5 p-1.5 text-white/45 transition-colors duration-200 group-hover:text-white"
+                        >
+                          <FaArrowUpRightFromSquare className="text-[12px]" />
+                        </a>
+                      ) : null}
                       {p.store ? (
                         <a
                           href={p.store}
@@ -138,23 +149,18 @@ export default function Projects() {
                           <FaChrome className="text-[14px]" />
                         </a>
                       ) : null}
-                      {p.repo && p.demo ? (
+                      {p.repo ? (
                         <a
-                          href={p.demo}
+                          href={p.repo}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`${p.title} website`}
-                          title="Website"
+                          aria-label={`${p.title} on GitHub`}
+                          title="GitHub"
                           className="relative z-10 -m-1.5 p-1.5 text-white/45 transition-colors duration-200 group-hover:text-white"
                         >
-                          <FaArrowUpRightFromSquare className="text-[12px]" />
+                          <FaGithub className="text-[14px]" />
                         </a>
                       ) : null}
-                      {p.repo ? (
-                        <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                      ) : (
-                        <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                      )}
                     </span>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-[var(--text-dim)]">
