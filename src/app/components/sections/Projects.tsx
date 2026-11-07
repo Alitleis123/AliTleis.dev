@@ -116,9 +116,9 @@ export default function Projects() {
                   <div className="flex items-center justify-between gap-3">
                     {/* Links can't nest. The title stretches over the card
                         (.card-link), and the store and GitHub links sit above
-                        it. The last icon only marks where the title goes, since
-                        a link there would be a second tab stop to the same
-                        place. */}
+                        it. The icon for wherever the title goes only marks it,
+                        since a link there would be a second tab stop to the
+                        same place. GitHub is always last. */}
                     <a
                       href={p.demo ?? p.repo}
                       target="_blank"
@@ -140,6 +140,9 @@ export default function Projects() {
                           <FaChrome className="text-[14px]" />
                         </a>
                       ) : null}
+                      {p.demo ? (
+                        <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
+                      ) : null}
                       {p.demo && p.repo ? (
                         <a
                           href={p.repo}
@@ -151,12 +154,9 @@ export default function Projects() {
                         >
                           <FaGithub className="text-[14px]" />
                         </a>
-                      ) : null}
-                      {p.demo ? (
-                        <FaArrowUpRightFromSquare className="text-[12px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                      ) : (
+                      ) : p.repo ? (
                         <FaGithub className="text-[14px] text-white/45 transition-colors duration-200 group-hover:text-white" />
-                      )}
+                      ) : null}
                     </span>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] tracking-[0.18em] text-[var(--text-dim)]">
