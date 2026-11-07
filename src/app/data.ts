@@ -472,6 +472,7 @@ export const otherWork: Project[] = [
     bullets: [],
     tech: ["Next.js", "React", "TypeScript", "Express", "MongoDB Atlas", "Azure Blob Storage"],
     demo: "https://topchoicerealtyny.com/",
+    repo: "https://github.com/sidebandstudio/topchoicerealty",
     iconKey: "home",
   },
   {
@@ -512,6 +513,7 @@ export const otherWork: Project[] = [
     desc: "Calorie target calculator. Mifflin-St Jeor for BMR, an activity multiplier for TDEE, then a goal adjustment.",
     bullets: [],
     tech: ["React", "Vite"],
+    demo: "https://alitleis123.github.io/CalorieCalculator/",
     repo: "https://github.com/Alitleis123/CalorieCalculator",
     iconKey: "calculator",
   },
