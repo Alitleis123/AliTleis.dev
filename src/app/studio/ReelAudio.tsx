@@ -37,14 +37,20 @@ export function useReelAudioPref() {
   // the server send unmuted and the client send muted, which is a hydration
   // mismatch, and nothing is playing on the first frame anyway.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMuted(localStorage.getItem(PREF_KEY) === "1");
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMuted(localStorage.getItem(PREF_KEY) === "1");
+    } catch {
+      // Keep the default when the browser blocks saved preferences.
+    }
   }, []);
 
   const toggle = useCallback(() => {
     setMuted((m) => {
       const next = !m;
-      localStorage.setItem(PREF_KEY, next ? "1" : "0");
+      try {
+        localStorage.setItem(PREF_KEY, next ? "1" : "0");
+      } catch {}
       return next;
     });
   }, []);
