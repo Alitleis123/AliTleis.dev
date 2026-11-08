@@ -41,6 +41,16 @@ globalThis.fetch = async (url, init) => {
       case "HGET": return { result: h().get(args[0]) ?? null };
       case "EVAL": {
         if (evalFails) return { error: "ERR script failed" };
+        if (key.includes("LRANGE")) {
+          const [, list, since, keep] = args;
+          return { result: (store.get(list) ?? []).slice(0, keep).filter((item) => {
+            try {
+              return JSON.parse(item)?.t > since;
+            } catch {
+              return false;
+            }
+          }) };
+        }
         // The three scripts in lib/owner.js, told apart by what they check.
         const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
         beforeEval?.();
@@ -436,6 +446,33 @@ test("a poll with a time gets only what came after it, across pages", async () =
   assert.equal(res.body.visits.length, 150);
   assert.equal(res.body.visits.at(-1).path, "/100");
   assert.deepEqual(res.body.asks, []);
+});
+
+test("a delayed entry does not hide newer entries in the same poll page", async () => {
+  const { token } = await enrollFirst();
+  const t0 = Date.parse("2026-10-01T00:00:00.000Z");
+  const entry = (i) => JSON.stringify({ t: new Date(t0 + i * 1000).toISOString(), q: `Question ${i}` });
+  // Answers finish out of order. Older questions can be pushed ahead of
+  // newer ones, including at the start of the next Redis page.
+  const entries = Array.from({ length: 250 }, (_, i) => entry(250 - i));
+  entries.unshift(entry(0));
+  entries.splice(100, 0, entry(0));
+  store.set("dev:asks", entries);
+
+  const since = new Date(t0 + 99 * 1000).toISOString();
+  const res = await call(panel.GET, `/api/panel?asks=${encodeURIComponent(since)}`, { method: "GET", token });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.asks.length, 151);
+  assert.equal(res.body.asks.at(-1).q, "Question 100");
+});
+
+test("a poll finds newer entries behind a full page of delayed answers", async () => {
+  const { token } = await enrollFirst();
+  const old = JSON.stringify({ t: "2026-10-01T00:00:00.000Z", q: "Delayed answer" });
+  const fresh = { t: "2026-10-01T00:00:20.000Z", q: "New question" };
+  store.set("dev:asks", [...Array(100).fill(old), "invalid JSON", JSON.stringify(fresh)]);
+  const res = await call(panel.GET, "/api/panel?asks=2026-10-01T00%3A00%3A10.000Z", { method: "GET", token });
+  assert.deepEqual(res.body.asks, [fresh]);
 });
 
 // ── Visits ──────────────────────────────────────────────────────────────────

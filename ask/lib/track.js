@@ -110,22 +110,23 @@ export async function recent(list) {
 }
 
 /**
- * Entries logged after `since`, read from the head of the list a page at a
- * time. The panel polls with this, so a poll moves a few new entries out of
- * Upstash rather than the whole log, which on the free plan's 10GB a month
- * would run out after a few days of leaving the panel open.
+ * Answers finish out of order, so a timestamp cannot end a list scan early.
+ * Filter the capped list inside Redis to keep old entries off the network
+ * and within the free plan's 10GB monthly transfer limit.
  */
+const NEWER = `
+local out = {}
+for _, item in ipairs(redis.call("LRANGE", KEYS[1], 0, tonumber(ARGV[2]) - 1)) do
+  local ok, entry = pcall(cjson.decode, item)
+  if ok and type(entry) == "table" and type(entry.t) == "string" and entry.t > ARGV[1] then
+    table.insert(out, item)
+  end
+end
+return out`;
+
 export async function newer(list, since) {
-  const out = [];
-  for (let start = 0; start < KEEP; start += 100) {
-    const [items] = await must([["LRANGE", list, start, start + 99]]);
-    for (const entry of parsed(items)) {
-      if (entry.t <= since) return out;
-      out.push(entry);
-    }
-    if (items.length < 100) break;
-  }
-  return out;
+  const [items] = await must([["EVAL", NEWER, 1, list, since, KEEP]]);
+  return parsed(items);
 }
 
 /** Crawlers and headless checks, which would otherwise read as visitors. */
