@@ -20,12 +20,13 @@ function ticks(r: Range) {
   if (step < DAY) first.setMinutes(0, 0, 0);
   else first.setHours(0, 0, 0, 0);
   const out: number[] = [];
-  for (let t = first.getTime(); t <= r.end; t += step) {
-    // Stepping by a fixed length drifts an hour across a DST change, so each
-    // day tick is snapped back to its midnight.
-    const d = new Date(t);
-    if (step >= DAY) d.setHours(0, 0, 0, 0);
+  // Day ticks step by the calendar. A fixed 24 hours lands on 11 PM after the
+  // clocks fall back, and snapping that to midnight repeated a day and left
+  // today off the ruler.
+  for (const d = first; d.getTime() <= r.end; ) {
     if (d.getTime() >= r.start) out.push(d.getTime());
+    if (step < DAY) d.setTime(d.getTime() + step);
+    else d.setDate(d.getDate() + step / DAY);
   }
   return { list: out, label: (t: number) => (step < DAY ? clock(t).replace(":00", "") : day(t)) };
 }
