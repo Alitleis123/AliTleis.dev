@@ -42,6 +42,10 @@ export default function Lightbox({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
+      // Ask can open on top of a gallery, and the keys typed there are not
+      // meant for the gallery underneath.
+      const other = document.activeElement?.closest('[role="dialog"]');
+      if (other && other !== dialogRef.current) return;
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowLeft") prev();
       else if (e.key === "ArrowRight") next();
