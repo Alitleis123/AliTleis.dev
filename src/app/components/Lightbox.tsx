@@ -50,11 +50,13 @@ export default function Lightbox({
       else if (e.key === "ArrowLeft") prev();
       else if (e.key === "ArrowRight") next();
     };
-    window.addEventListener("keydown", onKey);
+    // Capture, so this runs before Ask's own Escape closes it and hands focus
+    // back here, which made one Escape close both.
+    window.addEventListener("keydown", onKey, true);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKey, true);
       document.body.style.overflow = prevOverflow;
     };
   }, [open, onClose, prev, next]);
