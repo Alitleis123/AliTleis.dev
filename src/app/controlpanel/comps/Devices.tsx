@@ -99,7 +99,19 @@ export default function Devices({
                 {counted ? "Stop counting me" : "Count me again"}
               </button>
             )}
-            <button type="button" className="cp-btn" onClick={() => act(() => enroll())}>
+            <button
+              type="button"
+              className="cp-btn"
+              onClick={() =>
+                act(async () => {
+                  await enroll();
+                  // Signing in turns counting off for this browser again.
+                  try {
+                    setCounted(!localStorage.getItem("notrack"));
+                  } catch {}
+                })
+              }
+            >
               <LuFingerprint aria-hidden /> Add this browser&apos;s passkey
             </button>
             <button type="button" className="cp-btn cp-btn-primary" onClick={onLock}>
