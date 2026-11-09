@@ -67,9 +67,11 @@ const SWAP = `if redis.call("HGET", KEYS[1], ARGV[1]) == ARGV[2] then return red
 const FIRST = `if redis.call("HLEN", KEYS[1]) == 0 then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) end return -1`;
 // Forgets a passkey only while another is left. One already gone answers 0.
 const DROP = `if redis.call("HEXISTS", KEYS[1], ARGV[1]) ~= 1 then return 0 end if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
-// Spends the pairing code only while it is the one a challenge was issued
-// for, so a second device racing, or a newer code, cannot be used with it.
-const SPEND = `if redis.call("GET", KEYS[1]) == ARGV[1] then return redis.call("DEL", KEYS[1]) end return -1`;
+// Stores a passkey made with a pairing code and spends the code, only while
+// the code is the one the challenge was issued for. In one script, so a
+// second device racing or a newer code cannot use it, and a write that fails
+// leaves the code for another try.
+const PAIRED = `if redis.call("GET", KEYS[2]) == ARGV[3] then redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) redis.call("DEL", KEYS[2]) return 1 end return -1`;
 
 // ── Challenges ───────────────────────────────────────────────────────────────
 
@@ -186,16 +188,16 @@ export async function enroll(cred, name) {
     t: new Date().toISOString(),
     used: new Date().toISOString(),
   });
-  // The code is spent here, once the passkey checks out, rather than when the
-  // options went out. Spent then, a cancelled Face ID prompt killed the code.
-  if (paired) {
-    const [spent] = await must([["EVAL", SPEND, 1, PAIR, kind.slice(5)]]);
-    if (spent !== 1) return null;
-  }
   // Two challenges the password granted while the hash was empty must not
-  // both add a device. The second one finds the first already there.
+  // both add a device. The second one finds the first already there. A
+  // pairing code is spent here, with the passkey, rather than when the
+  // options went out. Spent then, a cancelled Face ID prompt killed the code.
   const [stored] = await must([
-    kind === "first" ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record] : ["HSET", PASSKEYS, b64(id), record],
+    kind === "first"
+      ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record]
+      : paired
+        ? ["EVAL", PAIRED, 2, PASSKEYS, PAIR, b64(id), record, kind.slice(5)]
+        : ["HSET", PASSKEYS, b64(id), record],
   ]);
   if (!(stored >= 0)) return null;
   return startSession(b64(id));

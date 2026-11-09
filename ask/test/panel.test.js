@@ -53,8 +53,10 @@ globalThis.fetch = async (url, init) => {
         }
         // The four scripts in lib/owner.js, told apart by what they check.
         if (key.includes('"GET"')) {
-          if (store.get(args[1]) !== args[2]) return { result: -1 };
-          store.delete(args[1]);
+          const [, hashKey, pairKey, field, value, code] = args;
+          if (store.get(pairKey) !== code) return { result: -1 };
+          (store.get(hashKey) ?? store.set(hashKey, new Map()).get(hashKey)).set(field, value);
+          store.delete(pairKey);
           return { result: 1 };
         }
         const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
