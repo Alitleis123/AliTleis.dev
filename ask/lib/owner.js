@@ -93,9 +93,9 @@ async function client(json, type) {
   } catch {
     return null;
   }
-  if (data?.type !== type || data.origin !== ORIGIN) return null;
-  if (typeof data.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return null;
+  if (typeof data?.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return null;
   const [kind] = await must([["GETDEL", `${NS}challenge:${data.challenge}`]]);
+  if (data.type !== type || data.origin !== ORIGIN) return null;
   return kind ?? null;
 }
 

@@ -303,6 +303,14 @@ test("a sign-in from another origin or without user verification is refused", as
   assert.equal((await signInWith(d, { flags: 0x01 })).status, 401);
 });
 
+test("a sign-in refused for its origin still spends the challenge", async () => {
+  const { d } = await enrollFirst();
+  const opts = await authCall({ action: "sign-in-options" });
+  const elsewhere = asserted(d, opts.body, { origin: "https://evil.test" });
+  assert.equal((await authCall({ action: "sign-in", credential: elsewhere })).status, 401);
+  assert.equal((await authCall({ action: "sign-in", credential: asserted(d, opts.body) })).status, 401);
+});
+
 test("a replayed sign-in is refused", async () => {
   const { d } = await enrollFirst();
   const opts = await authCall({ action: "sign-in-options" });
