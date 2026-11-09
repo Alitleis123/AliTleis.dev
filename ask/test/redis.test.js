@@ -41,6 +41,7 @@ test("the poll script filters a real Redis list by time", { skip: !REST_URL || !
     assert.deepEqual(await newer(list, at(10).t), [at(30), at(20)]);
     assert.equal((await newer(list, "")).length, 2997);
   } finally {
-    await redis([["DEL", list]]);
+    // Quietly, so a cleanup failure cannot hide the failure that matters.
+    await redis([["DEL", list]]).catch(() => {});
   }
 });

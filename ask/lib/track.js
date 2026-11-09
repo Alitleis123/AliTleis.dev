@@ -27,7 +27,9 @@ export async function redis(commands) {
   if (!DB_URL || !DB_TOKEN) return null;
   const res = await fetch(`${DB_URL}/pipeline`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${DB_TOKEN}` },
+    // Upstash reads the body either way. The Redis stand-in the pull request
+    // checks run answers 400 to the text/plain a bare string body gets.
+    headers: { Authorization: `Bearer ${DB_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify(commands),
     signal: AbortSignal.timeout(3000),
   });
