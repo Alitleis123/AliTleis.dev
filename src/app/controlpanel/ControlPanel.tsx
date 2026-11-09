@@ -120,18 +120,24 @@ export default function ControlPanel() {
   const sheetRef = useRef<HTMLDivElement>(null);
   // What the last poll left, for the next one to build on.
   const held = useRef<PanelData | null>(null);
-  // Bumped on Lock and on every refresh, so only the newest request's answer
-  // lands. A poll in flight cannot reopen a locked panel, and one that started
-  // before a save cannot overwrite the save's fresher labels.
+  // Bumped on Lock, so a poll that was already in flight cannot reopen the
+  // panel when its answer lands afterwards.
   const generation = useRef(0);
+  // Refreshes can overlap, as a poll still loading when a save refreshes. An
+  // answer is dropped only once a later-started one has landed, so a poll
+  // from before the save cannot undo it, and slow polls still all land.
+  const started = useRef(0);
+  const landed = useRef(0);
 
   const refresh = useCallback(async () => {
-    const mine = ++generation.current;
+    const mine = generation.current;
+    const order = ++started.current;
     setSyncing(true);
     try {
       const prev = held.current;
       const fresh = await load(prev ? { visits: back(prev.visits[0]?.t), asks: back(prev.asks[0]?.t) } : undefined);
-      if (mine !== generation.current) return;
+      if (mine !== generation.current || order < landed.current) return;
+      landed.current = order;
       const d = prev ? merge(prev, fresh) : fresh;
       held.current = d;
       setData(d);
