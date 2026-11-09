@@ -120,8 +120,8 @@ export default function ControlPanel() {
   const sheetRef = useRef<HTMLDivElement>(null);
   // What the last poll left, for the next one to build on.
   const held = useRef<PanelData | null>(null);
-  // Bumped on Lock, so a poll that was already in flight cannot reopen the
-  // panel when its answer lands afterwards.
+  // Bumped on Lock and on a sign-out, so a poll that was already in flight
+  // cannot reopen the panel when its answer lands afterwards.
   const generation = useRef(0);
   // Refreshes can overlap, as a poll still loading when a save refreshes. An
   // answer is dropped only once a later-started one has landed, so a poll
@@ -138,7 +138,9 @@ export default function ControlPanel() {
       const fresh = await load(prev ? { visits: back(prev.visits[0]?.t), asks: back(prev.asks[0]?.t) } : undefined);
       if (mine !== generation.current || order < landed.current) return;
       landed.current = order;
-      const d = prev ? merge(prev, fresh) : fresh;
+      // Merged into what is held now, not what was held when this started,
+      // so entries another refresh brought in meanwhile stay.
+      const d = held.current ? merge(held.current, fresh) : fresh;
       held.current = d;
       setData(d);
       setNow(Date.now());
@@ -148,8 +150,9 @@ export default function ControlPanel() {
       setEnrolled(true);
       setPhase("open");
     } catch (err) {
-      if (mine !== generation.current) return;
+      if (mine !== generation.current || order < landed.current) return;
       if (err instanceof SignedOut) {
+        generation.current++;
         token.clear();
         held.current = null;
         setData(null);
