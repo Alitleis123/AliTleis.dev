@@ -266,9 +266,13 @@ export function liveNow(all: Map<string, Visitor>, now: number) {
 export function ago(t: number, now: number) {
   const s = Math.max(0, Math.round((now - t) / 1000));
   if (s < 45) return "now";
-  if (s < 3600) return `${Math.round(s / 60)}m ago`;
-  if (s < 86400) return `${Math.round(s / 3600)}h ago`;
-  if (s < 7 * 86400) return `${Math.round(s / 86400)}d ago`;
+  // Each limit is checked after rounding, or 59.5 minutes read "60m ago".
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(s / 3600);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(s / 86400);
+  if (d < 7) return `${d}d ago`;
   return day(t);
 }
 
