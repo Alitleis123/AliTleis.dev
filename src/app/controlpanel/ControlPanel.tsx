@@ -120,12 +120,13 @@ export default function ControlPanel() {
   const sheetRef = useRef<HTMLDivElement>(null);
   // What the last poll left, for the next one to build on.
   const held = useRef<PanelData | null>(null);
-  // Bumped on Lock, so a poll that was already in flight cannot reopen the
-  // panel when its answer lands afterwards.
+  // Bumped on Lock and on every refresh, so only the newest request's answer
+  // lands. A poll in flight cannot reopen a locked panel, and one that started
+  // before a save cannot overwrite the save's fresher labels.
   const generation = useRef(0);
 
   const refresh = useCallback(async () => {
-    const mine = generation.current;
+    const mine = ++generation.current;
     setSyncing(true);
     try {
       const prev = held.current;
