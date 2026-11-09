@@ -215,6 +215,9 @@ export default function Studio() {
   // in their hands already.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Alt+Left is the browser's Back, and Ctrl or Cmd with a letter is the
+      // browser's too.
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       const target = e.target instanceof HTMLElement ? e.target : null;
       if (target?.closest("input, textarea, select, [contenteditable]")) return;
       // A focused control keeps the keys it already means something by. Space
