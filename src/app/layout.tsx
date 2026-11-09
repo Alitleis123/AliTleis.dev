@@ -29,9 +29,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  // No og:url. Set here, every page inherited the chooser's address, so a
+  // shared /studio/ or /galaxy/ card opened the chooser. Without it, a card
+  // links to the page that was shared.
   openGraph: {
     type: "website",
-    url: SITE_URL,
     siteName: "Ali Tleis",
     title: "Ali Tleis · Software Engineer",
     description: DESCRIPTION,
