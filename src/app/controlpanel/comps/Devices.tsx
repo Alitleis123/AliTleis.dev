@@ -87,9 +87,13 @@ export default function Devices({
                 type="button"
                 className="cp-btn"
                 onClick={() => {
-                  if (counted) localStorage.setItem("notrack", "1");
-                  else localStorage.removeItem("notrack");
-                  setCounted(!counted);
+                  try {
+                    if (counted) localStorage.setItem("notrack", "1");
+                    else localStorage.removeItem("notrack");
+                    setCounted(!counted);
+                  } catch {
+                    setError("This browser would not save that setting.");
+                  }
                 }}
               >
                 {counted ? "Stop counting me" : "Count me again"}
