@@ -33,7 +33,8 @@ export default function Asks({
     .filter((a) => a.a && a.ms != null)
     .map((a) => a.ms!)
     .sort((x, y) => x - y);
-  const median = times.length ? times[Math.floor(times.length / 2)] : null;
+  const mid = times.length >> 1;
+  const median = !times.length ? null : times.length % 2 ? times[mid] : (times[mid - 1] + times[mid]) / 2;
   const quota = inRange.filter((a) => a.misses?.some((m) => m.includes("429"))).length;
 
   const tile = (label: string, value: string, note?: string, warn = false) => (

@@ -249,11 +249,15 @@ export function rank<T>(items: T[], key: (item: T) => string | null | undefined,
   return [...counts].sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
-/** Who has viewed a page in the last five minutes, and where they are now. */
+/**
+ * Who has viewed a page or asked a question in the last five minutes, and the
+ * page they are on. The time is that latest move, so someone who opened a
+ * page half an hour ago and just asked something reads "now", not "30m ago".
+ */
 export function liveNow(all: Map<string, Visitor>, now: number) {
   return [...all.values()]
     .filter((v) => !v.hidden && !v.you && now - v.last < 5 * 60 * 1000 && v.views.length)
-    .map((v) => ({ visitor: v, path: v.views.at(-1)!.path, t: ms(v.views.at(-1)!.t) }))
+    .map((v) => ({ visitor: v, path: v.views.at(-1)!.path, t: v.last }))
     .sort((a, b) => b.t - a.t);
 }
 
@@ -262,9 +266,13 @@ export function liveNow(all: Map<string, Visitor>, now: number) {
 export function ago(t: number, now: number) {
   const s = Math.max(0, Math.round((now - t) / 1000));
   if (s < 45) return "now";
-  if (s < 3600) return `${Math.round(s / 60)}m ago`;
-  if (s < 86400) return `${Math.round(s / 3600)}h ago`;
-  if (s < 7 * 86400) return `${Math.round(s / 86400)}d ago`;
+  // Each limit is checked after rounding, or 59.5 minutes read "60m ago".
+  const m = Math.round(s / 60);
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(s / 3600);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(s / 86400);
+  if (d < 7) return `${d}d ago`;
   return day(t);
 }
 

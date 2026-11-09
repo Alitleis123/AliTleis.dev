@@ -53,6 +53,16 @@ export default function Tracks() {
   const [manualNotes, setManualNotes] = useState<string | null>(null);
   const notes = presenting ? (autoNotes ? autoOpenId : null) : manualNotes;
 
+  // The hand-picked state follows the run while it plays, so taking over
+  // keeps the open role on screen instead of snapping back to the first.
+  useEffect(() => {
+    if (!presenting) return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setManualOpen(autoOpenId);
+    setManualNotes(autoNotes ? autoOpenId : null);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [presenting, autoOpenId, autoNotes]);
+
   useScriptedScroll(
     notesRef,
     presenting && autoNotes,

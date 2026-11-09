@@ -56,7 +56,7 @@ const ALGS = { "-7": "ec", "-8": "ed25519", "-257": "rsa" };
 export const passkeys = () => hash(PASSKEYS);
 
 /**
- * Writes that depend on what the hash holds, run inside Redis so a second
+ * Writes that depend on what Redis holds, run inside Redis so a second
  * request cannot slip in between the check and the write. Each returns -1
  * when its condition fails.
  */
@@ -65,8 +65,13 @@ export const passkeys = () => hash(PASSKEYS);
 const SWAP = `if redis.call("HGET", KEYS[1], ARGV[1]) == ARGV[2] then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[3]) end return -1`;
 // Stores the first passkey only while there is none.
 const FIRST = `if redis.call("HLEN", KEYS[1]) == 0 then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) end return -1`;
-// Forgets a passkey only while another is left.
-const DROP = `if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
+// Forgets a passkey only while another is left. One already gone answers 0.
+const DROP = `if redis.call("HEXISTS", KEYS[1], ARGV[1]) ~= 1 then return 0 end if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
+// Stores a passkey made with a pairing code and spends the code, only while
+// the code is the one the challenge was issued for. In one script, so a
+// second device racing or a newer code cannot use it, and a write that fails
+// leaves the code for another try.
+const PAIRED = `if redis.call("GET", KEYS[2]) == ARGV[3] then redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) redis.call("DEL", KEYS[2]) return 1 end return -1`;
 
 // ── Challenges ───────────────────────────────────────────────────────────────
 
@@ -93,9 +98,9 @@ async function client(json, type) {
   } catch {
     return null;
   }
-  if (data?.type !== type || data.origin !== ORIGIN) return null;
-  if (typeof data.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return null;
+  if (typeof data?.challenge !== "string" || !/^[\w-]{43}$/.test(data.challenge)) return null;
   const [kind] = await must([["GETDEL", `${NS}challenge:${data.challenge}`]]);
+  if (data.type !== type || data.origin !== ORIGIN) return null;
   return kind ?? null;
 }
 
@@ -114,12 +119,16 @@ function authenticator(data) {
 
 /**
  * Whether this request may add a passkey, as the kind of challenge to issue:
- * "enroll" from a signed-in device or with a pairing code one made, "first"
- * with the password while there are none at all, null otherwise.
+ * "enroll" from a signed-in device, "pair:" and the code's hash with a pairing
+ * code one made, "first" with the password while there are none at all, null
+ * otherwise.
  */
 export async function mayEnroll(request, { password, code } = {}) {
   if (await signedIn(request)) return "enroll";
-  if (code) return (await redeemPair(code)) ? "enroll" : null;
+  if (code) {
+    const pair = await checkPair(code);
+    return pair ? `pair:${pair}` : null;
+  }
   if (typeof password !== "string" || !password || !process.env.ADMIN_PASSWORD) return null;
   const [count] = await must([["HLEN", PASSKEYS]]);
   return count === 0 && same(password, process.env.ADMIN_PASSWORD) ? "first" : null;
@@ -146,7 +155,8 @@ const TRANSPORTS = new Set(["ble", "hybrid", "internal", "nfc", "usb"]);
 /** Stores a new passkey from the browser's answer and signs that device in. */
 export async function enroll(cred, name) {
   const kind = await client(cred?.clientDataJSON, "webauthn.create");
-  if (kind !== "enroll" && kind !== "first") return null;
+  const paired = typeof kind === "string" && kind.startsWith("pair:");
+  if (kind !== "enroll" && kind !== "first" && !paired) return null;
 
   const data = unb64(cred.authenticatorData);
   const auth = authenticator(data);
@@ -179,9 +189,15 @@ export async function enroll(cred, name) {
     used: new Date().toISOString(),
   });
   // Two challenges the password granted while the hash was empty must not
-  // both add a device. The second one finds the first already there.
+  // both add a device. The second one finds the first already there. A
+  // pairing code is spent here, with the passkey, rather than when the
+  // options went out. Spent then, a cancelled Face ID prompt killed the code.
   const [stored] = await must([
-    kind === "first" ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record] : ["HSET", PASSKEYS, b64(id), record],
+    kind === "first"
+      ? ["EVAL", FIRST, 1, PASSKEYS, b64(id), record]
+      : paired
+        ? ["EVAL", PAIRED, 2, PASSKEYS, PAIR, b64(id), record, kind.slice(5)]
+        : ["HSET", PASSKEYS, b64(id), record],
   ]);
   if (!(stored >= 0)) return null;
   return startSession(b64(id));
@@ -272,10 +288,14 @@ export async function endSession(request) {
   if (token) await must([["DEL", sessionKey(token)]]);
 }
 
-/** Forgets a device, unless it is the last one, which would reopen the password. */
+/**
+ * Forgets a device, unless it is the last one, which would reopen the
+ * password. One already gone counts as forgotten, as when two tabs both press
+ * Forget, rather than reading as the last device.
+ */
 export async function forget(id) {
   const [removed] = await must([["EVAL", DROP, 1, PASSKEYS, String(id)]]);
-  return removed === 1;
+  return removed !== -1;
 }
 
 // ── Pairing ──────────────────────────────────────────────────────────────────
@@ -301,20 +321,20 @@ export async function startPair() {
   return { code: `${code.slice(0, 4)}-${code.slice(4)}`, expires: Date.now() + PAIR_SECONDS * 1000 };
 }
 
-async function redeemPair(code) {
+/**
+ * The stored hash when the code matches, without spending it. enroll spends
+ * it, so only one device gets in on it however many prompts were started.
+ */
+async function checkPair(code) {
   const [stored] = await must([["GET", PAIR]]);
-  if (!stored) return false;
-  if (same(sha(normal(code)).toString("hex"), stored)) {
-    // Two devices racing with the same code: only the one that deletes it wins.
-    const [deleted] = await must([["DEL", PAIR]]);
-    return deleted === 1;
-  }
+  if (!stored) return null;
+  if (same(sha(normal(code)).toString("hex"), stored)) return stored;
   const [fails] = await must([
     ["INCR", PAIR_FAILS],
     ["EXPIRE", PAIR_FAILS, PAIR_SECONDS],
   ]);
   if (fails >= 5) await must([["DEL", PAIR]]);
-  return false;
+  return null;
 }
 
 // ── Responses ────────────────────────────────────────────────────────────────

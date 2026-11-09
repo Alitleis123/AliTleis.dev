@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LuChevronDown, LuChrome, LuExternalLink, LuGithub, LuStar, LuUsers } from "react-icons/lu";
 import { featuredProjects, otherWork, type Project } from "../../data";
 import { COVER_MAP } from "../../lib/projectCovers";
@@ -47,6 +47,18 @@ export default function Bin() {
   const sel = presenting ? autoSel : manualSel;
   const notesOpen = presenting ? autoNotes : manualNotes;
   const take = presenting ? 0 : manualTake;
+
+  // The hand-picked state follows the run while it plays, so taking over
+  // keeps the frame on screen. It used to snap back to the first project, and
+  // a press on a later project's screenshot or notes acted on that one.
+  useEffect(() => {
+    if (!presenting) return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setManualSel(autoSel);
+    setManualNotes(autoNotes);
+    setManualTake(0);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [presenting, autoSel, autoNotes]);
 
   const p = featuredProjects[sel];
   const Cover = p.coverKey ? COVER_MAP[p.coverKey] : null;

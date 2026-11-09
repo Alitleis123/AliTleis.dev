@@ -41,7 +41,24 @@ globalThis.fetch = async (url, init) => {
       case "HGET": return { result: h().get(args[0]) ?? null };
       case "EVAL": {
         if (evalFails) return { error: "ERR script failed" };
-        // The three scripts in lib/owner.js, told apart by what they check.
+        if (key.includes("LRANGE")) {
+          const [, list, since, keep] = args;
+          return { result: (store.get(list) ?? []).slice(0, keep).filter((item) => {
+            try {
+              return JSON.parse(item)?.t > since;
+            } catch {
+              return false;
+            }
+          }) };
+        }
+        // The four scripts in lib/owner.js, told apart by what they check.
+        if (key.includes('"GET"')) {
+          const [, hashKey, pairKey, field, value, code] = args;
+          if (store.get(pairKey) !== code) return { result: -1 };
+          (store.get(hashKey) ?? store.set(hashKey, new Map()).get(hashKey)).set(field, value);
+          store.delete(pairKey);
+          return { result: 1 };
+        }
         const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
         beforeEval?.();
         const m = store.get(hashKey) ?? store.set(hashKey, new Map()).get(hashKey);
@@ -56,6 +73,7 @@ globalThis.fetch = async (url, init) => {
           return { result: 1 };
         }
         if (key.includes("> 1")) {
+          if (!m.has(field)) return { result: 0 };
           if (m.size <= 1) return { result: -1 };
           return { result: m.delete(field) ? 1 : 0 };
         }
@@ -259,6 +277,31 @@ test("a pairing code enrolls one more device, once", async () => {
   assert.equal((await signInWith(laptop)).status, 200);
 });
 
+test("a cancelled passkey prompt leaves the pairing code, which still enrolls one device", async () => {
+  const { token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  // Face ID cancelled after the options went out, then tried twice more.
+  assert.equal((await authCall({ action: "enroll-options", code: pair.body.code })).status, 200);
+  const a = await authCall({ action: "enroll-options", code: pair.body.code });
+  const b = await authCall({ action: "enroll-options", code: pair.body.code });
+  assert.equal(b.status, 200);
+
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), a.body) })).status, 200);
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), b.body) })).status, 400);
+  assert.equal(store.get("dev:passkeys").size, 2);
+});
+
+test("a prompt started with an old pairing code cannot spend a newer one", async () => {
+  const { token } = await enrollFirst();
+  const first = await authCall({ action: "pair" }, { token });
+  const stale = await authCall({ action: "enroll-options", code: first.body.code });
+  const second = await authCall({ action: "pair" }, { token });
+
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), stale.body) })).status, 400);
+  const fresh = await authCall({ action: "enroll-options", code: second.body.code });
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), fresh.body) })).status, 200);
+});
+
 test("five wrong pairing codes end the real one", async () => {
   const { token } = await enrollFirst();
   const pair = await authCall({ action: "pair" }, { token });
@@ -291,6 +334,14 @@ test("a sign-in from another origin or without user verification is refused", as
   const { d } = await enrollFirst();
   assert.equal((await signInWith(d, { origin: "https://evil.test" })).status, 401);
   assert.equal((await signInWith(d, { flags: 0x01 })).status, 401);
+});
+
+test("a sign-in refused for its origin still spends the challenge", async () => {
+  const { d } = await enrollFirst();
+  const opts = await authCall({ action: "sign-in-options" });
+  const elsewhere = asserted(d, opts.body, { origin: "https://evil.test" });
+  assert.equal((await authCall({ action: "sign-in", credential: elsewhere })).status, 401);
+  assert.equal((await authCall({ action: "sign-in", credential: asserted(d, opts.body) })).status, 401);
 });
 
 test("a replayed sign-in is refused", async () => {
@@ -346,6 +397,19 @@ test("forgetting two devices at once leaves one", async () => {
   ]);
   assert.deepEqual(results.map((r) => r.status).sort(), [200, 400]);
   assert.equal(store.get("dev:passkeys").size, 1);
+});
+
+test("a device with a long credential id can be forgotten, and forgetting it twice is fine", async () => {
+  const { token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  const opts = await authCall({ action: "enroll-options", code: pair.body.code });
+  const key = Object.assign(device(), { id: randomBytes(1023) });
+  assert.equal((await authCall({ action: "enroll", credential: created(key, opts.body) })).status, 200);
+
+  const id = b64(key.id);
+  assert.equal((await panelPost({ action: "forget", id }, token)).status, 200);
+  assert.equal(store.get("dev:passkeys").has(id), false);
+  assert.equal((await panelPost({ action: "forget", id }, token)).status, 200);
 });
 
 test("a failed Redis command ends the sign-in instead of passing", async () => {
@@ -438,6 +502,33 @@ test("a poll with a time gets only what came after it, across pages", async () =
   assert.deepEqual(res.body.asks, []);
 });
 
+test("a delayed entry does not hide newer entries in the same poll page", async () => {
+  const { token } = await enrollFirst();
+  const t0 = Date.parse("2026-10-01T00:00:00.000Z");
+  const entry = (i) => JSON.stringify({ t: new Date(t0 + i * 1000).toISOString(), q: `Question ${i}` });
+  // Answers finish out of order. Older questions can be pushed ahead of
+  // newer ones, including at the start of the next Redis page.
+  const entries = Array.from({ length: 250 }, (_, i) => entry(250 - i));
+  entries.unshift(entry(0));
+  entries.splice(100, 0, entry(0));
+  store.set("dev:asks", entries);
+
+  const since = new Date(t0 + 99 * 1000).toISOString();
+  const res = await call(panel.GET, `/api/panel?asks=${encodeURIComponent(since)}`, { method: "GET", token });
+  assert.equal(res.status, 200);
+  assert.equal(res.body.asks.length, 151);
+  assert.equal(res.body.asks.at(-1).q, "Question 100");
+});
+
+test("a poll finds newer entries behind a full page of delayed answers", async () => {
+  const { token } = await enrollFirst();
+  const old = JSON.stringify({ t: "2026-10-01T00:00:00.000Z", q: "Delayed answer" });
+  const fresh = { t: "2026-10-01T00:00:20.000Z", q: "New question" };
+  store.set("dev:asks", [...Array(100).fill(old), "invalid JSON", JSON.stringify(fresh)]);
+  const res = await call(panel.GET, "/api/panel?asks=2026-10-01T00%3A00%3A10.000Z", { method: "GET", token });
+  assert.deepEqual(res.body.asks, [fresh]);
+});
+
 // ── Visits ──────────────────────────────────────────────────────────────────
 
 test("a visit keeps the address and the link tag", async () => {
@@ -462,4 +553,20 @@ test("a visit keeps the address and the link tag", async () => {
   assert.equal(entry.tag, "k3x9qp");
   assert.equal(entry.org, "Google LLC");
   assert.match(entry.id, /^[0-9a-f]{8}$/);
+});
+
+test("a visit cuts a long referring host to what DNS allows", async () => {
+  const res = await visit.POST(
+    new Request("https://api.test/api/visit", {
+      method: "POST",
+      headers: {
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0) Safari/605.1.15",
+        "x-forwarded-for": "203.0.113.10",
+      },
+      body: JSON.stringify({ path: "/", first: true, ref: `https://${"a".repeat(100_000)}.com/` }),
+    }),
+  );
+  assert.equal(res.status, 204);
+  const [entry] = store.get("dev:visits").map((v) => JSON.parse(v));
+  assert.equal(entry.ref.length, 253);
 });

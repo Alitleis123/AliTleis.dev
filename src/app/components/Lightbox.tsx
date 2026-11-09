@@ -1,9 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { FaChevronLeft, FaChevronRight, FaXmark } from "react-icons/fa6";
 import { useFocusTrap } from "../lib/useFocusTrap";
+
+const subscribe = () => () => {};
 
 /** One open gallery: the images, which one is showing, and whose gallery it is. */
 export type LightboxState = {
@@ -39,20 +42,32 @@ export default function Lightbox({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
+      // Ask can open on top of a gallery, and the keys typed there are not
+      // meant for the gallery underneath.
+      const other = document.activeElement?.closest('[role="dialog"]');
+      if (other && other !== dialogRef.current) return;
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowLeft") prev();
       else if (e.key === "ArrowRight") next();
     };
-    window.addEventListener("keydown", onKey);
+    // Capture, so this runs before Ask's own Escape closes it and hands focus
+    // back here, which made one Escape close both.
+    window.addEventListener("keydown", onKey, true);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
-      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("keydown", onKey, true);
       document.body.style.overflow = prevOverflow;
     };
   }, [open, onClose, prev, next]);
 
-  return (
+  // Rendered into <body>. <main> is its own stacking context, below the nav
+  // and the floating pills, so no z-index inside it could lift the gallery
+  // over them, and they covered its title, close button and thumbnails.
+  const client = useSyncExternalStore(subscribe, () => true, () => false);
+  if (!client) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && state ? (
         <motion.div
@@ -173,6 +188,7 @@ export default function Lightbox({
           ) : null}
         </motion.div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

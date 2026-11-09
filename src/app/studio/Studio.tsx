@@ -215,6 +215,9 @@ export default function Studio() {
   // in their hands already.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Alt+Left is the browser's Back, and Ctrl or Cmd with a letter is the
+      // browser's too.
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       const target = e.target instanceof HTMLElement ? e.target : null;
       if (target?.closest("input, textarea, select, [contenteditable]")) return;
       // A focused control keeps the keys it already means something by. Space
@@ -331,10 +334,13 @@ export default function Studio() {
             is already false by the time the comp's own click handler sets its
             manual selection: a comp reads `presenting ? auto : manual`, so
             without this a click during the guided run set manual state that
-            nothing was looking at, and appeared to do nothing. */}
+            nothing was looking at, and appeared to do nothing. Enter and
+            Space on a focused row click it without a pointer, so clicks are
+            caught too. */}
         <div
           className="st-boot-stage flex min-w-0 flex-1 flex-col"
           onPointerDownCapture={takeOver}
+          onClickCapture={takeOver}
         >
           <Viewer
             time={time}

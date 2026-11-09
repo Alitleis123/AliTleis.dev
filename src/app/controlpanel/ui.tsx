@@ -113,6 +113,8 @@ export function Copy({ text, label = "Copy" }: { text: string; label?: string })
     <button
       type="button"
       className="cp-btn"
+      // An icon-only copy, like the one beside an IP, still needs a name.
+      aria-label={label ? undefined : done ? "Copied" : "Copy"}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text);

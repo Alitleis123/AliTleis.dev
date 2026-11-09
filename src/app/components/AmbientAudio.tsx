@@ -72,7 +72,11 @@ export default function AmbientAudio({ onStart }: { onStart?: () => void }) {
           startingRef.current = false;
           fade(VOLUME, 3000);
           setState("on");
-          if (remember) localStorage.setItem(PREF_KEY, "on");
+          try {
+            if (remember) localStorage.setItem(PREF_KEY, "on");
+          } catch {
+            // Playback still works when the browser blocks saved preferences.
+          }
         })
         .catch(() => {
           // A press is a gesture, so this is a genuine failure rather than
@@ -99,7 +103,9 @@ export default function AmbientAudio({ onStart }: { onStart?: () => void }) {
       if (desiredRef.current === "off") elRef.current?.pause();
     }, 650);
     setState("off");
-    localStorage.setItem(PREF_KEY, "off");
+    try {
+      localStorage.setItem(PREF_KEY, "off");
+    } catch {}
   }, [fade, disarm]);
 
   /**
@@ -115,7 +121,11 @@ export default function AmbientAudio({ onStart }: { onStart?: () => void }) {
   useEffect(() => {
     const el = elRef.current;
     if (!el) return;
-    if (localStorage.getItem(PREF_KEY) !== "on") {
+    let resume = false;
+    try {
+      resume = localStorage.getItem(PREF_KEY) === "on";
+    } catch {}
+    if (!resume) {
       // Defensive: a hot reload can hand us an element that is already
       // playing, and silence has to win over whatever state it is in.
       el.pause();
