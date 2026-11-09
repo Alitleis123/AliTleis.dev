@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { withBasePath } from "../data";
 import { scrollBehavior } from "../lib/animations";
 import { useFocusTrap } from "../lib/useFocusTrap";
@@ -193,7 +193,7 @@ export default function CommandPalette() {
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, open);
   const threadRef = useRef<HTMLDivElement>(null);
-  const typedRef = useRef<Set<number>>(new Set());
+  const [typed, setTyped] = useState<Set<number>>(() => new Set());
   const encoderRef = useRef<((t: string) => Promise<Float32Array>) | null>(null);
   const encoderLoadRef = useRef<Promise<void> | null>(null);
 
@@ -641,7 +641,7 @@ export default function CommandPalette() {
               ) : null}
 
               <div className="flex flex-col gap-7">
-                {turns.map((t, ti) => (
+                {turns.map((t) => (
                   <motion.div
                     key={t.id}
                     initial="hidden"
@@ -707,9 +707,9 @@ export default function CommandPalette() {
                           <p className="mt-1.5 text-[13px] leading-[1.75] text-[var(--text-muted)]">
                             <Typed
                               text={t.hits[0].snippet}
-                              instant={typedRef.current.has(ti)}
+                              instant={typed.has(t.id)}
                               onGrow={() => stickToBottom(false)}
-                              onDone={() => typedRef.current.add(ti)}
+                              onDone={() => setTyped((done) => new Set(done).add(t.id))}
                             />
                           </p>
                           <button
@@ -835,12 +835,11 @@ function Typed({
   onDone: () => void;
 }) {
   const [n, setN] = useState(instant ? text.length : 0);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     if (instant) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      setN(text.length);
       onDone();
       return;
     }
@@ -875,12 +874,14 @@ function Typed({
     // dependencies: the parent rebuilds them every render, and reacting to that
     // would restart the reveal from the first character on each keystroke.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, instant]);
+  }, [text, instant, reduced]);
+
+  const visible = instant || reduced ? text.length : n;
 
   return (
     <>
-      {text.slice(0, n)}
-      {n < text.length ? <span aria-hidden className="ask-caret" /> : null}
+      {text.slice(0, visible)}
+      {visible < text.length ? <span aria-hidden className="ask-caret" /> : null}
     </>
   );
 }

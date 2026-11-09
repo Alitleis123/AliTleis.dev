@@ -90,6 +90,7 @@ const nowLabel = buildDate.toLocaleDateString("en-US", {
 });
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   // Next's dev badge anchors bottom-left, on top of the ambient-audio button.
   // Development only, but it makes that control unclickable while working.
   devIndicators: false,
