@@ -17,7 +17,8 @@ const clip = (v, max) => (typeof v === "string" && v ? v.slice(0, max) : null);
 function from(referrer) {
   try {
     const host = new URL(referrer).hostname.replace(/^www\./, "");
-    return host === "alitleis.dev" ? null : host;
+    // A URL's host has no length limit, and DNS stops at 253.
+    return host === "alitleis.dev" ? null : host.slice(0, 253);
   } catch {
     return null;
   }

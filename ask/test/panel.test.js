@@ -500,3 +500,19 @@ test("a visit keeps the address and the link tag", async () => {
   assert.equal(entry.org, "Google LLC");
   assert.match(entry.id, /^[0-9a-f]{8}$/);
 });
+
+test("a visit cuts a long referring host to what DNS allows", async () => {
+  const res = await visit.POST(
+    new Request("https://api.test/api/visit", {
+      method: "POST",
+      headers: {
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0) Safari/605.1.15",
+        "x-forwarded-for": "203.0.113.10",
+      },
+      body: JSON.stringify({ path: "/", first: true, ref: `https://${"a".repeat(100_000)}.com/` }),
+    }),
+  );
+  assert.equal(res.status, 204);
+  const [entry] = store.get("dev:visits").map((v) => JSON.parse(v));
+  assert.equal(entry.ref.length, 253);
+});
