@@ -65,8 +65,8 @@ export const passkeys = () => hash(PASSKEYS);
 const SWAP = `if redis.call("HGET", KEYS[1], ARGV[1]) == ARGV[2] then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[3]) end return -1`;
 // Stores the first passkey only while there is none.
 const FIRST = `if redis.call("HLEN", KEYS[1]) == 0 then return redis.call("HSET", KEYS[1], ARGV[1], ARGV[2]) end return -1`;
-// Forgets a passkey only while another is left.
-const DROP = `if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
+// Forgets a passkey only while another is left. One already gone answers 0.
+const DROP = `if redis.call("HEXISTS", KEYS[1], ARGV[1]) ~= 1 then return 0 end if redis.call("HLEN", KEYS[1]) > 1 then return redis.call("HDEL", KEYS[1], ARGV[1]) end return -1`;
 // Spends the pairing code only while it is the one a challenge was issued
 // for, so a second device racing, or a newer code, cannot be used with it.
 const SPEND = `if redis.call("GET", KEYS[1]) == ARGV[1] then return redis.call("DEL", KEYS[1]) end return -1`;
@@ -286,10 +286,14 @@ export async function endSession(request) {
   if (token) await must([["DEL", sessionKey(token)]]);
 }
 
-/** Forgets a device, unless it is the last one, which would reopen the password. */
+/**
+ * Forgets a device, unless it is the last one, which would reopen the
+ * password. One already gone counts as forgotten, as when two tabs both press
+ * Forget, rather than reading as the last device.
+ */
 export async function forget(id) {
   const [removed] = await must([["EVAL", DROP, 1, PASSKEYS, String(id)]]);
-  return removed === 1;
+  return removed !== -1;
 }
 
 // ── Pairing ──────────────────────────────────────────────────────────────────

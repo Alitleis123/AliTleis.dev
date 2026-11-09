@@ -108,7 +108,8 @@ export async function POST(request) {
         return reply(request, { ok: true });
 
       case "forget":
-        return (await forget(clip(body.id, 200)))
+        // WebAuthn allows a credential id of 1023 bytes, 1364 in base64url.
+        return (await forget(clip(body.id, 1400)))
           ? reply(request, { ok: true })
           : reply(request, { error: "Keep at least one device, or the password opens setup again." }, 400);
 

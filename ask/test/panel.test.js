@@ -71,6 +71,7 @@ globalThis.fetch = async (url, init) => {
           return { result: 1 };
         }
         if (key.includes("> 1")) {
+          if (!m.has(field)) return { result: 0 };
           if (m.size <= 1) return { result: -1 };
           return { result: m.delete(field) ? 1 : 0 };
         }
@@ -394,6 +395,19 @@ test("forgetting two devices at once leaves one", async () => {
   ]);
   assert.deepEqual(results.map((r) => r.status).sort(), [200, 400]);
   assert.equal(store.get("dev:passkeys").size, 1);
+});
+
+test("a device with a long credential id can be forgotten, and forgetting it twice is fine", async () => {
+  const { token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  const opts = await authCall({ action: "enroll-options", code: pair.body.code });
+  const key = Object.assign(device(), { id: randomBytes(1023) });
+  assert.equal((await authCall({ action: "enroll", credential: created(key, opts.body) })).status, 200);
+
+  const id = b64(key.id);
+  assert.equal((await panelPost({ action: "forget", id }, token)).status, 200);
+  assert.equal(store.get("dev:passkeys").has(id), false);
+  assert.equal((await panelPost({ action: "forget", id }, token)).status, 200);
 });
 
 test("a failed Redis command ends the sign-in instead of passing", async () => {
