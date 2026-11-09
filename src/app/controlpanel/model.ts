@@ -249,11 +249,15 @@ export function rank<T>(items: T[], key: (item: T) => string | null | undefined,
   return [...counts].sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
-/** Who has viewed a page in the last five minutes, and where they are now. */
+/**
+ * Who has viewed a page or asked a question in the last five minutes, and the
+ * page they are on. The time is that latest move, so someone who opened a
+ * page half an hour ago and just asked something reads "now", not "30m ago".
+ */
 export function liveNow(all: Map<string, Visitor>, now: number) {
   return [...all.values()]
     .filter((v) => !v.hidden && !v.you && now - v.last < 5 * 60 * 1000 && v.views.length)
-    .map((v) => ({ visitor: v, path: v.views.at(-1)!.path, t: ms(v.views.at(-1)!.t) }))
+    .map((v) => ({ visitor: v, path: v.views.at(-1)!.path, t: v.last }))
     .sort((a, b) => b.t - a.t);
 }
 
