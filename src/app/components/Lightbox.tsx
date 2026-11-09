@@ -1,9 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { FaChevronLeft, FaChevronRight, FaXmark } from "react-icons/fa6";
 import { useFocusTrap } from "../lib/useFocusTrap";
+
+const subscribe = () => () => {};
 
 /** One open gallery: the images, which one is showing, and whose gallery it is. */
 export type LightboxState = {
@@ -52,7 +55,13 @@ export default function Lightbox({
     };
   }, [open, onClose, prev, next]);
 
-  return (
+  // Rendered into <body>. <main> is its own stacking context, below the nav
+  // and the floating pills, so no z-index inside it could lift the gallery
+  // over them, and they covered its title, close button and thumbnails.
+  const client = useSyncExternalStore(subscribe, () => true, () => false);
+  if (!client) return null;
+
+  return createPortal(
     <AnimatePresence>
       {open && state ? (
         <motion.div
@@ -173,6 +182,7 @@ export default function Lightbox({
           ) : null}
         </motion.div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
