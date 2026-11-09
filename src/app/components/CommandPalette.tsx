@@ -357,6 +357,10 @@ export default function CommandPalette() {
     },
     [index, lex, words, STOP],
   );
+  const rankRef = useRef(rank);
+  useEffect(() => {
+    rankRef.current = rank;
+  }, [rank]);
 
   /**
    * Downloads the encoder once, on the first question.
@@ -444,7 +448,10 @@ export default function CommandPalette() {
       } catch {
         vec = null;
       }
-      const hits = rank(q, vec);
+      // The latest rank, not the one from when the question was sent: on a
+      // slow connection the search index can land during the awaits above,
+      // and the old one would still find no index and return nothing.
+      const hits = rankRef.current(q, vec);
 
       // The passages land straight away, while the writer is still working.
       const id = ++turnIdRef.current;
@@ -517,7 +524,7 @@ export default function CommandPalette() {
         settle(null);
       }
     },
-    [rank, thinking, waiting, turns, loadEncoder, loadReader],
+    [thinking, waiting, turns, loadEncoder, loadReader],
   );
 
   const go = useCallback((d: Doc) => {
