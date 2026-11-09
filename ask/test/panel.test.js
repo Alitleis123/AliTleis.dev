@@ -51,7 +51,12 @@ globalThis.fetch = async (url, init) => {
             }
           }) };
         }
-        // The three scripts in lib/owner.js, told apart by what they check.
+        // The four scripts in lib/owner.js, told apart by what they check.
+        if (key.includes('"GET"')) {
+          if (store.get(args[1]) !== args[2]) return { result: -1 };
+          store.delete(args[1]);
+          return { result: 1 };
+        }
         const [, hashKey, field, a, b] = [key, args[1], args[2], args[3], args[4]];
         beforeEval?.();
         const m = store.get(hashKey) ?? store.set(hashKey, new Map()).get(hashKey);
@@ -267,6 +272,31 @@ test("a pairing code enrolls one more device, once", async () => {
 
   // The Ed25519 device signs in too.
   assert.equal((await signInWith(laptop)).status, 200);
+});
+
+test("a cancelled passkey prompt leaves the pairing code, which still enrolls one device", async () => {
+  const { token } = await enrollFirst();
+  const pair = await authCall({ action: "pair" }, { token });
+  // Face ID cancelled after the options went out, then tried twice more.
+  assert.equal((await authCall({ action: "enroll-options", code: pair.body.code })).status, 200);
+  const a = await authCall({ action: "enroll-options", code: pair.body.code });
+  const b = await authCall({ action: "enroll-options", code: pair.body.code });
+  assert.equal(b.status, 200);
+
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), a.body) })).status, 200);
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), b.body) })).status, 400);
+  assert.equal(store.get("dev:passkeys").size, 2);
+});
+
+test("a prompt started with an old pairing code cannot spend a newer one", async () => {
+  const { token } = await enrollFirst();
+  const first = await authCall({ action: "pair" }, { token });
+  const stale = await authCall({ action: "enroll-options", code: first.body.code });
+  const second = await authCall({ action: "pair" }, { token });
+
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), stale.body) })).status, 400);
+  const fresh = await authCall({ action: "enroll-options", code: second.body.code });
+  assert.equal((await authCall({ action: "enroll", credential: created(device(), fresh.body) })).status, 200);
 });
 
 test("five wrong pairing codes end the real one", async () => {
