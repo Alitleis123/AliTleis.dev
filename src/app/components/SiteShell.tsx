@@ -60,12 +60,13 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     if (entering) clearSwitchArrival();
   }, [entering, pathname]);
 
-  // Counts each page view for the control panel at /controlpanel. Opening the
-  // site once with ?notrack stops counting this browser, so Ali's own visits
-  // stay out of it, and ?notrack=off counts it again. Signing in to the panel
-  // sets the same flag.
+  // Counts each page view for the Site screen in Media Pool, Ali's own app,
+  // which reads the log. Opening the site once with ?notrack stops counting
+  // this browser, so Ali's own visits stay out of it, and ?notrack=off counts
+  // it again. The /mediapool door sets the same flag on a device that reaches
+  // Media Pool.
   useEffect(() => {
-    if (pathname?.startsWith("/controlpanel")) return;
+    if (pathname?.startsWith("/mediapool")) return;
     const params = new URLSearchParams(window.location.search);
     const flag = params.get("notrack");
     const src = params.get("ref") ?? params.get("utm_source");
@@ -112,13 +113,13 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  // Three routes bring their own frame. The suite and the control panel are
-  // full viewport applications, and the chooser is a single screen that would
+  // Three routes bring their own frame. The suite and the Media Pool door are
+  // full viewport screens, and the chooser is a single screen that would
   // look absurd under a nav offering to take you to the page you are choosing
   // between.
   const bare =
     pathname?.startsWith("/studio") ||
-    pathname?.startsWith("/controlpanel") ||
+    pathname?.startsWith("/mediapool") ||
     pathname === "/" ||
     pathname === "";
 
