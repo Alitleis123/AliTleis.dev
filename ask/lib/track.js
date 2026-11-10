@@ -1,7 +1,7 @@
 /**
- * The log behind the control panel at alitleis.dev/controlpanel: every
- * question asked in the Ask panel with what came back, and every page view the
- * site reports to /api/visit.
+ * The site's log, which the Site screen in Media Pool (Ali's own app) reads:
+ * every question asked in the Ask panel with what came back, and every page
+ * view the site reports to /api/visit.
  *
  * Kept in Upstash Redis on the free plan, as two capped lists of JSON, newest
  * first. Logging never fails a request. Without the database variables, or
@@ -16,9 +16,6 @@ const DB_TOKEN = process.env.KV_REST_API_TOKEN;
 export const NS = process.env.VERCEL_ENV === "production" ? "" : "dev:";
 export const ASKS = `${NS}asks`;
 export const VISITS = `${NS}visits`;
-/** The panel's own notes: names Ali gave visitors, and the links he sent out. */
-export const LABELS = `${NS}labels`;
-export const LINKS = `${NS}links`;
 
 /** Roughly a year of a portfolio's traffic, and well under the free 256MB. */
 const KEEP = 3000;
@@ -27,16 +24,15 @@ export async function redis(commands) {
   if (!DB_URL || !DB_TOKEN) return null;
   const res = await fetch(`${DB_URL}/pipeline`, {
     method: "POST",
-    // Upstash reads the body either way. The Redis stand-in the pull request
-    // checks run answers 400 to the text/plain a bare string body gets.
+    // Upstash reads the body either way, but a Redis REST stand-in answers
+    // 400 to the text/plain a bare string body gets.
     headers: { Authorization: `Bearer ${DB_TOKEN}`, "Content-Type": "application/json" },
     body: JSON.stringify(commands),
     signal: AbortSignal.timeout(3000),
   });
   if (!res.ok) throw new Error(`Upstash returned ${res.status}`);
   // A pipeline answers 200 even when one of its commands failed, with that
-  // command's error in place of its result. Passed on as undefined, a failed
-  // conditional write in lib/owner.js would read as one that went through.
+  // command's error in place of its result, so that is a failure too.
   const out = await res.json();
   const failed = out.find((r) => r.error);
   if (failed) throw new Error(`Upstash command failed: ${failed.error}`);
@@ -71,64 +67,6 @@ export async function later(promise) {
     console.error("waitUntil failed:", err.message);
   }
   await promise;
-}
-
-/**
- * For the panel and its sign-in, where a missing database is an error to show
- * rather than an entry to drop.
- */
-export async function must(commands) {
-  const out = await redis(commands);
-  if (!out) throw new Error("KV_REST_API_URL and KV_REST_API_TOKEN are not set.");
-  return out;
-}
-
-/** A Redis hash of JSON values, as an object. Upstash sends HGETALL flat. */
-export async function hash(key) {
-  const [flat] = await must([["HGETALL", key]]);
-  const out = {};
-  for (let i = 0; i + 1 < (flat?.length ?? 0); i += 2) {
-    try {
-      out[flat[i]] = JSON.parse(flat[i + 1]);
-    } catch {
-      // A hand-edited entry that is not JSON is skipped, not fatal.
-    }
-  }
-  return out;
-}
-
-const parsed = (items) =>
-  items.flatMap((item) => {
-    try {
-      return [JSON.parse(item)];
-    } catch {
-      return [];
-    }
-  });
-
-export async function recent(list) {
-  const [items] = (await redis([["LRANGE", list, 0, KEEP - 1]])) ?? [[]];
-  return parsed(items);
-}
-
-/**
- * Answers finish out of order, so a timestamp cannot end a list scan early.
- * Filter the capped list inside Redis to keep old entries off the network
- * and within the free plan's 10GB monthly transfer limit.
- */
-const NEWER = `
-local out = {}
-for _, item in ipairs(redis.call("LRANGE", KEYS[1], 0, tonumber(ARGV[2]) - 1)) do
-  local ok, entry = pcall(cjson.decode, item)
-  if ok and type(entry) == "table" and type(entry.t) == "string" and entry.t > ARGV[1] then
-    table.insert(out, item)
-  end
-end
-return out`;
-
-export async function newer(list, since) {
-  const [items] = await must([["EVAL", NEWER, 1, list, since, KEEP]]);
-  return parsed(items);
 }
 
 /** Crawlers and headless checks, which would otherwise read as visitors. */

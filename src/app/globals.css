@@ -96,10 +96,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* The control panel's red, for errors, failed asks and the live dot. The
-   lighter shade is for text, which needs the extra contrast on dark grey. */
+/* The Media Pool door's red, for its one error. A light shade, for the
+   contrast text needs on dark grey. */
 @theme {
-  --color-cp-red: #ff5a4f;
   --color-cp-red-text: #ff8a80;
 }
 
@@ -1234,78 +1233,18 @@ section {
   }
 }
 
-/* ── Control panel ─────────────────────────────────────────────
-   /controlpanel takes the suite's palette through .st-root and adds
-   only what the suite has no equivalent for: level meters, the record
-   light, and form controls sized for reading rather than for chrome.
+/* ── Media Pool door ───────────────────────────────────────────
+   /mediapool takes the suite's palette through .st-root and adds only
+   the record light and the button the suite has no equivalent for.
    ─────────────────────────────────────────────────────────────── */
 
-/* The panel is read rather than edited, so its labels run a size up and a
-   step brighter than the suite's 10px chrome. */
-.cp-root {
-  --st-faint: rgba(244, 244, 241, 0.62);
-}
-
-.cp-root .st-label {
-  font-size: 11px;
-}
-
-/* A level meter, segmented like the ones on an audio track. The fill uses
-   the same stripe as the trough, so its segments sit on the trough's. */
-.cp-meter {
-  height: 6px;
-  overflow: hidden;
-  border-radius: 1px;
-  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 3px, transparent 3px 5px);
-}
-
-.cp-meter > span {
-  display: block;
-  height: 100%;
-  background: repeating-linear-gradient(90deg, var(--st-accent) 0 3px, transparent 3px 5px);
-}
-
-/* Red because recording is red in every editor, and it means the same here:
-   someone is on the site right now. Grey when nobody is. */
+/* Grey: nothing is recording. */
 .cp-rec {
   width: 7px;
   height: 7px;
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--st-faint);
-}
-
-.cp-rec-on {
-  background: var(--color-cp-red);
-  box-shadow: 0 0 10px color-mix(in oklab, var(--color-cp-red) 55%, transparent);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .cp-rec-on {
-    animation: cp-rec 1.6s ease-in-out infinite;
-  }
-}
-
-@keyframes cp-rec {
-  50% {
-    opacity: 0.35;
-  }
-}
-
-.cp-input {
-  height: 32px;
-  width: 100%;
-  min-width: 0;
-  border: 1px solid var(--st-line-strong);
-  border-radius: 3px;
-  background: var(--st-stage);
-  padding: 0 10px;
-  font-size: 13px;
-  color: var(--st-text);
-}
-
-.cp-input::placeholder {
-  color: var(--st-faint);
 }
 
 .cp-btn {
@@ -1345,19 +1284,4 @@ section {
   border-color: transparent;
   color: #2a1a02;
   filter: brightness(1.12);
-}
-
-/* iOS zooms the page into any field under 16px, so touch gets 16px and the
-   taller target a thumb needs. */
-@media (pointer: coarse) {
-  .cp-input {
-    height: 40px;
-    font-size: 16px;
-  }
-
-  .cp-btn {
-    height: 38px;
-    padding: 0 14px;
-    font-size: 13px;
-  }
 }

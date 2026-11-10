@@ -42,29 +42,21 @@ shows up by name, a home connection as its ISP, from api.ipapi.is), the city
 from Vercel's headers, the device, and an id that ties one browser's views
 together.
 
-## The control panel
+## Reading the log
 
-The log is read at `https://alitleis.dev/controlpanel`, which unlocks with a
-passkey: Face ID on the iPhone, Touch ID on a Mac, Windows Hello on a PC. The
-page holds no data. `api/panel.js` sends the log only to a session that
-`api/auth.js` started from a stored passkey. `lib/owner.js` explains how the
-parts fit together.
+The Site screen in Media Pool, Ali's own app on his tailnet, reads the log
+straight from Upstash and keeps its notes there too: the `labels` hash of
+names for visitors and the `links` hash of named links. Nothing on this site
+reads them. `https://alitleis.dev/mediapool` is the way in. It sends a
+browser that can reach Media Pool on to it and shows anyone else a lock.
 
-- The first device sets up with the `ADMIN_PASSWORD` production variable,
-  and only while no passkey is stored. After that the password opens nothing.
-- A Mac on the same Apple ID gets the iPhone's passkey through iCloud
-  Keychain. Any other device pairs with a one-time code from Devices on a
-  signed-in one.
-- Lost every device: delete the `passkeys` hash in the Upstash console, and
-  setup opens to the password again.
-- Named links come from Links in the panel. Whoever opens one is called by
-  that name, on that visit and every later one from the same browser.
-- Signing in stops counting that browser's visits. `?notrack` does the same
-  on a browser that never signs in, and `?notrack=off` undoes it.
-- Local and preview runs log to `dev:` keys, apart from production, and need
-  `PANEL_ORIGIN` set to the page's origin, like `http://localhost:3000`.
+- Whoever opens a named link is called by that link's name, on that visit
+  and every later one from the same browser.
+- A browser the /mediapool page sends on stops counting. `?notrack` does the
+  same anywhere, and `?notrack=off` undoes it.
+- Local and preview runs log to `dev:` keys, apart from production.
 
-The tests run offline against a fake Upstash and real P-256 and Ed25519 keys:
+The tests run offline against a fake Upstash:
 
 ```bash
 node --test ask/test/*.test.js
