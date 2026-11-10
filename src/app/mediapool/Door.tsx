@@ -1,15 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { LuScanFace } from "react-icons/lu";
 
 /** Media Pool, Ali's fleet app, which answers only on his own tailnet. */
 const MEDIA_POOL = "https://light-vm.tailde9e5d.ts.net:8088/";
 
 /** Whether this browser reaches Media Pool, which answers /api/door only to Ali's own devices. */
-async function reachable() {
+async function reachable(signal: AbortSignal) {
   try {
-    const res = await fetch(`${MEDIA_POOL}api/door`, { cache: "no-store", signal: AbortSignal.timeout(4000) });
+    const res = await fetch(`${MEDIA_POOL}api/door`, {
+      cache: "no-store",
+      signal: AbortSignal.any([signal, AbortSignal.timeout(4000)]),
+    });
     return res.ok;
   } catch {
     return false;
@@ -28,26 +31,24 @@ async function reachable() {
  */
 export default function Door() {
   const [phase, setPhase] = useState<"checking" | "opening" | "locked">("checking");
-  const [tried, setTried] = useState(false);
-
-  const knock = useCallback(
-    () =>
-      reachable().then((ok) => {
-        if (!ok) return setPhase("locked");
-        setPhase("opening");
-        try {
-          localStorage.setItem("notrack", "1");
-        } catch {
-          // Storage is blocked, so this browser's visits keep counting.
-        }
-        window.location.replace(MEDIA_POOL);
-      }),
-    [],
-  );
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    void knock();
-  }, [knock]);
+    // Leaving the page, or trying again, drops this check, so a late answer can't redirect.
+    const check = new AbortController();
+    void reachable(check.signal).then((ok) => {
+      if (check.signal.aborted) return;
+      if (!ok) return setPhase("locked");
+      setPhase("opening");
+      try {
+        localStorage.setItem("notrack", "1");
+      } catch {
+        // Storage is blocked, so this browser's visits keep counting.
+      }
+      window.location.replace(MEDIA_POOL);
+    });
+    return () => check.abort();
+  }, [attempt]);
 
   return (
     <div className="st-root st-hatch flex min-h-[100dvh] flex-col bg-[var(--st-stage)] text-[var(--st-text)]">
@@ -66,17 +67,23 @@ export default function Door() {
             disabled={phase !== "locked"}
             onClick={() => {
               setPhase("checking");
-              setTried(true);
-              void knock();
+              setAttempt((n) => n + 1);
             }}
             className="cp-btn cp-btn-primary mt-6 h-11! w-full text-[14px]!"
           >
             <LuScanFace aria-hidden className="text-[18px]" />
             {phase === "locked" ? "Unlock with passkey" : phase === "opening" ? "Opening…" : "Connecting…"}
           </button>
-          {phase === "locked" && tried && (
+          <noscript>
+            <p className="mt-3 text-[12.5px] text-[var(--st-faint)]">Unlocking needs JavaScript.</p>
+          </noscript>
+          {phase === "locked" && attempt > 0 && (
             <p role="alert" className="mt-3 text-[12.5px] text-cp-red-text">
-              This device can&apos;t reach Media Pool.
+              Couldn&apos;t reach Media Pool from this page.{" "}
+              {/* A browser can block this page's check of a private address, but not a visit. */}
+              <a href={MEDIA_POOL} className="underline underline-offset-2">
+                Open it directly
+              </a>
             </p>
           )}
         </div>
