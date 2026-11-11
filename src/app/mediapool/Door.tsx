@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** Media Pool, Ali's fleet app, which answers only on his own tailnet. */
 const MEDIA_POOL = "https://light-vm.tailde9e5d.ts.net:8088/";
@@ -31,6 +31,7 @@ async function reachable(signal: AbortSignal) {
 export default function Door() {
   const [phase, setPhase] = useState<"checking" | "opening" | "locked">("checking");
   const [attempt, setAttempt] = useState(0);
+  const retry = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Leaving the page, or trying again, drops this check, so a late answer can't redirect.
@@ -51,6 +52,11 @@ export default function Door() {
 
   const locked = phase === "locked";
 
+  // A retry that fails again puts focus back on Try again, which went away while it checked.
+  useEffect(() => {
+    if (locked && attempt > 0) retry.current?.focus();
+  }, [locked, attempt]);
+
   return (
     <div className="st-root st-hatch flex min-h-[100dvh] flex-col bg-[var(--st-stage)] text-[var(--st-text)]">
       <header className="flex shrink-0 items-center gap-2.5 border-b border-[var(--st-line)] bg-[var(--st-chrome)] px-3 py-2.5">
@@ -61,15 +67,16 @@ export default function Door() {
 
       <main className="flex flex-1 items-center justify-center px-5 py-10">
         <div className="w-full max-w-[380px]">
-          <p className="st-eyebrow">Media offline</p>
+          <p className="st-eyebrow">{locked ? "Media offline" : "Media Pool"}</p>
           {locked ? (
             <>
               <h1 className="mt-3 text-[40px] font-semibold leading-[1.05] tracking-[-0.035em]">Locked</h1>
               <p role="alert" className="st-body mt-3 text-[13.5px]! leading-[1.6]! text-[var(--st-dim)]">
-                This device can&apos;t reach Media Pool.
+                This page couldn&apos;t reach Media Pool.
               </p>
               <div className="mt-5 flex gap-4 text-[12.5px] text-[var(--st-faint)]">
                 <button
+                  ref={retry}
                   type="button"
                   onClick={() => {
                     setPhase("checking");

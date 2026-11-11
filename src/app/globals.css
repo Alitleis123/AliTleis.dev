@@ -96,12 +96,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* The Media Pool door's red, for its one error. A light shade, for the
-   contrast text needs on dark grey. */
-@theme {
-  --color-cp-red-text: #ff8a80;
-}
-
 /* Base document styles. Smooth scrolling only for visitors who have not asked
    for less motion. An unconditional copy of this rule used to sit beside it,
    which made the media query do nothing. */
@@ -1235,7 +1229,7 @@ section {
 
 /* ── Media Pool door ───────────────────────────────────────────
    /mediapool takes the suite's palette through .st-root and adds only
-   the record light and the button the suite has no equivalent for.
+   the record light the suite has no equivalent for.
    ─────────────────────────────────────────────────────────────── */
 
 /* Grey: nothing is recording. */
@@ -1245,43 +1239,4 @@ section {
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--st-faint);
-}
-
-.cp-btn {
-  display: inline-flex;
-  height: 28px;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  border: 1px solid var(--st-line-strong);
-  border-radius: 3px;
-  background: var(--st-panel-hi);
-  padding: 0 10px;
-  font-size: 12px;
-  color: var(--st-dim);
-  white-space: nowrap;
-  transition: color 150ms ease, border-color 150ms ease, background-color 150ms ease;
-}
-
-.cp-btn:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: var(--st-text);
-}
-
-.cp-btn:disabled {
-  opacity: 0.45;
-}
-
-.cp-btn-primary {
-  border-color: transparent;
-  background: var(--st-accent);
-  color: #2a1a02;
-  font-weight: 500;
-}
-
-.cp-btn-primary:hover:not(:disabled) {
-  border-color: transparent;
-  color: #2a1a02;
-  filter: brightness(1.12);
 }
